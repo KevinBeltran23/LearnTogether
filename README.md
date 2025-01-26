@@ -20,7 +20,7 @@ pnpm dev
 bun dev
 ```
 
-# contributing
+## contributing
 
 prettier and linting are enforced automatically by husky pre-commit
 
