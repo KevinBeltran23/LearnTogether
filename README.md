@@ -19,3 +19,17 @@ pnpm dev
 # or
 bun dev
 ```
+
+# contributing
+
+prettier and linting are enforced automatically by husky pre-commit
+
+to run manually
+
+```bash
+npx lint-staged
+# or
+npm run lint:fix
+# or
+npm run format
+```
