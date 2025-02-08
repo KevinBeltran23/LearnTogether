@@ -1,16 +1,15 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import styles from '@/styles/home.module.css';
 
 export default function Home() {
   return (
-    <div className={styles.body}>
+    <div className="p-8 flex flex-col gap-8">
       <header>
-        <nav className={styles.navbar}>
+        <nav className="flex items-center justify-between">
           <Link href="/" className="logo">
             <Image src="/next.svg" alt="Logo" width={120} height={40} />
           </Link>
-          <ul className={styles.links}>
+          <ul className="flex gap-8">
             <li>
               <Link href="#">Home</Link>
             </li>
@@ -21,7 +20,7 @@ export default function Home() {
               <Link href="#">Search</Link>
             </li>
             <li>
-              <Link href="#">Messagees</Link>
+              <Link href="#">Messages</Link>
             </li>
             <li>
               <Link href="#">Profile</Link>
@@ -30,26 +29,26 @@ export default function Home() {
         </nav>
       </header>
 
-      <main className={styles.main}>
-        <section className="additional-nav">
-          <ul>
+      <main className="flex gap-8">
+        <section className="flex flex-col gap-4">
+          <ul className="flex gap-4">
             <li>Filter</li>
             <li>Sort</li>
             <li>Messages</li>
           </ul>
         </section>
 
-        <section className="feed">
-          <h2>New Posts</h2>
-          <ul className="posts">
+        <section className="flex-1">
+          <h2 className="text-xl font-semibold">New Posts</h2>
+          <ul className="list-disc pl-5">
             <li>post</li>
             <li>anotherPost</li>
           </ul>
         </section>
 
-        <aside className="sidebar">
-          <h3>Groups</h3>
-          <ul>
+        <aside className="w-1/4">
+          <h3 className="text-lg font-semibold">Groups</h3>
+          <ul className="list-disc pl-5">
             <li>
               <Link href="#">Post Title 1</Link>
             </li>
