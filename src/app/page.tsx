@@ -43,9 +43,9 @@ export default function Home() {
       {/* Navigation Bar */}
       <Navbar></Navbar>
 
-      <main className="grid grid-cols-6 gap-8">
+      <main className="flex gap-8">
         {/* Sidebar */}
-        <aside className="col-span-1 space-y-4">
+        <aside className="min-w-[7rem] w-[10%] space-y-4">
           <h3 className="text-lg font-semibold">Groups</h3>
           <ul className="list-disc pl-5 space-y-2 text-gray-700">
             <li>
@@ -65,7 +65,7 @@ export default function Home() {
         </aside>
 
         {/* Main Content */}
-        <section className="col-span-3 space-y-6">
+        <section className="flex-grow space-y-6">
           {/* Filters  */}
           <section className="h-10 flex items-center justify-start gap-4">
             <DropdownMenu>
