@@ -46,22 +46,22 @@ export default function Navbar() {
         >
           <li>
             <Button variant="ghost">
-              <Link href="#">Home</Link>
+              <Link href="/feed">Home</Link>
             </Button>
           </li>
           <li>
             <Button variant="ghost">
-              <Link href="#">Create Post</Link>
+              <Link href="/">Create Post</Link>
             </Button>
           </li>
           <li>
             <Button variant="ghost">
-              <Link href="#">Search</Link>
+              <Link href="/">Search</Link>
             </Button>
           </li>
           <li>
             <Button variant="ghost">
-              <Link href="#">Messages</Link>
+              <Link href="/">Messages</Link>
             </Button>
           </li>
         </ul>
@@ -78,10 +78,10 @@ export default function Navbar() {
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuItem>
-              <Link href="#">Profile</Link>
+              <Link href="/profile">Profile</Link>
             </DropdownMenuItem>
             <DropdownMenuItem>
-              <Link href="#">Settings</Link>
+              <Link href="/settings">Settings</Link>
             </DropdownMenuItem>
             <DropdownMenuItem>Logout</DropdownMenuItem>
           </DropdownMenuContent>

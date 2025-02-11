@@ -24,7 +24,7 @@ const INITIALPOSTLIST = [
   },
 ];
 
-export default function Profile() {
+export default function Settings() {
   const [postList] = useState(INITIALPOSTLIST);
 
   return (
