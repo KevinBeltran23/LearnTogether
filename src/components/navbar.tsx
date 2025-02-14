@@ -1,6 +1,5 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import {
@@ -10,66 +9,42 @@ import {
   DropdownMenuItem,
 } from '@/components/ui/dropdown-menu';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faBars } from '@fortawesome/free-solid-svg-icons';
+import {
+  faUser,
+  faHouse,
+  faMagnifyingGlass,
+  faMessage,
+  faPlus,
+} from '@fortawesome/free-solid-svg-icons';
 
 export default function Navbar() {
-  const [isOpen, setIsOpen] = useState(false);
-
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth >= 768) {
-        setIsOpen(false);
-      }
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
   return (
-    <nav className="flex items-center justify-between border-b p-4">
-      {/* Left side - Menu Button (Mobile) & Main Links */}
-      <div className="flex items-center">
-        {/* Hamburger menu for mobile */}
-        <button
-          onClick={() => setIsOpen(!isOpen)}
-          className="md:hidden text-gray-700 mr-4"
-        >
-          <FontAwesomeIcon icon={faBars} size="lg" />
-        </button>
-
-        {/* Navbar Links (Hidden on mobile unless open) */}
-        <ul
-          className={`flex flex-col md:flex-row gap-4 text-lg font-medium absolute md:static bg-white w-full md:w-auto left-0 p-4 md:p-0 transition-all ${
-            isOpen ? 'top-16 shadow-md' : 'top-[-100vh]'
-          } lg:top-auto`}
-        >
+    <>
+      {/* DESKTOP NAVBAR */}
+      <nav className="sticky top-0 ml-[2rem] z-20 flex bg-white items-center justify-between border-b p-4 md:flex hidden">
+        <ul className="flex gap-4 text-lg font-medium">
           <li>
-            <Button variant="ghost">
-              <Link href="/feed">Home</Link>
+            <Button>
+              <FontAwesomeIcon icon={faHouse} size="lg" />
             </Button>
           </li>
           <li>
-            <Button variant="ghost">
-              <Link href="/">Create Post</Link>
+            <Button>
+              <FontAwesomeIcon icon={faPlus} size="lg" />
             </Button>
           </li>
           <li>
-            <Button variant="ghost">
-              <Link href="/">Search</Link>
+            <Button>
+              <FontAwesomeIcon icon={faMagnifyingGlass} size="lg" />
             </Button>
           </li>
           <li>
-            <Button variant="ghost">
-              <Link href="/">Messages</Link>
+            <Button>
+              <FontAwesomeIcon icon={faMessage} size="lg" />
             </Button>
           </li>
         </ul>
-      </div>
 
-      {/* Right side - Profile & Settings */}
-      <ul className="flex items-center gap-4">
-        {/* User Profile Dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost">
@@ -86,7 +61,48 @@ export default function Navbar() {
             <DropdownMenuItem>Logout</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-      </ul>
-    </nav>
+      </nav>
+
+      {/* MOBILE VIEW NAVBARS */}
+
+      {/* Top */}
+      <nav className="sticky top-0 ml-[2rem] z-20 flex bg-white items-center justify-between border-b p-4 md:flex md:hidden">
+        <Button>
+          <FontAwesomeIcon icon={faHouse} size="lg" />
+        </Button>
+
+        <Button>
+          <FontAwesomeIcon icon={faMagnifyingGlass} size="lg" />
+        </Button>
+      </nav>
+
+      {/* Bottom */}
+      <nav className="fixed bottom-0 left-0 w-full bg-white shadow-md p-3 flex justify-around items-center md:hidden">
+        <Button>
+          <FontAwesomeIcon icon={faMessage} size="lg" />
+        </Button>
+
+        <Button>
+          <FontAwesomeIcon icon={faPlus} size="lg" />
+        </Button>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost">
+              <FontAwesomeIcon icon={faUser} size="lg" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem>
+              <Link href="/profile">Profile</Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <Link href="/settings">Settings</Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem>Logout</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </nav>
+    </>
   );
 }
