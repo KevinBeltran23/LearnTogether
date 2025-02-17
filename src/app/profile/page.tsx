@@ -6,38 +6,22 @@ import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faUser,
-  faKey,
-  faBell,
-  faGlobe,
-  faShieldAlt,
-} from '@fortawesome/free-solid-svg-icons';
+import { faUser, faBook, faLock } from '@fortawesome/free-solid-svg-icons';
 
-export default function Settings() {
-  const [darkMode, setDarkMode] = useState(false);
-  const [notifications, setNotifications] = useState(true);
-  const [selectedSection, setSelectedSection] = useState('Profile');
+export default function EditProfile() {
+  const [selectedSection, setSelectedSection] = useState('Personal Info');
+  const [publicProfile, setPublicProfile] = useState(true);
 
   const renderSection = () => {
     switch (selectedSection) {
-      case 'Profile':
+      case 'Personal Info':
         return (
           <div className="space-y-4 max-w-lg">
-            <h2 className="text-xl font-semibold">Profile</h2>
+            <h2 className="text-xl font-semibold">Personal Info</h2>
             <hr />
             <div>
               <Label htmlFor="name">Name</Label>
               <Input id="name" placeholder="Your name" className="w-full" />
-            </div>
-            <div>
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="Your email"
-                className="w-full"
-              />
             </div>
             <div>
               <Label htmlFor="username">Username</Label>
@@ -47,38 +31,43 @@ export default function Settings() {
                 className="w-full"
               />
             </div>
-          </div>
-        );
-      case 'Account':
-        return (
-          <div className="space-y-4 max-w-lg">
-            <h2 className="text-xl font-semibold">Account</h2>
-            <hr />
-            <div className="flex items-center justify-between">
-              <Label>Dark Mode</Label>
-              <Switch checked={darkMode} onCheckedChange={setDarkMode} />
-            </div>
             <div>
-              <Label htmlFor="password">Change Password</Label>
+              <Label htmlFor="bio">Bio</Label>
               <Input
-                id="password"
-                type="password"
-                placeholder="New password"
+                id="bio"
+                placeholder="A short bio about you"
                 className="w-full"
               />
             </div>
           </div>
         );
-      case 'Notifications':
+      case 'Study Preferences':
         return (
           <div className="space-y-4 max-w-lg">
-            <h2 className="text-xl font-semibold">Notifications</h2>
+            <h2 className="text-xl font-semibold">Study Preferences</h2>
             <hr />
-            <div className="flex items-center justify-between">
-              <Label>Email Notifications</Label>
-              <Switch
-                checked={notifications}
-                onCheckedChange={setNotifications}
+            <div>
+              <Label htmlFor="subjects">Preferred Subjects</Label>
+              <Input
+                id="subjects"
+                placeholder="E.g. Math, CS, Physics"
+                className="w-full"
+              />
+            </div>
+            <div>
+              <Label htmlFor="study-style">Study Style</Label>
+              <Input
+                id="study-style"
+                placeholder="E.g. Solo, Group, Hybrid"
+                className="w-full"
+              />
+            </div>
+            <div>
+              <Label htmlFor="availability">Availability</Label>
+              <Input
+                id="availability"
+                placeholder="Your preferred study hours"
+                className="w-full"
               />
             </div>
           </div>
@@ -90,22 +79,10 @@ export default function Settings() {
             <hr />
             <div className="flex items-center justify-between">
               <Label>Public Profile</Label>
-              <Switch />
-            </div>
-            <div className="flex items-center justify-between">
-              <Label>Search Engine Indexing</Label>
-              <Switch />
-            </div>
-          </div>
-        );
-      case 'Security':
-        return (
-          <div className="space-y-4 max-w-lg">
-            <h2 className="text-xl font-semibold">Security</h2>
-            <hr />
-            <div>
-              <Label htmlFor="2fa">Two-Factor Authentication</Label>
-              <Switch />
+              <Switch
+                checked={publicProfile}
+                onCheckedChange={setPublicProfile}
+              />
             </div>
           </div>
         );
@@ -117,47 +94,36 @@ export default function Settings() {
   return (
     <div className="space-y-6 p-10 pb-16">
       <div className="space-y-0.5">
-        <h2 className="text-2xl font-bold">Settings</h2>
-        <p>Manage your account settings and preferences</p>
+        <h2 className="text-2xl font-bold">Edit Profile</h2>
+        <p>Update your personal details and study preferences</p>
       </div>
       <div className="flex flex-col lg:flex-row lg:space-x-12">
         <aside className="lg:w-1/5 space-y-2">
           <ul className="space-y-2">
             <li
-              className={`cursor-pointer p-2 rounded-lg ${selectedSection === 'Profile' ? 'bg-gray-200' : ''}`}
-              onClick={() => setSelectedSection('Profile')}
+              className={`cursor-pointer p-2 rounded-lg ${selectedSection === 'Personal Info' ? 'bg-gray-200' : ''}`}
+              onClick={() => setSelectedSection('Personal Info')}
             >
-              <FontAwesomeIcon icon={faUser} className="mr-2" /> Profile
+              <FontAwesomeIcon icon={faUser} className="mr-2" /> Personal Info
             </li>
             <li
-              className={`cursor-pointer p-2 rounded-lg ${selectedSection === 'Account' ? 'bg-gray-200' : ''}`}
-              onClick={() => setSelectedSection('Account')}
+              className={`cursor-pointer p-2 rounded-lg ${selectedSection === 'Study Preferences' ? 'bg-gray-200' : ''}`}
+              onClick={() => setSelectedSection('Study Preferences')}
             >
-              <FontAwesomeIcon icon={faKey} className="mr-2" /> Account
-            </li>
-            <li
-              className={`cursor-pointer p-2 rounded-lg ${selectedSection === 'Notifications' ? 'bg-gray-200' : ''}`}
-              onClick={() => setSelectedSection('Notifications')}
-            >
-              <FontAwesomeIcon icon={faBell} className="mr-2" /> Notifications
+              <FontAwesomeIcon icon={faBook} className="mr-2" /> Study
+              Preferences
             </li>
             <li
               className={`cursor-pointer p-2 rounded-lg ${selectedSection === 'Privacy' ? 'bg-gray-200' : ''}`}
               onClick={() => setSelectedSection('Privacy')}
             >
-              <FontAwesomeIcon icon={faGlobe} className="mr-2" /> Privacy
-            </li>
-            <li
-              className={`cursor-pointer p-2 rounded-lg ${selectedSection === 'Security' ? 'bg-gray-200' : ''}`}
-              onClick={() => setSelectedSection('Security')}
-            >
-              <FontAwesomeIcon icon={faShieldAlt} className="mr-2" /> Security
+              <FontAwesomeIcon icon={faLock} className="mr-2" /> Privacy
             </li>
           </ul>
         </aside>
         <div className="flex-1 space-y-6 bg-white p-6 rounded-lg shadow-md max-w-2xl">
           {renderSection()}
-          <Button>Update Account</Button>
+          <Button>Save Changes</Button>
         </div>
       </div>
     </div>
