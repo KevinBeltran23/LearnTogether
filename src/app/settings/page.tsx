@@ -7,7 +7,6 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-  faUser,
   faKey,
   faBell,
   faGlobe,
@@ -17,14 +16,25 @@ import {
 export default function Settings() {
   const [darkMode, setDarkMode] = useState(false);
   const [notifications, setNotifications] = useState(true);
-  const [selectedSection, setSelectedSection] = useState('Profile');
+  const [selectedSection, setSelectedSection] = useState('Display');
 
   const renderSection = () => {
     switch (selectedSection) {
-      case 'Profile':
+      case 'Display':
         return (
           <div className="space-y-4 max-w-lg">
-            <h2 className="text-xl font-semibold">Profile</h2>
+            <h2 className="text-xl font-semibold">Display</h2>
+            <hr />
+            <div className="flex items-center justify-between">
+              <Label>Dark Mode</Label>
+              <Switch checked={darkMode} onCheckedChange={setDarkMode} />
+            </div>
+          </div>
+        );
+      case 'Account':
+        return (
+          <div className="space-y-4 max-w-lg">
+            <h2 className="text-xl font-semibold">Account</h2>
             <hr />
             <div>
               <Label htmlFor="name">Name</Label>
@@ -44,26 +54,6 @@ export default function Settings() {
               <Input
                 id="username"
                 placeholder="Your username"
-                className="w-full"
-              />
-            </div>
-          </div>
-        );
-      case 'Account':
-        return (
-          <div className="space-y-4 max-w-lg">
-            <h2 className="text-xl font-semibold">Account</h2>
-            <hr />
-            <div className="flex items-center justify-between">
-              <Label>Dark Mode</Label>
-              <Switch checked={darkMode} onCheckedChange={setDarkMode} />
-            </div>
-            <div>
-              <Label htmlFor="password">Change Password</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="New password"
                 className="w-full"
               />
             </div>
@@ -103,9 +93,18 @@ export default function Settings() {
           <div className="space-y-4 max-w-lg">
             <h2 className="text-xl font-semibold">Security</h2>
             <hr />
-            <div>
+            <div className="flex items-center justify-between">
               <Label htmlFor="2fa">Two-Factor Authentication</Label>
               <Switch />
+            </div>
+            <div>
+              <Label htmlFor="password">Change Password</Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="New password"
+                className="w-full"
+              />
             </div>
           </div>
         );
@@ -124,10 +123,10 @@ export default function Settings() {
         <aside className="lg:w-1/5 space-y-2">
           <ul className="space-y-2">
             <li
-              className={`cursor-pointer p-2 rounded-lg ${selectedSection === 'Profile' ? 'bg-gray-200' : ''}`}
-              onClick={() => setSelectedSection('Profile')}
+              className={`cursor-pointer p-2 rounded-lg ${selectedSection === 'Display' ? 'bg-gray-200' : ''}`}
+              onClick={() => setSelectedSection('Display')}
             >
-              <FontAwesomeIcon icon={faUser} className="mr-2" /> Profile
+              <FontAwesomeIcon icon={faKey} className="mr-2" /> Display
             </li>
             <li
               className={`cursor-pointer p-2 rounded-lg ${selectedSection === 'Account' ? 'bg-gray-200' : ''}`}
