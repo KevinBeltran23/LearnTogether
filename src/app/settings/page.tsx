@@ -1,76 +1,165 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
-import { Card, CardContent } from '@/components/ui/card';
-import { nanoid } from 'nanoid';
-import Navbar from '@/components/navbar';
-
-const INITIALPOSTLIST = [
-  {
-    id: nanoid(),
-    title: 'User Post 1',
-    description: 'Description of user post 1.',
-  },
-  {
-    id: nanoid(),
-    title: 'User Post 2',
-    description: 'Description of user post 2.',
-  },
-  {
-    id: nanoid(),
-    title: 'User Post 3',
-    description: 'Description of user post 3.',
-  },
-];
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  faUser,
+  faKey,
+  faBell,
+  faGlobe,
+  faShieldAlt,
+} from '@fortawesome/free-solid-svg-icons';
 
 export default function Settings() {
-  const [postList] = useState(INITIALPOSTLIST);
+  const [darkMode, setDarkMode] = useState(false);
+  const [notifications, setNotifications] = useState(true);
+  const [selectedSection, setSelectedSection] = useState('Profile');
+
+  const renderSection = () => {
+    switch (selectedSection) {
+      case 'Profile':
+        return (
+          <div className="space-y-4 max-w-lg">
+            <h2 className="text-xl font-semibold">Profile</h2>
+            <hr />
+            <div>
+              <Label htmlFor="name">Name</Label>
+              <Input id="name" placeholder="Your name" className="w-full" />
+            </div>
+            <div>
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="Your email"
+                className="w-full"
+              />
+            </div>
+            <div>
+              <Label htmlFor="username">Username</Label>
+              <Input
+                id="username"
+                placeholder="Your username"
+                className="w-full"
+              />
+            </div>
+          </div>
+        );
+      case 'Account':
+        return (
+          <div className="space-y-4 max-w-lg">
+            <h2 className="text-xl font-semibold">Account</h2>
+            <hr />
+            <div className="flex items-center justify-between">
+              <Label>Dark Mode</Label>
+              <Switch checked={darkMode} onCheckedChange={setDarkMode} />
+            </div>
+            <div>
+              <Label htmlFor="password">Change Password</Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="New password"
+                className="w-full"
+              />
+            </div>
+          </div>
+        );
+      case 'Notifications':
+        return (
+          <div className="space-y-4 max-w-lg">
+            <h2 className="text-xl font-semibold">Notifications</h2>
+            <hr />
+            <div className="flex items-center justify-between">
+              <Label>Email Notifications</Label>
+              <Switch
+                checked={notifications}
+                onCheckedChange={setNotifications}
+              />
+            </div>
+          </div>
+        );
+      case 'Privacy':
+        return (
+          <div className="space-y-4 max-w-lg">
+            <h2 className="text-xl font-semibold">Privacy</h2>
+            <hr />
+            <div className="flex items-center justify-between">
+              <Label>Public Profile</Label>
+              <Switch />
+            </div>
+            <div className="flex items-center justify-between">
+              <Label>Search Engine Indexing</Label>
+              <Switch />
+            </div>
+          </div>
+        );
+      case 'Security':
+        return (
+          <div className="space-y-4 max-w-lg">
+            <h2 className="text-xl font-semibold">Security</h2>
+            <hr />
+            <div>
+              <Label htmlFor="2fa">Two-Factor Authentication</Label>
+              <Switch />
+            </div>
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
 
   return (
-    <div className="p-8 space-y-8">
-      {/* Navigation Bar */}
-      <Navbar></Navbar>
-
-      <main className="flex gap-8">
-        {/* Sidebar */}
-        <aside className="min-w-[7rem] w-[10%] space-y-4">
-          <h3 className="text-lg font-semibold">Profile Menu</h3>
-          <ul className="list-disc pl-5 space-y-2 text-gray-700">
-            <li>
-              <Link href="/settings">Settings</Link>
+    <div className="space-y-6 p-10 pb-16">
+      <div className="space-y-0.5">
+        <h2 className="text-2xl font-bold">Settings</h2>
+        <p>Manage your account settings and preferences</p>
+      </div>
+      <div className="flex flex-col lg:flex-row lg:space-x-12">
+        <aside className="lg:w-1/5 space-y-2">
+          <ul className="space-y-2">
+            <li
+              className={`cursor-pointer p-2 rounded-lg ${selectedSection === 'Profile' ? 'bg-gray-200' : ''}`}
+              onClick={() => setSelectedSection('Profile')}
+            >
+              <FontAwesomeIcon icon={faUser} className="mr-2" /> Profile
             </li>
-            <li>My Preferences</li>
-            <li>My Groups</li>
+            <li
+              className={`cursor-pointer p-2 rounded-lg ${selectedSection === 'Account' ? 'bg-gray-200' : ''}`}
+              onClick={() => setSelectedSection('Account')}
+            >
+              <FontAwesomeIcon icon={faKey} className="mr-2" /> Account
+            </li>
+            <li
+              className={`cursor-pointer p-2 rounded-lg ${selectedSection === 'Notifications' ? 'bg-gray-200' : ''}`}
+              onClick={() => setSelectedSection('Notifications')}
+            >
+              <FontAwesomeIcon icon={faBell} className="mr-2" /> Notifications
+            </li>
+            <li
+              className={`cursor-pointer p-2 rounded-lg ${selectedSection === 'Privacy' ? 'bg-gray-200' : ''}`}
+              onClick={() => setSelectedSection('Privacy')}
+            >
+              <FontAwesomeIcon icon={faGlobe} className="mr-2" /> Privacy
+            </li>
+            <li
+              className={`cursor-pointer p-2 rounded-lg ${selectedSection === 'Security' ? 'bg-gray-200' : ''}`}
+              onClick={() => setSelectedSection('Security')}
+            >
+              <FontAwesomeIcon icon={faShieldAlt} className="mr-2" /> Security
+            </li>
           </ul>
         </aside>
-
-        {/* Main Content */}
-        <section className="flex-grow space-y-6">
-          {/* Profile Header */}
-          <section className="flex items-center space-x-4">
-            <div>
-              <h2 className="text-2xl font-semibold">John Doe</h2>
-              <p className="text-gray-600">Joined: January 2025</p>
-            </div>
-          </section>
-
-          {/* User's Posts */}
-          <section>
-            <h2 className="text-xl font-semibold mb-4">My Posts</h2>
-            <div className="space-y-4">
-              {postList.map((post) => (
-                <Card key={post.id} className="p-4 shadow-md">
-                  <CardContent>
-                    <h3 className="text-lg font-semibold">{post.title}</h3>
-                    <p className="text-gray-600">{post.description}</p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </section>
-        </section>
-      </main>
+        <div className="flex-1 space-y-6 bg-white p-6 rounded-lg shadow-md max-w-2xl">
+          {renderSection()}
+          <Button>Update Account</Button>
+        </div>
+      </div>
     </div>
   );
 }
