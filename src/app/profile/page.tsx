@@ -6,7 +6,13 @@ import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faBook, faLock } from '@fortawesome/free-solid-svg-icons';
+import {
+  faUser,
+  faBook,
+  faLock,
+  faClock,
+  faGraduationCap,
+} from '@fortawesome/free-solid-svg-icons';
 import Spinner from '@/components/ui/spinner';
 import { useRequireAuth } from '@/context/authContext';
 import { MobileSectionDropdown } from '@/components/mobileSectionDropdown';
@@ -20,7 +26,9 @@ export default function EditProfile() {
 
   const sections = [
     { name: 'Personal Info', icon: faUser },
+    { name: 'Academic Info', icon: faGraduationCap },
     { name: 'Study Preferences', icon: faBook },
+    { name: 'Availability', icon: faClock },
     { name: 'Privacy', icon: faLock },
   ];
 
@@ -35,13 +43,13 @@ export default function EditProfile() {
               </h2>
             </div>
             <div className="space-y-4">
-              <div>
+              <div className="space-y-2">
                 <Label htmlFor="name" className="text-sm font-medium">
                   Name
                 </Label>
                 <Input id="name" placeholder="Your name" className="w-full" />
               </div>
-              <div>
+              <div className="space-y-2">
                 <Label htmlFor="username" className="text-sm font-medium">
                   Username
                 </Label>
@@ -51,19 +59,83 @@ export default function EditProfile() {
                   className="w-full"
                 />
               </div>
-              <div>
+              <div className="space-y-2">
                 <Label htmlFor="bio" className="text-sm font-medium">
                   Bio
                 </Label>
                 <Input
                   id="bio"
-                  placeholder="A short bio about you"
+                  placeholder="Tell others about yourself"
+                  className="w-full"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="location" className="text-sm font-medium">
+                  Location
+                </Label>
+                <Input
+                  id="location"
+                  placeholder="City, Country"
                   className="w-full"
                 />
               </div>
             </div>
           </div>
         );
+
+      case 'Academic Info':
+        return (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between pb-4 border-b">
+              <h2 className="text-xl font-semibold text-gray-900">
+                Academic Info
+              </h2>
+            </div>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="school" className="text-sm font-medium">
+                  School/University
+                </Label>
+                <Input
+                  id="school"
+                  placeholder="Your institution"
+                  className="w-full"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="major" className="text-sm font-medium">
+                  Field of Study/Major
+                </Label>
+                <Input
+                  id="major"
+                  placeholder="Your field of study"
+                  className="w-full"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="year" className="text-sm font-medium">
+                  Year/Level
+                </Label>
+                <Input
+                  id="year"
+                  placeholder="e.g., Freshman, Senior, Graduate"
+                  className="w-full"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="interests" className="text-sm font-medium">
+                  Academic Interests
+                </Label>
+                <Input
+                  id="interests"
+                  placeholder="e.g., Machine Learning, Literature, Biology"
+                  className="w-full"
+                />
+              </div>
+            </div>
+          </div>
+        );
+
       case 'Study Preferences':
         return (
           <div className="space-y-6">
@@ -73,39 +145,103 @@ export default function EditProfile() {
               </h2>
             </div>
             <div className="space-y-4">
-              <div>
-                <Label htmlFor="subjects" className="text-sm font-medium">
-                  Preferred Subjects
-                </Label>
-                <Input
-                  id="subjects"
-                  placeholder="E.g. Math, CS, Physics"
-                  className="w-full"
-                />
-              </div>
-              <div>
+              <div className="space-y-2">
                 <Label htmlFor="study-style" className="text-sm font-medium">
-                  Study Style
+                  Preferred Study Style
                 </Label>
                 <Input
                   id="study-style"
-                  placeholder="E.g. Solo, Group, Hybrid"
+                  placeholder="e.g., Group discussions, Silent study, Project collaboration"
                   className="w-full"
                 />
               </div>
-              <div>
-                <Label htmlFor="availability" className="text-sm font-medium">
-                  Availability
+              <div className="space-y-2">
+                <Label htmlFor="environment" className="text-sm font-medium">
+                  Preferred Study Environment
                 </Label>
                 <Input
-                  id="availability"
-                  placeholder="Your preferred study hours"
+                  id="environment"
+                  placeholder="e.g., Library, Coffee shop, Online"
+                  className="w-full"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="group-size" className="text-sm font-medium">
+                  Preferred Group Size
+                </Label>
+                <Input
+                  id="group-size"
+                  placeholder="e.g., 2-3 people, 4-6 people"
+                  className="w-full"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="subjects" className="text-sm font-medium">
+                  Subjects Looking to Study
+                </Label>
+                <Input
+                  id="subjects"
+                  placeholder="List subjects you want to study with others"
                   className="w-full"
                 />
               </div>
             </div>
           </div>
         );
+
+      case 'Availability':
+        return (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between pb-4 border-b">
+              <h2 className="text-xl font-semibold text-gray-900">
+                Availability
+              </h2>
+            </div>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label
+                  htmlFor="preferred-times"
+                  className="text-sm font-medium"
+                >
+                  Preferred Study Times
+                </Label>
+                <Input
+                  id="preferred-times"
+                  placeholder="e.g., Weekday evenings, Weekend afternoons"
+                  className="w-full"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="time-zone" className="text-sm font-medium">
+                  Time Zone
+                </Label>
+                <Input
+                  id="time-zone"
+                  placeholder="Your time zone"
+                  className="w-full"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="frequency" className="text-sm font-medium">
+                  Study Frequency
+                </Label>
+                <Input
+                  id="frequency"
+                  placeholder="e.g., Weekly, Bi-weekly, As needed"
+                  className="w-full"
+                />
+              </div>
+              <div className="space-y-0.5">
+                <Label className="text-base">Weekly Availability</Label>
+                <p className="text-sm text-gray-500 mb-2">
+                  Select your typical available times
+                </p>
+                {/* Here you could add a more sophisticated calendar/schedule picker component */}
+              </div>
+            </div>
+          </div>
+        );
+
       case 'Privacy':
         return (
           <div className="space-y-6">
@@ -125,9 +261,28 @@ export default function EditProfile() {
                   onCheckedChange={setPublicProfile}
                 />
               </div>
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label className="text-base">Show Location</Label>
+                  <p className="text-sm text-gray-500">
+                    Display your location to other users
+                  </p>
+                </div>
+                <Switch />
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label className="text-base">Study Availability</Label>
+                  <p className="text-sm text-gray-500">
+                    Show your availability calendar to others
+                  </p>
+                </div>
+                <Switch />
+              </div>
             </div>
           </div>
         );
+
       default:
         return null;
     }
