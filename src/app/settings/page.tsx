@@ -8,19 +8,14 @@ import { Label } from '@/components/ui/label';
 import Spinner from '@/components/ui/spinner';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
+  faDisplay,
   faKey,
   faBell,
   faGlobe,
   faShieldAlt,
 } from '@fortawesome/free-solid-svg-icons';
 import { useRequireAuth } from '@/context/authContext';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { MobileSectionDropdown } from '@/components/mobileSectionDropdown';
 
 export default function Settings() {
   const { user, loading } = useRequireAuth();
@@ -195,45 +190,17 @@ export default function Settings() {
 
         <div className="flex flex-col md:flex-row md:space-x-6 space-y-6 md:space-y-0">
           {/* Mobile Dropdown */}
-          <div className="md:hidden w-full">
-            <Select value={selectedSection} onValueChange={setSelectedSection}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select section" />
-              </SelectTrigger>
-              <SelectContent>
-                {[
-                  { name: 'Display', icon: faKey },
-                  { name: 'Account', icon: faKey },
-                  { name: 'Notifications', icon: faBell },
-                  { name: 'Privacy', icon: faGlobe },
-                  { name: 'Security', icon: faShieldAlt },
-                ].map((item) => (
-                  <SelectItem
-                    key={item.name}
-                    value={item.name}
-                    className={`focus:bg-blue-50 
-                      ${
-                        selectedSection === item.name
-                          ? 'bg-blue-50 text-blue-700 font-medium'
-                          : 'text-gray-700'
-                      }`}
-                  >
-                    <div className="flex items-center">
-                      <FontAwesomeIcon
-                        icon={item.icon}
-                        className={`w-4 h-4 mr-3 ${
-                          selectedSection === item.name
-                            ? 'text-blue-700'
-                            : 'text-gray-700'
-                        }`}
-                      />
-                      {item.name}
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          <MobileSectionDropdown
+            sections={[
+              { name: 'Display', icon: faDisplay },
+              { name: 'Account', icon: faKey },
+              { name: 'Notifications', icon: faBell },
+              { name: 'Privacy', icon: faGlobe },
+              { name: 'Security', icon: faShieldAlt },
+            ]}
+            selectedSection={selectedSection}
+            onSectionChange={setSelectedSection}
+          />
 
           {/* Desktop Sidebar - hide on mobile */}
           <aside className="hidden md:block md:w-64 flex-shrink-0">
