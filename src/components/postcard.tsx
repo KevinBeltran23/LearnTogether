@@ -58,7 +58,7 @@ export default function PostCard({
             </Badge>
           ))}
         </div>
-        <Button className="mt-4 w-full" variant="default">
+        <Button className="mt-4" variant="default">
           <FontAwesomeIcon icon={faEnvelope} className="mr-2" /> Message {user}
         </Button>
       </CardContent>

@@ -14,6 +14,13 @@ import {
   faShieldAlt,
 } from '@fortawesome/free-solid-svg-icons';
 import { useRequireAuth } from '@/context/authContext';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 export default function Settings() {
   const { user, loading } = useRequireAuth();
@@ -27,89 +34,139 @@ export default function Settings() {
     switch (selectedSection) {
       case 'Display':
         return (
-          <div className="space-y-4 max-w-lg">
-            <h2 className="text-xl font-semibold">Display</h2>
-            <hr />
-            <div className="flex items-center justify-between">
-              <Label>Dark Mode</Label>
-              <Switch checked={darkMode} onCheckedChange={setDarkMode} />
+          <div className="space-y-6">
+            <div className="flex items-center justify-between pb-4 border-b">
+              <h2 className="text-xl font-semibold text-gray-900">Display</h2>
+            </div>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label className="text-base">Dark Mode</Label>
+                  <p className="text-sm text-gray-500">
+                    Enable dark mode for the application
+                  </p>
+                </div>
+                <Switch checked={darkMode} onCheckedChange={setDarkMode} />
+              </div>
             </div>
           </div>
         );
       case 'Account':
         return (
-          <div className="space-y-4 max-w-lg">
-            <h2 className="text-xl font-semibold">Account</h2>
-            <hr />
-            <div>
-              <Label htmlFor="name">Name</Label>
-              <Input id="name" placeholder="Your name" className="w-full" />
+          <div className="space-y-6">
+            <div className="flex items-center justify-between pb-4 border-b">
+              <h2 className="text-xl font-semibold text-gray-900">Account</h2>
             </div>
-            <div>
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="Your email"
-                className="w-full"
-              />
-            </div>
-            <div>
-              <Label htmlFor="username">Username</Label>
-              <Input
-                id="username"
-                placeholder="Your username"
-                className="w-full"
-              />
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="name" className="text-sm font-medium">
+                  Name
+                </Label>
+                <Input id="name" placeholder="Your name" className="w-full" />
+              </div>
+              <div>
+                <Label htmlFor="email" className="text-sm font-medium">
+                  Email
+                </Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="Your email"
+                  className="w-full"
+                />
+              </div>
+              <div>
+                <Label htmlFor="username" className="text-sm font-medium">
+                  Username
+                </Label>
+                <Input
+                  id="username"
+                  placeholder="Your username"
+                  className="w-full"
+                />
+              </div>
             </div>
           </div>
         );
       case 'Notifications':
         return (
-          <div className="space-y-4 max-w-lg">
-            <h2 className="text-xl font-semibold">Notifications</h2>
-            <hr />
-            <div className="flex items-center justify-between">
-              <Label>Email Notifications</Label>
-              <Switch
-                checked={notifications}
-                onCheckedChange={setNotifications}
-              />
+          <div className="space-y-6">
+            <div className="flex items-center justify-between pb-4 border-b">
+              <h2 className="text-xl font-semibold text-gray-900">
+                Notifications
+              </h2>
+            </div>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label className="text-base">Email Notifications</Label>
+                  <p className="text-sm text-gray-500">
+                    Receive email notifications about your activities
+                  </p>
+                </div>
+                <Switch
+                  checked={notifications}
+                  onCheckedChange={setNotifications}
+                />
+              </div>
             </div>
           </div>
         );
       case 'Privacy':
         return (
-          <div className="space-y-4 max-w-lg">
-            <h2 className="text-xl font-semibold">Privacy</h2>
-            <hr />
-            <div className="flex items-center justify-between">
-              <Label>Public Profile</Label>
-              <Switch />
+          <div className="space-y-6">
+            <div className="flex items-center justify-between pb-4 border-b">
+              <h2 className="text-xl font-semibold text-gray-900">Privacy</h2>
             </div>
-            <div className="flex items-center justify-between">
-              <Label>Search Engine Indexing</Label>
-              <Switch />
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label className="text-base">Public Profile</Label>
+                  <p className="text-sm text-gray-500">
+                    Anyone can view your profile
+                  </p>
+                </div>
+                <Switch />
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label className="text-base">Search Engine Indexing</Label>
+                  <p className="text-sm text-gray-500">
+                    Allow search engines to index your profile
+                  </p>
+                </div>
+                <Switch />
+              </div>
             </div>
           </div>
         );
       case 'Security':
         return (
-          <div className="space-y-4 max-w-lg">
-            <h2 className="text-xl font-semibold">Security</h2>
-            <hr />
-            <div className="flex items-center justify-between">
-              <Label htmlFor="2fa">Two-Factor Authentication</Label>
-              <Switch />
+          <div className="space-y-6">
+            <div className="flex items-center justify-between pb-4 border-b">
+              <h2 className="text-xl font-semibold text-gray-900">Security</h2>
             </div>
-            <div>
-              <Label htmlFor="password">Change Password</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="New password"
-                className="w-full"
-              />
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label className="text-base">Two-Factor Authentication</Label>
+                  <p className="text-sm text-gray-500">
+                    Secure your account with two-factor authentication
+                  </p>
+                </div>
+                <Switch />
+              </div>
+              <div>
+                <Label htmlFor="password" className="text-sm font-medium">
+                  Change Password
+                </Label>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="New password"
+                  className="w-full"
+                />
+              </div>
             </div>
           </div>
         );
@@ -127,49 +184,99 @@ export default function Settings() {
   }
 
   return (
-    <div className="space-y-6 p-10 pb-16">
-      <div className="space-y-0.5">
-        <h2 className="text-2xl font-bold">Settings</h2>
-        <p>Manage your account settings and preferences</p>
-      </div>
-      <div className="flex flex-col lg:flex-row lg:space-x-12">
-        <aside className="lg:w-1/5 space-y-2">
-          <ul className="space-y-2">
-            <li
-              className={`cursor-pointer p-2 rounded-lg ${selectedSection === 'Display' ? 'bg-gray-200' : ''}`}
-              onClick={() => setSelectedSection('Display')}
-            >
-              <FontAwesomeIcon icon={faKey} className="mr-2" /> Display
-            </li>
-            <li
-              className={`cursor-pointer p-2 rounded-lg ${selectedSection === 'Account' ? 'bg-gray-200' : ''}`}
-              onClick={() => setSelectedSection('Account')}
-            >
-              <FontAwesomeIcon icon={faKey} className="mr-2" /> Account
-            </li>
-            <li
-              className={`cursor-pointer p-2 rounded-lg ${selectedSection === 'Notifications' ? 'bg-gray-200' : ''}`}
-              onClick={() => setSelectedSection('Notifications')}
-            >
-              <FontAwesomeIcon icon={faBell} className="mr-2" /> Notifications
-            </li>
-            <li
-              className={`cursor-pointer p-2 rounded-lg ${selectedSection === 'Privacy' ? 'bg-gray-200' : ''}`}
-              onClick={() => setSelectedSection('Privacy')}
-            >
-              <FontAwesomeIcon icon={faGlobe} className="mr-2" /> Privacy
-            </li>
-            <li
-              className={`cursor-pointer p-2 rounded-lg ${selectedSection === 'Security' ? 'bg-gray-200' : ''}`}
-              onClick={() => setSelectedSection('Security')}
-            >
-              <FontAwesomeIcon icon={faShieldAlt} className="mr-2" /> Security
-            </li>
-          </ul>
-        </aside>
-        <div className="flex-1 space-y-6 bg-white p-6 rounded-lg shadow-md max-w-2xl">
-          {renderSection()}
-          <Button>Update Account</Button>
+    <div className="min-h-screen bg-gray-50 p-4 sm:p-6 md:p-8">
+      <div className="flex flex-col pt-16 sm:pt-24 max-w-6xl mx-auto space-y-6">
+        <div className="space-y-1">
+          <h2 className="text-2xl font-bold text-gray-900">Settings</h2>
+          <p className="text-sm text-gray-600">
+            Manage your account settings and preferences
+          </p>
+        </div>
+
+        <div className="flex flex-col md:flex-row md:space-x-6 space-y-6 md:space-y-0">
+          {/* Mobile Dropdown */}
+          <div className="md:hidden w-full">
+            <Select value={selectedSection} onValueChange={setSelectedSection}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select section" />
+              </SelectTrigger>
+              <SelectContent>
+                {[
+                  { name: 'Display', icon: faKey },
+                  { name: 'Account', icon: faKey },
+                  { name: 'Notifications', icon: faBell },
+                  { name: 'Privacy', icon: faGlobe },
+                  { name: 'Security', icon: faShieldAlt },
+                ].map((item) => (
+                  <SelectItem
+                    key={item.name}
+                    value={item.name}
+                    className={`focus:bg-blue-50 
+                      ${
+                        selectedSection === item.name
+                          ? 'bg-blue-50 text-blue-700 font-medium'
+                          : 'text-gray-700'
+                      }`}
+                  >
+                    <div className="flex items-center">
+                      <FontAwesomeIcon
+                        icon={item.icon}
+                        className={`w-4 h-4 mr-3 ${
+                          selectedSection === item.name
+                            ? 'text-blue-700'
+                            : 'text-gray-700'
+                        }`}
+                      />
+                      {item.name}
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Desktop Sidebar - hide on mobile */}
+          <aside className="hidden md:block md:w-64 flex-shrink-0">
+            <nav className="bg-white p-3 rounded-lg shadow-sm">
+              <ul className="space-y-1">
+                {[
+                  { name: 'Display', icon: faKey },
+                  { name: 'Account', icon: faKey },
+                  { name: 'Notifications', icon: faBell },
+                  { name: 'Privacy', icon: faGlobe },
+                  { name: 'Security', icon: faShieldAlt },
+                ].map((item) => (
+                  <li key={item.name}>
+                    <button
+                      onClick={() => setSelectedSection(item.name)}
+                      className={`w-full flex items-center px-3 py-2 text-sm rounded-md transition-colors
+                        ${
+                          selectedSection === item.name
+                            ? 'bg-blue-50 text-blue-700 font-medium'
+                            : 'text-gray-700 hover:bg-gray-100'
+                        }`}
+                    >
+                      <FontAwesomeIcon
+                        icon={item.icon}
+                        className="w-4 h-4 mr-3"
+                      />
+                      {item.name}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          </aside>
+
+          {/* Main Content */}
+          <main className="flex-1">
+            <div className="bg-white p-6 rounded-lg shadow-sm space-y-6">
+              {renderSection()}
+              <div className="pt-4 border-t">
+                <Button className="w-auto">Save Changes</Button>
+              </div>
+            </div>
+          </main>
         </div>
       </div>
     </div>
