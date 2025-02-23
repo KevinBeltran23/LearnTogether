@@ -86,7 +86,7 @@ export function Header() {
                     : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                 }`}
             >
-              Discover
+              Notifications
             </Link>
             <Link
               href="/messages"
@@ -97,7 +97,7 @@ export function Header() {
                     : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                 }`}
             >
-              Messages
+              Create
             </Link>
           </nav>
 

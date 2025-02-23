@@ -5,7 +5,11 @@ import { Button } from '@/components/ui/button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHouse, faPlus, faBell } from '@fortawesome/free-solid-svg-icons';
 
-export default function Footer() {
+interface FooterProps {
+  showCreatePost?: boolean;
+}
+
+export default function Footer({ showCreatePost = true }: FooterProps) {
   return (
     <div>
       {/* MOBILE VIEW NAVBAR */}
@@ -19,9 +23,11 @@ export default function Footer() {
             </Button>
           </Link>
 
-          <Button variant="ghost" size="icon">
-            <FontAwesomeIcon icon={faPlus} className="h-5 w-5" />
-          </Button>
+          {showCreatePost && (
+            <Button variant="ghost" size="icon">
+              <FontAwesomeIcon icon={faPlus} className="h-5 w-5" />
+            </Button>
+          )}
 
           <Link href="/notifications">
             <Button variant="ghost" size="icon">
