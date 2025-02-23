@@ -57,63 +57,112 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="max-w-md mx-auto mt-16 p-6 bg-white shadow-lg rounded-lg">
-      <h2 className="text-2xl font-bold text-center mb-4">
-        Welcome to StudyBuddy
-      </h2>
+    <main className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="w-full min-h-screen sm:min-h-fit sm:w-[24rem] sm:rounded-xl p-6 sm:p-8 bg-white sm:shadow-lg flex flex-col justify-center">
+        <section className="mb-8 text-center">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+            Welcome Back
+          </h1>
+          <p className="mt-2 text-sm text-gray-600">
+            Please sign in to continue
+          </p>
+        </section>
 
-      {error && <p className="text-red-500 text-center">{error}</p>}
+        {/* Error Alert */}
+        {error && (
+          <div
+            role="alert"
+            aria-live="polite"
+            className="mb-4 p-4 bg-red-50 border border-red-100 text-red-600 text-sm rounded-lg"
+          >
+            {error}
+          </div>
+        )}
 
-      <form onSubmit={handleLogin} className="space-y-4">
-        <div>
-          <Input
-            id="email"
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
+        {/* Login Form */}
+        <form onSubmit={handleLogin} className="space-y-4">
+          <div>
+            <label
+              htmlFor="email"
+              className="text-sm font-medium text-gray-700"
+            >
+              Email
+            </label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="name@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="w-full"
+            />
+          </div>
+
+          <div>
+            <label
+              htmlFor="password"
+              className="text-sm font-medium text-gray-700"
+            >
+              Password
+            </label>
+            <Input
+              id="password"
+              type="password"
+              placeholder="Enter your password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="w-full"
+            />
+          </div>
+
+          <Button type="submit" className="w-full h-11 text-base">
+            Sign In
+          </Button>
+        </form>
+
+        {/* Divider */}
+        <div className="relative my-6">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-gray-200"></div>
+          </div>
+          <div className="relative flex justify-center text-sm">
+            <span className="px-2 bg-white text-gray-500">Or</span>
+          </div>
         </div>
 
-        <div>
-          <Input
-            id="password"
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
+        {/* Social Login */}
+        <div className="space-y-3">
+          <Button
+            onClick={handleGoogleLogin}
+            variant="outline"
+            className="w-full h-11 text-base font-medium"
+          >
+            Continue with Google
+          </Button>
+
+          <Button
+            variant="outline"
+            className="w-full h-11 text-base font-medium"
+          >
+            <Link href="/feed" className="w-full">
+              Continue as Guest
+            </Link>
+          </Button>
         </div>
 
-        <Button type="submit" className="w-full">
-          Login
-        </Button>
-      </form>
-
-      <div className="mt-4 space-y-2">
-        <Button
-          onClick={handleGoogleLogin}
-          variant="outline"
-          className="w-full"
-        >
-          Login with Google
-        </Button>
-
-        <Button variant="outline" className="w-full">
-          <Link href="/feed" className="w-full">
-            Continue as Guest
+        {/* Sign Up Link */}
+        <p className="mt-8 text-center text-sm text-gray-600">
+          Don&apos;t have an account?{' '}
+          <Link
+            href="/signup"
+            className="font-semibold text-blue-600 hover:text-blue-500"
+          >
+            Sign up
           </Link>
-        </Button>
+        </p>
       </div>
-
-      <p className="text-center text-sm mt-4">
-        Don&apos;t have an account?{' '}
-        <Link href="/signup" className="text-blue-600">
-          Sign Up
-        </Link>
-      </p>
-    </div>
+    </main>
   );
 }
