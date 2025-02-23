@@ -8,6 +8,7 @@ import Filterbar from '@/components/filterbar';
 import Sidebar from '@/components/sidebar';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars } from '@fortawesome/free-solid-svg-icons';
+import { useRequireAuth } from '@/context/authContext';
 
 const PAGE_SIZE = 5; // Number of posts to load per batch
 
@@ -23,13 +24,16 @@ const STATIC_POSTS = Array.from({ length: 50 }, (_, i) => ({
   subjects: [`Subject ${i + 1}`, `Topic ${(i % 5) + 1}`],
 }));
 
-export default function Home() {
+export default function FeedPage() {
+  const { user, loading } = useRequireAuth();
   const [postList, setPostList] = useState(STATIC_POSTS.slice(0, PAGE_SIZE));
   const [isFetching, setIsFetching] = useState(false);
   const observerRef = useRef<IntersectionObserver | null>(null);
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const sidebarRef = useRef<HTMLDivElement | null>(null);
+
+  console.log(user);
 
   const [filters, setFilters] = useState({
     sortBy: 'Most Recent',
@@ -102,6 +106,14 @@ export default function Home() {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <Spinner />
+      </div>
+    );
+  }
 
   return (
     <div className="p-8">

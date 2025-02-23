@@ -16,8 +16,20 @@ import {
   faMessage,
   faPlus,
 } from '@fortawesome/free-solid-svg-icons';
+import { useAuth } from '@/context/authContext';
 
 export default function Navbar() {
+  const { logout } = useAuth();
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      // The AuthContext will handle the redirect to login page
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
+
   return (
     <>
       {/* DESKTOP NAVBAR */}
@@ -58,7 +70,7 @@ export default function Navbar() {
             <DropdownMenuItem>
               <Link href="/settings">Settings</Link>
             </DropdownMenuItem>
-            <DropdownMenuItem>Logout</DropdownMenuItem>
+            <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </nav>
@@ -99,7 +111,7 @@ export default function Navbar() {
             <DropdownMenuItem>
               <Link href="/settings">Settings</Link>
             </DropdownMenuItem>
-            <DropdownMenuItem>Logout</DropdownMenuItem>
+            <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </nav>

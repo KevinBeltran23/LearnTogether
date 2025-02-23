@@ -7,10 +7,14 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faBook, faLock } from '@fortawesome/free-solid-svg-icons';
-
+import Spinner from '@/components/ui/spinner';
+import { useRequireAuth } from '@/context/authContext';
 export default function EditProfile() {
+  const { user, loading } = useRequireAuth();
   const [selectedSection, setSelectedSection] = useState('Personal Info');
   const [publicProfile, setPublicProfile] = useState(true);
+
+  console.log(user);
 
   const renderSection = () => {
     switch (selectedSection) {
@@ -90,6 +94,14 @@ export default function EditProfile() {
         return null;
     }
   };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <Spinner />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 p-10 pb-16">

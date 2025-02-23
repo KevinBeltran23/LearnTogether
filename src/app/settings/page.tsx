@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
+import Spinner from '@/components/ui/spinner';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faKey,
@@ -12,11 +13,15 @@ import {
   faGlobe,
   faShieldAlt,
 } from '@fortawesome/free-solid-svg-icons';
+import { useRequireAuth } from '@/context/authContext';
 
 export default function Settings() {
+  const { user, loading } = useRequireAuth();
   const [darkMode, setDarkMode] = useState(false);
   const [notifications, setNotifications] = useState(true);
   const [selectedSection, setSelectedSection] = useState('Display');
+
+  console.log(user);
 
   const renderSection = () => {
     switch (selectedSection) {
@@ -112,6 +117,14 @@ export default function Settings() {
         return null;
     }
   };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <Spinner />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 p-10 pb-16">

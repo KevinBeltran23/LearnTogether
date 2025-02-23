@@ -3,10 +3,13 @@
 //import { useParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import Spinner from '@/components/ui/spinner';
+import { useRequireAuth } from '@/context/authContext';
 
 export default function ProfilePage() {
-  //const params = useParams();
-  //const slug = params?.slug || 'dummyuser';
+  const { user, loading } = useRequireAuth();
+
+  console.log(user);
 
   // Dummy user data
   const dummyUser = {
@@ -19,38 +22,43 @@ export default function ProfilePage() {
     profilePicture: 'https://via.placeholder.com/150',
   };
 
-  // Use dummy data for now
-  const user = dummyUser;
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <Spinner />
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-2xl mx-auto p-6 bg-white shadow-lg rounded-lg space-y-4">
       {/* Profile Header */}
       <div className="flex items-center space-x-4">
         <Avatar className="w-16 h-16">
-          <AvatarImage src={user.profilePicture} alt={user.name} />
-          <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+          <AvatarImage src={dummyUser.profilePicture} alt={dummyUser.name} />
+          <AvatarFallback>{dummyUser.name.charAt(0)}</AvatarFallback>
         </Avatar>
         <div>
-          <h1 className="text-2xl font-bold">{user.name}</h1>
-          <p className="text-gray-600">@{user.username}</p>
+          <h1 className="text-2xl font-bold">{dummyUser.name}</h1>
+          <p className="text-gray-600">@{dummyUser.username}</p>
         </div>
       </div>
 
       {/* Bio */}
-      <p className="text-gray-700">{user.bio}</p>
+      <p className="text-gray-700">{dummyUser.bio}</p>
 
       {/* Study Preferences */}
       <div>
         <h2 className="text-lg font-semibold">Study Preferences</h2>
-        <p className="text-gray-600">{user.studyPreferences}</p>
+        <p className="text-gray-600">{dummyUser.studyPreferences}</p>
       </div>
 
       {/* Contact Button */}
       <Button
         className="w-full"
-        onClick={() => (window.location.href = `mailto:${user.email}`)}
+        onClick={() => (window.location.href = `mailto:${dummyUser.email}`)}
       >
-        Message {user.name}
+        Message {dummyUser.name}
       </Button>
     </div>
   );

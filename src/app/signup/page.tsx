@@ -1,11 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
 import { useRouter } from 'next/navigation';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { useCreateUserWithEmailAndPassword } from 'react-firebase-hooks/auth';
+import { auth } from '@/lib/firebaseconfig';
+
 import Link from 'next/link';
 
 export default function SignupPage() {
@@ -15,17 +16,33 @@ export default function SignupPage() {
   const [error, setError] = useState('');
   const router = useRouter();
 
+  const [createUserWithEmailAndPassword] =
+    useCreateUserWithEmailAndPassword(auth);
+
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (password !== confirmPassword) {
       setError('Passwords do not match');
       return;
     }
+
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
-      router.push('/feed'); // Redirect after signup
+      const res = await createUserWithEmailAndPassword(email, password);
+      if (!res) {
+        setError('Failed to create account');
+        return;
+      }
+      setEmail('');
+      setPassword('');
+      setConfirmPassword('');
+      router.push('/feed');
     } catch (err) {
-      setError(err);
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('An error occurred during signup');
+      }
     }
   };
 
@@ -76,7 +93,7 @@ export default function SignupPage() {
 
       <p className="text-center text-sm mt-4">
         Already have an account?{' '}
-        <Link href="/login" className="text-blue-600">
+        <Link href="/" className="text-blue-600">
           Login
         </Link>
       </p>
