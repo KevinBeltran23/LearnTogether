@@ -5,6 +5,7 @@ import PostCard from '@/components/postcard';
 import Spinner from '@/components/ui/spinner';
 import Filterbar from '@/components/filterbar';
 import { useRequireAuth } from '@/context/authContext';
+import { useSearch } from '@/context/searchContext';
 
 const PAGE_SIZE = 5; // Number of posts to load per batch
 
@@ -21,6 +22,7 @@ const STATIC_POSTS = Array.from({ length: 50 }, (_, i) => ({
 }));
 
 export default function FeedPage() {
+  const { searchQuery } = useSearch();
   const { user, loading } = useRequireAuth();
   const [postList, setPostList] = useState(STATIC_POSTS.slice(0, PAGE_SIZE));
   const [isFetching, setIsFetching] = useState(false);
@@ -36,7 +38,16 @@ export default function FeedPage() {
   });
 
   const filteredPosts = postList.filter((post) => {
+    const searchMatch =
+      searchQuery === '' ||
+      post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      post.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      post.subjects.some((subject) =>
+        subject.toLowerCase().includes(searchQuery.toLowerCase()),
+      );
+
     return (
+      searchMatch &&
       (!filters.type || post.learningType === filters.type) &&
       (!filters.topic || post.subjects.includes(filters.topic))
     );

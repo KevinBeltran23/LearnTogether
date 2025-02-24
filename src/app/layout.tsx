@@ -4,6 +4,7 @@ import '@/styles/index.css';
 import { AuthProvider } from '@/context/authContext';
 import { SidebarProvider } from '@/context/sidebarContext';
 import ClientLayout from '@/components/clientLayout';
+import { SearchProvider } from '@/context/searchContext';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -32,7 +33,9 @@ export default function RootLayout({
       >
         <AuthProvider>
           <SidebarProvider>
-            <ClientLayout>{children}</ClientLayout>
+            <SearchProvider>
+              <ClientLayout>{children}</ClientLayout>
+            </SearchProvider>
           </SidebarProvider>
         </AuthProvider>
       </body>

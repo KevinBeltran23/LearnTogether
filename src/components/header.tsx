@@ -20,6 +20,7 @@ import { useSidebar } from '@/context/sidebarContext';
 import { Modal } from '@/components/modal';
 import { CreatePostForm } from '@/components/createPostForm';
 import { useState, useEffect } from 'react';
+import { useSearch } from '@/context/searchContext';
 
 export function Header() {
   const { logout } = useAuth();
@@ -27,7 +28,7 @@ export function Header() {
   const pathname = usePathname();
   const [isCreatePostOpen, setIsCreatePostOpen] = useState(false);
   const [isSearchVisible, setIsSearchVisible] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  const { searchQuery, setSearchQuery } = useSearch();
 
   const handleClickOutside = (e: MouseEvent) => {
     const target = e.target as HTMLElement;
@@ -74,8 +75,11 @@ export function Header() {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement search functionality
-    console.log('Searching for:', searchQuery);
+    setSearchQuery(searchQuery);
+  };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
   };
 
   return (
@@ -143,7 +147,7 @@ export function Header() {
                     <input
                       type="text"
                       value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
+                      onChange={handleSearchChange}
                       className="border rounded-lg px-3 py-1 mr-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                       placeholder="Search..."
                       autoFocus
