@@ -45,7 +45,6 @@ export default function Sidebar() {
           w-64 md:w-64
           bg-white 
           shadow-lg md:shadow-none
-          z-50 
           transition-transform duration-300 ease-in-out
           ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
           pt-16 md:pt-4

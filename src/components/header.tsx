@@ -17,9 +17,15 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { useAuth } from '@/context/authContext';
 import { useSidebar } from '@/context/sidebarContext';
+import { Modal } from '@/components/modal';
+import { CreatePostForm } from '@/components/createPostForm';
+import { useState } from 'react';
 
 export function Header() {
   const { logout } = useAuth();
+  const { toggleSidebar } = useSidebar();
+  const pathname = usePathname();
+  const [isCreatePostOpen, setIsCreatePostOpen] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -29,16 +35,27 @@ export function Header() {
       console.error('Logout failed:', error);
     }
   };
-  const { toggleSidebar } = useSidebar();
-
-  const pathname = usePathname();
 
   const isActive = (path: string) => {
     return pathname === path;
   };
 
+  const handleCreatePost = (data: {
+    title: string;
+    description: string;
+    learningType: string;
+    location: string;
+    subjects: string;
+    availability: string;
+    school: string;
+  }) => {
+    console.log('New post data:', data);
+    // Here you would typically send the data to your backend
+    setIsCreatePostOpen(false);
+  };
+
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200">
+    <header className="fixed top-0 left-0 right-0 z-10 bg-white border-b border-gray-200">
       <div className="w-full px-4">
         <div className="flex justify-between items-center h-16">
           {/* Left Section */}
@@ -65,7 +82,7 @@ export function Header() {
           </div>
 
           {/* Center Section - Desktop Nav */}
-          <nav className="hidden md:flex items-center space-x-1">
+          <nav className="hidden lg:flex items-center space-x-1">
             <Link
               href="/feed"
               className={`px-3 py-2 rounded-md text-sm font-medium transition-colors
@@ -78,26 +95,15 @@ export function Header() {
               Feed
             </Link>
             <Link
-              href="/discover"
+              href="/notifications"
               className={`px-3 py-2 rounded-md text-sm font-medium transition-colors
                 ${
-                  isActive('/discover')
+                  isActive('/notifications')
                     ? 'bg-gray-100 text-gray-900'
                     : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                 }`}
             >
               Notifications
-            </Link>
-            <Link
-              href="/messages"
-              className={`px-3 py-2 rounded-md text-sm font-medium transition-colors
-                ${
-                  isActive('/messages')
-                    ? 'bg-gray-100 text-gray-900'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                }`}
-            >
-              Create
             </Link>
           </nav>
 
@@ -130,9 +136,29 @@ export function Header() {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+
+            {/* Create Post Button */}
+            <Button
+              onClick={() => setIsCreatePostOpen(true)}
+              className="hidden lg:flex items-center gap-2"
+            >
+              Create Post
+            </Button>
           </div>
         </div>
       </div>
+
+      {/* Create Post Modal */}
+      <Modal
+        isOpen={isCreatePostOpen}
+        onClose={() => setIsCreatePostOpen(false)}
+        title="Create a Study Post"
+      >
+        <CreatePostForm
+          onSubmit={handleCreatePost}
+          onCancel={() => setIsCreatePostOpen(false)}
+        />
+      </Modal>
     </header>
   );
 }
