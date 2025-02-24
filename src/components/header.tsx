@@ -19,13 +19,31 @@ import { useAuth } from '@/context/authContext';
 import { useSidebar } from '@/context/sidebarContext';
 import { Modal } from '@/components/modal';
 import { CreatePostForm } from '@/components/createPostForm';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export function Header() {
   const { logout } = useAuth();
   const { toggleSidebar } = useSidebar();
   const pathname = usePathname();
   const [isCreatePostOpen, setIsCreatePostOpen] = useState(false);
+  const [isSearchVisible, setIsSearchVisible] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const handleClickOutside = (e: MouseEvent) => {
+    const target = e.target as HTMLElement;
+    if (!target.closest('.search-container') && searchQuery === '') {
+      setIsSearchVisible(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isSearchVisible) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+      };
+    }
+  }, [isSearchVisible, searchQuery]);
 
   const handleLogout = async () => {
     try {
@@ -52,6 +70,12 @@ export function Header() {
     console.log('New post data:', data);
     // Here you would typically send the data to your backend
     setIsCreatePostOpen(false);
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    // TODO: Implement search functionality
+    console.log('Searching for:', searchQuery);
   };
 
   return (
@@ -109,9 +133,46 @@ export function Header() {
 
           {/* Right Section */}
           <div className="flex items-center space-x-2">
-            <Button variant="ghost" size="icon">
-              <FontAwesomeIcon icon={faMagnifyingGlass} className="h-5 w-5" />
-            </Button>
+            <div className="flex items-center search-container relative w-10">
+              <div className="absolute right-0">
+                {isSearchVisible ? (
+                  <form
+                    onSubmit={handleSearch}
+                    className="flex items-center absolute right-0 top-1/2 -translate-y-1/2 bg-white"
+                  >
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="border rounded-lg px-3 py-1 mr-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Search..."
+                      autoFocus
+                    />
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setIsSearchVisible(false)}
+                    >
+                      <FontAwesomeIcon
+                        icon={faMagnifyingGlass}
+                        className="h-5 w-5"
+                      />
+                    </Button>
+                  </form>
+                ) : (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setIsSearchVisible(true)}
+                  >
+                    <FontAwesomeIcon
+                      icon={faMagnifyingGlass}
+                      className="h-5 w-5"
+                    />
+                  </Button>
+                )}
+              </div>
+            </div>
 
             {/* User Dropdown */}
             <DropdownMenu>
