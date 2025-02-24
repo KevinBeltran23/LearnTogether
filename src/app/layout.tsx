@@ -1,10 +1,12 @@
-import type { Metadata } from 'next';
+'use client';
+
 import { Geist, Geist_Mono } from 'next/font/google';
 import '@/styles/index.css';
 import { AuthProvider } from '@/context/authContext';
 import { SidebarProvider } from '@/context/sidebarContext';
 import ClientLayout from '@/components/clientLayout';
 import { SearchProvider } from '@/context/searchContext';
+import { ThemeProvider } from 'next-themes';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -16,11 +18,6 @@ const geistMono = Geist_Mono({
   subsets: ['latin'],
 });
 
-export const metadata: Metadata = {
-  title: 'StudyBuddy',
-  description: 'Find your perfect study partner!',
-};
-
 export default function RootLayout({
   children,
 }: {
@@ -31,13 +28,15 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <AuthProvider>
-          <SidebarProvider>
-            <SearchProvider>
-              <ClientLayout>{children}</ClientLayout>
-            </SearchProvider>
-          </SidebarProvider>
-        </AuthProvider>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <AuthProvider>
+            <SidebarProvider>
+              <SearchProvider>
+                <ClientLayout>{children}</ClientLayout>
+              </SearchProvider>
+            </SidebarProvider>
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

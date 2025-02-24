@@ -17,9 +17,7 @@ export default function Footer({ showCreatePost = true }: FooterProps) {
   const [isCreatePostOpen, setIsCreatePostOpen] = useState(false);
   const pathname = usePathname();
 
-  const isActive = (path: string) => {
-    return pathname === path;
-  };
+  const isActive = (path: string) => pathname === path;
 
   const handleCreatePost = (data: {
     title: string;
@@ -31,21 +29,19 @@ export default function Footer({ showCreatePost = true }: FooterProps) {
     school: string;
   }) => {
     console.log('New post data:', data);
-    // Here you would typically send the data to your backend
     setIsCreatePostOpen(false);
   };
 
   return (
     <div>
       {/* MOBILE VIEW NAVBAR */}
-
-      {/* Bottom */}
-      <nav className="fixed bottom-0 left-0 w-full bg-white shadow-lg lg:hidden">
+      <nav className="fixed bottom-0 left-0 w-full bg-white dark:bg-gray-900 shadow-lg lg:hidden border-t border-gray-200 dark:border-gray-700">
         <div className="flex justify-around items-center p-3">
           <Link href="/feed">
             <Button
               variant={isActive('/feed') ? 'outline' : 'ghost'}
               size="icon"
+              className="text-gray-900 dark:text-white"
             >
               <FontAwesomeIcon icon={faHouse} className="h-5 w-5" />
             </Button>
@@ -56,6 +52,7 @@ export default function Footer({ showCreatePost = true }: FooterProps) {
               variant="ghost"
               size="icon"
               onClick={() => setIsCreatePostOpen(true)}
+              className="text-gray-900 dark:text-white"
             >
               <FontAwesomeIcon icon={faPlus} className="h-5 w-5" />
             </Button>
@@ -65,6 +62,7 @@ export default function Footer({ showCreatePost = true }: FooterProps) {
             <Button
               variant={isActive('/notifications') ? 'outline' : 'ghost'}
               size="icon"
+              className="text-gray-900 dark:text-white"
             >
               <FontAwesomeIcon icon={faBell} className="h-5 w-5" />
             </Button>

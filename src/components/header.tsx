@@ -21,6 +21,7 @@ import { Modal } from '@/components/modal';
 import { CreatePostForm } from '@/components/createPostForm';
 import { useState, useEffect } from 'react';
 import { useSearch } from '@/context/searchContext';
+import { DarkModeToggle } from '@/components/darkMode';
 
 export function Header() {
   const { logout } = useAuth();
@@ -49,41 +50,15 @@ export function Header() {
   const handleLogout = async () => {
     try {
       await logout();
-      // The AuthContext will handle the redirect to login page
     } catch (error) {
       console.error('Logout failed:', error);
     }
   };
 
-  const isActive = (path: string) => {
-    return pathname === path;
-  };
-
-  const handleCreatePost = (data: {
-    title: string;
-    description: string;
-    learningType: string;
-    location: string;
-    subjects: string;
-    availability: string;
-    school: string;
-  }) => {
-    console.log('New post data:', data);
-    // Here you would typically send the data to your backend
-    setIsCreatePostOpen(false);
-  };
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    setSearchQuery(searchQuery);
-  };
-
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
-  };
+  const isActive = (path: string) => pathname === path;
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-10 bg-white border-b border-gray-200">
+    <header className="fixed top-0 left-0 right-0 z-10 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
       <div className="w-full px-4">
         <div className="flex justify-between items-center h-16">
           {/* Left Section */}
@@ -95,7 +70,10 @@ export function Header() {
               onClick={toggleSidebar}
               className="md:hidden"
             >
-              <FontAwesomeIcon icon={faBars} className="h-5 w-5" />
+              <FontAwesomeIcon
+                icon={faBars}
+                className="h-5 w-5 text-gray-900 dark:text-white"
+              />
             </Button>
 
             {/* Logo */}
@@ -103,7 +81,7 @@ export function Header() {
               <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold">S</span>
               </div>
-              <span className="text-xl font-bold text-gray-900 hidden sm:inline-block">
+              <span className="text-xl font-bold text-gray-900 dark:text-white hidden sm:inline-block">
                 StudyBuddy
               </span>
             </Link>
@@ -113,26 +91,27 @@ export function Header() {
           <nav className="hidden lg:flex items-center space-x-1">
             <Link
               href="/feed"
-              className={`px-3 py-2 rounded-md text-sm font-medium transition-colors
+              className={`px-3 py-2 rounded-md text-sm font-medium transition-colors 
                 ${
                   isActive('/feed')
-                    ? 'bg-gray-100 text-gray-900'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                    ? 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white'
+                    : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
                 }`}
             >
               Feed
             </Link>
             <Link
               href="/notifications"
-              className={`px-3 py-2 rounded-md text-sm font-medium transition-colors
+              className={`px-3 py-2 rounded-md text-sm font-medium transition-colors 
                 ${
                   isActive('/notifications')
-                    ? 'bg-gray-100 text-gray-900'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                    ? 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white'
+                    : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
                 }`}
             >
               Notifications
             </Link>
+            <DarkModeToggle />
           </nav>
 
           {/* Right Section */}
@@ -141,14 +120,17 @@ export function Header() {
               <div className="absolute right-0">
                 {isSearchVisible ? (
                   <form
-                    onSubmit={handleSearch}
-                    className="flex items-center absolute right-0 top-1/2 -translate-y-1/2 bg-white"
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      setSearchQuery(searchQuery);
+                    }}
+                    className="flex items-center absolute right-0 top-1/2 -translate-y-1/2 bg-white dark:bg-gray-900"
                   >
                     <input
                       type="text"
                       value={searchQuery}
-                      onChange={handleSearchChange}
-                      className="border rounded-lg px-3 py-1 mr-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="border dark:border-gray-600 rounded-lg px-3 py-1 mr-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                       placeholder="Search..."
                       autoFocus
                     />
@@ -159,7 +141,7 @@ export function Header() {
                     >
                       <FontAwesomeIcon
                         icon={faMagnifyingGlass}
-                        className="h-5 w-5"
+                        className="h-5 w-5 text-gray-900 dark:text-white"
                       />
                     </Button>
                   </form>
@@ -171,7 +153,7 @@ export function Header() {
                   >
                     <FontAwesomeIcon
                       icon={faMagnifyingGlass}
-                      className="h-5 w-5"
+                      className="h-5 w-5 text-gray-900 dark:text-white"
                     />
                   </Button>
                 )}
@@ -182,22 +164,39 @@ export function Header() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon" className="rounded-full">
-                  <FontAwesomeIcon icon={faUser} className="h-5 w-5" />
+                  <FontAwesomeIcon
+                    icon={faUser}
+                    className="h-5 w-5 text-gray-900 dark:text-white"
+                  />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuContent
+                align="end"
+                className="w-48 bg-white dark:bg-gray-800"
+              >
                 <DropdownMenuItem asChild>
-                  <Link href="/profile" className="w-full">
+                  <Link
+                    href="/profile"
+                    className="w-full text-gray-900 dark:text-white"
+                  >
                     Profile
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link href="/settings" className="w-full">
+                  <Link
+                    href="/settings"
+                    className="w-full text-gray-900 dark:text-white"
+                  >
                     Settings
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <button onClick={handleLogout}>Sign Out</button>
+                  <button
+                    onClick={handleLogout}
+                    className="text-gray-900 dark:text-white"
+                  >
+                    Sign Out
+                  </button>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -205,7 +204,7 @@ export function Header() {
             {/* Create Post Button */}
             <Button
               onClick={() => setIsCreatePostOpen(true)}
-              className="hidden lg:flex items-center gap-2"
+              className="hidden lg:flex items-center gap-2 bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
             >
               Create Post
             </Button>
@@ -220,7 +219,10 @@ export function Header() {
         title="Create a Study Post"
       >
         <CreatePostForm
-          onSubmit={handleCreatePost}
+          onSubmit={(data) => {
+            console.log('New post data:', data);
+            setIsCreatePostOpen(false);
+          }}
           onCancel={() => setIsCreatePostOpen(false)}
         />
       </Modal>
