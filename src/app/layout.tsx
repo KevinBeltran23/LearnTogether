@@ -7,6 +7,7 @@ import { SidebarProvider } from '@/context/sidebarContext';
 import ClientLayout from '@/components/clientLayout';
 import { SearchProvider } from '@/context/searchContext';
 import { ThemeProvider } from 'next-themes';
+import { useState, useEffect } from 'react';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -18,6 +19,20 @@ const geistMono = Geist_Mono({
   subsets: ['latin'],
 });
 
+function ProvidersAfterMount({ children }: { children: React.ReactNode }) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return <>{children}</>;
+  }
+
+  return <ThemeProvider attribute="class">{children}</ThemeProvider>;
+}
+
 export default function RootLayout({
   children,
 }: {
@@ -28,7 +43,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <ProvidersAfterMount>
           <AuthProvider>
             <SidebarProvider>
               <SearchProvider>
@@ -36,7 +51,7 @@ export default function RootLayout({
               </SearchProvider>
             </SidebarProvider>
           </AuthProvider>
-        </ThemeProvider>
+        </ProvidersAfterMount>
       </body>
     </html>
   );
