@@ -1,5 +1,7 @@
 'use client';
 
+// think this is fine for now
+
 import { ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';

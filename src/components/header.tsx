@@ -1,5 +1,7 @@
 'use client';
 
+// this is fine for now I think
+
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -22,6 +24,17 @@ import { CreatePostForm } from '@/components/createPostForm';
 import { useState, useEffect } from 'react';
 import { useSearch } from '@/context/searchContext';
 import { DarkModeToggle } from '@/components/darkMode';
+
+const TEXTS = {
+  title: 'StudyBuddy',
+  createPostButton: 'Create Post',
+  profile: 'Profile',
+  settings: 'Settings',
+  signOut: 'Sign Out',
+  feed: 'Feed',
+  notifications: 'Notifications',
+  searchPlaceholder: 'Search...',
+};
 
 export function Header() {
   const { logout } = useAuth();
@@ -82,7 +95,7 @@ export function Header() {
                 <span className="text-white font-bold">S</span>
               </div>
               <span className="text-xl font-bold text-gray-900 dark:text-white hidden sm:inline-block">
-                StudyBuddy
+                {TEXTS.title}
               </span>
             </Link>
           </div>
@@ -98,7 +111,7 @@ export function Header() {
                     : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
                 }`}
             >
-              Feed
+              {TEXTS.feed}
             </Link>
             <Link
               href="/notifications"
@@ -109,7 +122,7 @@ export function Header() {
                     : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
                 }`}
             >
-              Notifications
+              {TEXTS.notifications}
             </Link>
             <DarkModeToggle />
           </nav>
@@ -119,6 +132,7 @@ export function Header() {
             <div className="flex items-center search-container relative w-10">
               <div className="absolute right-0">
                 {isSearchVisible ? (
+                  // search bar
                   <form
                     onSubmit={(e) => {
                       e.preventDefault();
@@ -131,7 +145,7 @@ export function Header() {
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       className="border dark:border-gray-600 rounded-lg px-3 py-1 mr-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="Search..."
+                      placeholder={TEXTS.searchPlaceholder}
                       autoFocus
                     />
                     <Button
@@ -160,7 +174,7 @@ export function Header() {
               </div>
             </div>
 
-            {/* User Dropdown */}
+            {/* User Dropdown - Im going to try to make this a componenet from dropdown.tsx just was a bit different */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon" className="rounded-full">
@@ -179,7 +193,7 @@ export function Header() {
                     href="/profile"
                     className="w-full text-gray-900 dark:text-white"
                   >
-                    Profile
+                    {TEXTS.profile}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
@@ -187,7 +201,7 @@ export function Header() {
                     href="/settings"
                     className="w-full text-gray-900 dark:text-white"
                   >
-                    Settings
+                    {TEXTS.settings}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
@@ -195,7 +209,7 @@ export function Header() {
                     onClick={handleLogout}
                     className="text-gray-900 dark:text-white"
                   >
-                    Sign Out
+                    {TEXTS.signOut}
                   </button>
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -206,7 +220,7 @@ export function Header() {
               onClick={() => setIsCreatePostOpen(true)}
               className="hidden lg:flex items-center gap-2 bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
             >
-              Create Post
+              {TEXTS.createPostButton}
             </Button>
           </div>
         </div>

@@ -1,4 +1,5 @@
-// Import the functions you need from the SDKs you need
+// Honestly I might just publish the secrets im not sure
+
 import { getApps, initializeApp, getApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 

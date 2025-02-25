@@ -1,16 +1,43 @@
 'use client';
 
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { useSidebar } from '@/context/sidebarContext';
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUsers } from '@fortawesome/free-solid-svg-icons';
 import { usePathname } from 'next/navigation';
 
+// Define dummy group items
+const DUMMY_GROUP_ITEMS = ['Group A', 'Group B', 'Group C']; // Dummy items for now
+
+// Define a single constant object for all text
+const TEXTS = {
+  groupsTitle: 'Groups',
+};
+
 export default function Sidebar() {
   const { isSidebarOpen, closeSidebar } = useSidebar();
   const sidebarRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
+
+  // State for group items
+  const [groupItems, setGroupItems] = useState<string[]>(DUMMY_GROUP_ITEMS);
+
+  // Example effect to simulate fetching data from the backend
+  useEffect(() => {
+    // Simulate fetching data
+    const fetchGroupItems = async () => {
+      // Replace this with your actual fetch call
+      // const response = await fetch('/api/group-items');
+      // const data = await response.json();
+      // setGroupItems(data);
+
+      // For now, we will just use the dummy items
+      setGroupItems(DUMMY_GROUP_ITEMS);
+    };
+
+    fetchGroupItems();
+  }, []);
 
   // Handle click outside
   useEffect(() => {
@@ -63,10 +90,10 @@ export default function Sidebar() {
       >
         <div className="p-4">
           <h1 className="text-lg font-semibold mb-3 text-gray-900 dark:text-white">
-            Groups
+            {TEXTS.groupsTitle}
           </h1>
           <ul className="space-y-2 text-gray-700 dark:text-gray-300">
-            {['Group 1', 'Group 2', 'Group 3'].map((group, index) => (
+            {groupItems.map((group, index) => (
               <li key={index}>
                 <Link
                   href="#"

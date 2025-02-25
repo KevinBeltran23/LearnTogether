@@ -5,7 +5,6 @@ import {
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 
 interface DropdownProps {
@@ -27,7 +26,6 @@ const Dropdown: React.FC<DropdownProps> = ({
         {label} {selectedValue}
       </DropdownMenuTrigger>
       <DropdownMenuContent>
-        <DropdownMenuSeparator />
         {options.map((option) => (
           <DropdownMenuItem
             key={option.value}
