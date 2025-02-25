@@ -17,41 +17,77 @@ import Spinner from '@/components/ui/spinner';
 import { useRequireAuth } from '@/context/authContext';
 import { MobileSectionDropdown } from '@/components/mobileSectionDropdown';
 
+const TEXTS = {
+  title: 'Edit Profile',
+  subtitle: 'Update your personal details and study preferences',
+  personalInfoSection: 'Personal Info',
+  academicInfoSection: 'Academic Info',
+  studyPreferencesSection: 'Study Preferences',
+  availabilitySection: 'Availability',
+  privacySection: 'Privacy',
+  nameLabel: 'Name',
+  usernameLabel: 'Username',
+  bioLabel: 'Bio',
+  locationLabel: 'Location',
+  schoolLabel: 'School/University',
+  majorLabel: 'Field of Study/Major',
+  yearLabel: 'Year/Level',
+  interestsLabel: 'Academic Interests',
+  studyStyleLabel: 'Preferred Study Style',
+  environmentLabel: 'Preferred Study Environment',
+  groupSizeLabel: 'Preferred Group Size',
+  subjectsLabel: 'Subjects Looking to Study',
+  preferredTimesLabel: 'Preferred Study Times',
+  timeZoneLabel: 'Time Zone',
+  frequencyLabel: 'Study Frequency',
+  publicProfileLabel: 'Public Profile',
+  publicProfileDescription: 'Allow others to view your profile',
+  showLocationLabel: 'Show Location',
+  showLocationDescription: 'Display your location to other users',
+  studyAvailabilityLabel: 'Study Availability',
+  studyAvailabilityDescription: 'Show your availability calendar to others',
+  saveChangesButton: 'Save Changes',
+  weeklyAvailabilityLabel: 'Weekly Availability',
+  weeklyAvailabilityDescription: 'Select your typical available times',
+};
+
 export default function EditProfile() {
   const { user, loading } = useRequireAuth();
-  const [selectedSection, setSelectedSection] = useState('Personal Info');
+  const [selectedSection, setSelectedSection] = useState(
+    TEXTS.personalInfoSection,
+  );
   const [publicProfile, setPublicProfile] = useState(true);
 
   console.log(user);
 
   const sections = [
-    { name: 'Personal Info', icon: faUser },
-    { name: 'Academic Info', icon: faGraduationCap },
-    { name: 'Study Preferences', icon: faBook },
-    { name: 'Availability', icon: faClock },
-    { name: 'Privacy', icon: faLock },
+    { name: TEXTS.personalInfoSection, icon: faUser },
+    { name: TEXTS.academicInfoSection, icon: faGraduationCap },
+    { name: TEXTS.studyPreferencesSection, icon: faBook },
+    { name: TEXTS.availabilitySection, icon: faClock },
+    { name: TEXTS.privacySection, icon: faLock },
   ];
 
   const renderSection = () => {
     switch (selectedSection) {
-      case 'Personal Info':
+      case TEXTS.personalInfoSection:
         return (
           <div className="space-y-6">
             <div className="flex items-center justify-between pb-4 border-b">
               <h2 className="text-xl font-semibold text-gray-900">
-                Personal Info
+                {TEXTS.personalInfoSection}
               </h2>
             </div>
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="name" className="text-sm font-medium">
-                  Name
+                  {TEXTS.nameLabel}
                 </Label>
                 <Input id="name" placeholder="Your name" className="w-full" />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="username" className="text-sm font-medium">
-                  Username
+                  {TEXTS.usernameLabel}
                 </Label>
                 <Input
                   id="username"
@@ -61,7 +97,7 @@ export default function EditProfile() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="bio" className="text-sm font-medium">
-                  Bio
+                  {TEXTS.bioLabel}
                 </Label>
                 <Input
                   id="bio"
@@ -71,7 +107,7 @@ export default function EditProfile() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="location" className="text-sm font-medium">
-                  Location
+                  {TEXTS.locationLabel}
                 </Label>
                 <Input
                   id="location"
@@ -83,18 +119,18 @@ export default function EditProfile() {
           </div>
         );
 
-      case 'Academic Info':
+      case TEXTS.academicInfoSection:
         return (
           <div className="space-y-6">
             <div className="flex items-center justify-between pb-4 border-b">
               <h2 className="text-xl font-semibold text-gray-900">
-                Academic Info
+                {TEXTS.academicInfoSection}
               </h2>
             </div>
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="school" className="text-sm font-medium">
-                  School/University
+                  {TEXTS.schoolLabel}
                 </Label>
                 <Input
                   id="school"
@@ -104,7 +140,7 @@ export default function EditProfile() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="major" className="text-sm font-medium">
-                  Field of Study/Major
+                  {TEXTS.majorLabel}
                 </Label>
                 <Input
                   id="major"
@@ -114,7 +150,7 @@ export default function EditProfile() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="year" className="text-sm font-medium">
-                  Year/Level
+                  {TEXTS.yearLabel}
                 </Label>
                 <Input
                   id="year"
@@ -124,7 +160,7 @@ export default function EditProfile() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="interests" className="text-sm font-medium">
-                  Academic Interests
+                  {TEXTS.interestsLabel}
                 </Label>
                 <Input
                   id="interests"
@@ -136,18 +172,18 @@ export default function EditProfile() {
           </div>
         );
 
-      case 'Study Preferences':
+      case TEXTS.studyPreferencesSection:
         return (
           <div className="space-y-6">
             <div className="flex items-center justify-between pb-4 border-b">
               <h2 className="text-xl font-semibold text-gray-900">
-                Study Preferences
+                {TEXTS.studyPreferencesSection}
               </h2>
             </div>
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="study-style" className="text-sm font-medium">
-                  Preferred Study Style
+                  {TEXTS.studyStyleLabel}
                 </Label>
                 <Input
                   id="study-style"
@@ -157,7 +193,7 @@ export default function EditProfile() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="environment" className="text-sm font-medium">
-                  Preferred Study Environment
+                  {TEXTS.environmentLabel}
                 </Label>
                 <Input
                   id="environment"
@@ -167,7 +203,7 @@ export default function EditProfile() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="group-size" className="text-sm font-medium">
-                  Preferred Group Size
+                  {TEXTS.groupSizeLabel}
                 </Label>
                 <Input
                   id="group-size"
@@ -177,7 +213,7 @@ export default function EditProfile() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="subjects" className="text-sm font-medium">
-                  Subjects Looking to Study
+                  {TEXTS.subjectsLabel}
                 </Label>
                 <Input
                   id="subjects"
@@ -189,12 +225,12 @@ export default function EditProfile() {
           </div>
         );
 
-      case 'Availability':
+      case TEXTS.availabilitySection:
         return (
           <div className="space-y-6">
             <div className="flex items-center justify-between pb-4 border-b">
               <h2 className="text-xl font-semibold text-gray-900">
-                Availability
+                {TEXTS.availabilitySection}
               </h2>
             </div>
             <div className="space-y-4">
@@ -203,7 +239,7 @@ export default function EditProfile() {
                   htmlFor="preferred-times"
                   className="text-sm font-medium"
                 >
-                  Preferred Study Times
+                  {TEXTS.preferredTimesLabel}
                 </Label>
                 <Input
                   id="preferred-times"
@@ -213,7 +249,7 @@ export default function EditProfile() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="time-zone" className="text-sm font-medium">
-                  Time Zone
+                  {TEXTS.timeZoneLabel}
                 </Label>
                 <Input
                   id="time-zone"
@@ -223,7 +259,7 @@ export default function EditProfile() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="frequency" className="text-sm font-medium">
-                  Study Frequency
+                  {TEXTS.frequencyLabel}
                 </Label>
                 <Input
                   id="frequency"
@@ -232,28 +268,34 @@ export default function EditProfile() {
                 />
               </div>
               <div className="space-y-0.5">
-                <Label className="text-base">Weekly Availability</Label>
+                <Label className="text-base">
+                  {TEXTS.weeklyAvailabilityLabel}
+                </Label>
                 <p className="text-sm text-gray-500 mb-2">
-                  Select your typical available times
+                  {TEXTS.weeklyAvailabilityDescription}
                 </p>
-                {/* Here you could add a more sophisticated calendar/schedule picker component */}
+                {/* It would be nice to add a nicer calendar/schedule picker component here */}
               </div>
             </div>
           </div>
         );
 
-      case 'Privacy':
+      case TEXTS.privacySection:
         return (
           <div className="space-y-6">
             <div className="flex items-center justify-between pb-4 border-b">
-              <h2 className="text-xl font-semibold text-gray-900">Privacy</h2>
+              <h2 className="text-xl font-semibold text-gray-900">
+                {TEXTS.privacySection}
+              </h2>
             </div>
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label className="text-base">Public Profile</Label>
+                  <Label className="text-base">
+                    {TEXTS.publicProfileLabel}
+                  </Label>
                   <p className="text-sm text-gray-500">
-                    Allow others to view your profile
+                    {TEXTS.publicProfileDescription}
                   </p>
                 </div>
                 <Switch
@@ -263,18 +305,20 @@ export default function EditProfile() {
               </div>
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label className="text-base">Show Location</Label>
+                  <Label className="text-base">{TEXTS.showLocationLabel}</Label>
                   <p className="text-sm text-gray-500">
-                    Display your location to other users
+                    {TEXTS.showLocationDescription}
                   </p>
                 </div>
                 <Switch />
               </div>
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label className="text-base">Study Availability</Label>
+                  <Label className="text-base">
+                    {TEXTS.studyAvailabilityLabel}
+                  </Label>
                   <p className="text-sm text-gray-500">
-                    Show your availability calendar to others
+                    {TEXTS.studyAvailabilityDescription}
                   </p>
                 </div>
                 <Switch />
@@ -300,10 +344,8 @@ export default function EditProfile() {
     <div className="min-h-screen bg-gray-50 p-4 sm:p-6 md:p-8">
       <div className="flex flex-col pt-16 sm:pt-24 max-w-6xl mx-auto space-y-6">
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-gray-900">Edit Profile</h2>
-          <p className="text-sm text-gray-600">
-            Update your personal details and study preferences
-          </p>
+          <h1 className="text-2xl font-bold text-gray-900">{TEXTS.title}</h1>
+          <p className="text-sm text-gray-600">{TEXTS.subtitle}</p>
         </div>
 
         <div className="flex flex-col md:flex-row md:space-x-6 space-y-6 md:space-y-0">
@@ -346,7 +388,7 @@ export default function EditProfile() {
             <div className="bg-white p-6 rounded-lg shadow-sm space-y-6">
               {renderSection()}
               <div className="pt-4 border-t">
-                <Button className="w-auto">Save Changes</Button>
+                <Button className="w-auto">{TEXTS.saveChangesButton}</Button>
               </div>
             </div>
           </main>

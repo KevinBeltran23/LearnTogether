@@ -9,6 +9,22 @@ import { auth } from '@/lib/firebaseconfig';
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import Link from 'next/link';
 
+// Constant for text strings
+const TEXTS = {
+  title: 'Welcome Back',
+  subtitle: 'Please sign in to continue',
+  emailLabel: 'Email',
+  passwordLabel: 'Password',
+  signInButton: 'Sign In',
+  googleSignInButton: 'Continue with Google',
+  guestSignInButton: 'Continue as Guest',
+  signUpText: "Don't have an account?",
+  errorAlert: 'An error occurred during login',
+  invalidCredentials: 'Invalid email or password',
+  googleLoginError: 'Failed to login with Google',
+  signUpLink: 'Sign up',
+};
+
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -23,7 +39,7 @@ export default function LoginPage() {
     try {
       const res = await signInWithEmailAndPassword(email, password);
       if (!res) {
-        setError('Invalid email or password');
+        setError(TEXTS.invalidCredentials);
         return;
       }
       setEmail('');
@@ -33,7 +49,7 @@ export default function LoginPage() {
       if (err instanceof Error) {
         setError(err.message);
       } else {
-        setError('An error occurred during login');
+        setError(TEXTS.errorAlert);
       }
     }
   };
@@ -43,7 +59,7 @@ export default function LoginPage() {
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
       if (!result) {
-        setError('Failed to login with Google');
+        setError(TEXTS.googleLoginError);
         return;
       }
       router.push('/feed');
@@ -51,21 +67,19 @@ export default function LoginPage() {
       if (err instanceof Error) {
         setError(err.message);
       } else {
-        setError('An error occurred during Google login');
+        setError(TEXTS.errorAlert);
       }
     }
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="w-full min-h-screen sm:min-h-fit sm:w-[24rem] sm:rounded-xl p-6 sm:p-8 bg-white sm:shadow-lg flex flex-col justify-center">
         <section className="mb-8 text-center">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-            Welcome Back
+            {TEXTS.title}
           </h1>
-          <p className="mt-2 text-sm text-gray-600">
-            Please sign in to continue
-          </p>
+          <p className="mt-2 text-sm text-gray-600">{TEXTS.subtitle}</p>
         </section>
 
         {/* Error Alert */}
@@ -86,7 +100,7 @@ export default function LoginPage() {
               htmlFor="email"
               className="text-sm font-medium text-gray-700"
             >
-              Email
+              {TEXTS.emailLabel}
             </label>
             <Input
               id="email"
@@ -104,7 +118,7 @@ export default function LoginPage() {
               htmlFor="password"
               className="text-sm font-medium text-gray-700"
             >
-              Password
+              {TEXTS.passwordLabel}
             </label>
             <Input
               id="password"
@@ -118,7 +132,7 @@ export default function LoginPage() {
           </div>
 
           <Button type="submit" className="w-full h-11 text-base">
-            Sign In
+            {TEXTS.signInButton}
           </Button>
         </form>
 
@@ -139,7 +153,7 @@ export default function LoginPage() {
             variant="outline"
             className="w-full h-11 text-base font-medium"
           >
-            Continue with Google
+            {TEXTS.googleSignInButton}
           </Button>
 
           <Button
@@ -147,22 +161,22 @@ export default function LoginPage() {
             className="w-full h-11 text-base font-medium"
           >
             <Link href="/feed" className="w-full">
-              Continue as Guest
+              {TEXTS.guestSignInButton}
             </Link>
           </Button>
         </div>
 
         {/* Sign Up Link */}
         <p className="mt-8 text-center text-sm text-gray-600">
-          Don&apos;t have an account?{' '}
+          {TEXTS.signUpText}{' '}
           <Link
             href="/signup"
             className="font-semibold text-blue-600 hover:text-blue-500"
           >
-            Sign up
+            {TEXTS.signUpLink}
           </Link>
         </p>
       </div>
-    </main>
+    </div>
   );
 }

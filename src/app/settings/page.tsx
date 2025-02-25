@@ -57,6 +57,7 @@ export default function Settings() {
   console.log(user);
 
   const renderSection = () => {
+    // I am using h2 right here because the h1 is already used in the html calling this component
     switch (selectedSection) {
       case 'Display':
         return (
@@ -227,7 +228,7 @@ export default function Settings() {
     <div className="min-h-screen bg-gray-50 p-4 sm:p-6 md:p-8">
       <div className="flex flex-col pt-16 sm:pt-24 max-w-6xl mx-auto space-y-6">
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-gray-900">{TEXTS.title}</h2>
+          <h1 className="text-2xl font-bold text-gray-900">{TEXTS.title}</h1>
           <p className="text-sm text-gray-600">{TEXTS.subtitle}</p>
         </div>
 
@@ -278,15 +279,15 @@ export default function Settings() {
             </nav>
           </aside>
 
-          {/* Main Content */}
-          <main className="flex-1">
+          {/* Center Content */}
+          <div className="flex-1">
             <div className="bg-white p-6 rounded-lg shadow-sm space-y-6">
               {renderSection()}
               <div className="pt-4 border-t">
                 <Button className="w-auto">{TEXTS.saveChangesButton}</Button>
               </div>
             </div>
-          </main>
+          </div>
         </div>
       </div>
     </div>

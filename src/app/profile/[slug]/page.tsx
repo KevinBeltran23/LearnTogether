@@ -1,5 +1,7 @@
 'use client';
 
+// I think this is fine for now
+
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faGraduationCap,
@@ -46,6 +48,25 @@ const dummyProfile = {
   ],
 };
 
+const TEXTS = {
+  profileHeader: 'Profile',
+  connectButton: 'Connect',
+  studyPreferencesHeader: 'Study Preferences',
+  availabilityHeader: 'Availability',
+  academicInterestsHeader: 'Academic Interests',
+  quickInfoHeader: 'Quick Info',
+  preferredTimesLabel: 'Preferred Times',
+  frequencyLabel: 'Frequency',
+  publicProfileLabel: 'Public Profile',
+  studyStyleLabel: 'Study Style',
+  subjectsLabel: 'Subjects',
+  schoolLabel: 'School',
+  yearLabel: 'Year',
+  majorLabel: 'Major',
+  locationLabel: 'Location',
+  timeZoneLabel: 'Time Zone',
+};
+
 export default function ProfileView() {
   return (
     <div className="min-h-screen bg-gray-50 p-4 sm:p-6 md:p-8">
@@ -69,13 +90,18 @@ export default function ProfileView() {
             </div>
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <p className="text-gray-700">{dummyProfile.bio}</p>
-              <Button className="w-full sm:w-auto">Connect</Button>
+              <Button className="w-full sm:w-auto">
+                {TEXTS.connectButton}
+              </Button>
             </div>
           </div>
         </div>
 
         {/* Quick Info */}
-        <div className="bg-white rounded-lg shadow-sm p-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <section className="bg-white rounded-lg shadow-sm p-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">
+            {TEXTS.quickInfoHeader}
+          </h2>
           <div className="flex items-center space-x-3">
             <FontAwesomeIcon
               icon={faBuilding}
@@ -105,12 +131,12 @@ export default function ProfileView() {
               {dummyProfile.availability.timeZone}
             </span>
           </div>
-        </div>
+        </section>
 
         {/* Study Preferences */}
-        <div className="bg-white rounded-lg shadow-sm p-6">
+        <section className="bg-white rounded-lg shadow-sm p-6">
           <h2 className="text-xl font-semibold text-gray-900 mb-4">
-            Study Preferences
+            {TEXTS.studyPreferencesHeader}
           </h2>
           <div className="space-y-4">
             <div className="flex items-start space-x-3">
@@ -118,20 +144,24 @@ export default function ProfileView() {
                 icon={faUsers}
                 className="w-5 h-5 text-gray-400 mt-1"
               />
-              <div>
-                <h3 className="font-medium text-gray-900">Study Style</h3>
+              <section>
+                <h3 className="font-medium text-gray-900">
+                  {TEXTS.studyStyleLabel}
+                </h3>
                 <p className="text-gray-600">
                   {dummyProfile.studyPreferences.style}
                 </p>
-              </div>
+              </section>
             </div>
             <div className="flex items-start space-x-3">
               <FontAwesomeIcon
                 icon={faBook}
                 className="w-5 h-5 text-gray-400 mt-1"
               />
-              <div>
-                <h3 className="font-medium text-gray-900">Subjects</h3>
+              <section>
+                <h3 className="font-medium text-gray-900">
+                  {TEXTS.subjectsLabel}
+                </h3>
                 <div className="flex flex-wrap gap-2 mt-2">
                   {dummyProfile.subjects.map((subject) => (
                     <Badge key={subject} variant="secondary">
@@ -139,36 +169,40 @@ export default function ProfileView() {
                     </Badge>
                   ))}
                 </div>
-              </div>
+              </section>
             </div>
           </div>
-        </div>
+        </section>
 
         {/* Availability */}
-        <div className="bg-white rounded-lg shadow-sm p-6">
+        <section className="bg-white rounded-lg shadow-sm p-6">
           <h2 className="text-xl font-semibold text-gray-900 mb-4">
-            Availability
+            {TEXTS.availabilityHeader}
           </h2>
           <div className="space-y-4">
-            <div>
-              <h3 className="font-medium text-gray-900">Preferred Times</h3>
+            <section>
+              <h3 className="font-medium text-gray-900">
+                {TEXTS.preferredTimesLabel}
+              </h3>
               <p className="text-gray-600">
                 {dummyProfile.availability.preferredTimes}
               </p>
-            </div>
-            <div>
-              <h3 className="font-medium text-gray-900">Frequency</h3>
+            </section>
+            <section>
+              <h3 className="font-medium text-gray-900">
+                {TEXTS.frequencyLabel}
+              </h3>
               <p className="text-gray-600">
                 {dummyProfile.availability.frequency}
               </p>
-            </div>
+            </section>
           </div>
-        </div>
+        </section>
 
         {/* Interests */}
-        <div className="bg-white rounded-lg shadow-sm p-6">
+        <section className="bg-white rounded-lg shadow-sm p-6">
           <h2 className="text-xl font-semibold text-gray-900 mb-4">
-            Academic Interests
+            {TEXTS.academicInterestsHeader}
           </h2>
           <div className="flex flex-wrap gap-2">
             {dummyProfile.interests.map((interest) => (
@@ -177,7 +211,7 @@ export default function ProfileView() {
               </Badge>
             ))}
           </div>
-        </div>
+        </section>
       </div>
     </div>
   );
