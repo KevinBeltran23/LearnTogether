@@ -73,13 +73,15 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="w-full min-h-screen sm:min-h-fit sm:w-[24rem] sm:rounded-xl p-6 sm:p-8 bg-white sm:shadow-lg flex flex-col justify-center">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-zinc-900">
+      <div className="w-full min-h-screen sm:min-h-fit sm:w-[24rem] sm:rounded-xl p-6 sm:p-8 bg-white dark:bg-zinc-950 sm:shadow-lg dark:sm:shadow-zinc-800/20 flex flex-col justify-center">
         <section className="mb-8 text-center">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
             {TEXTS.title}
           </h1>
-          <p className="mt-2 text-sm text-gray-600">{TEXTS.subtitle}</p>
+          <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+            {TEXTS.subtitle}
+          </p>
         </section>
 
         {/* Error Alert */}
@@ -87,7 +89,7 @@ export default function LoginPage() {
           <div
             role="alert"
             aria-live="polite"
-            className="mb-4 p-4 bg-red-50 border border-red-100 text-red-600 text-sm rounded-lg"
+            className="mb-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800 text-red-600 dark:text-red-400 text-sm rounded-lg"
           >
             {error}
           </div>
@@ -98,7 +100,7 @@ export default function LoginPage() {
           <div>
             <label
               htmlFor="email"
-              className="text-sm font-medium text-gray-700"
+              className="text-sm font-medium text-gray-700 dark:text-gray-300"
             >
               {TEXTS.emailLabel}
             </label>
@@ -116,7 +118,7 @@ export default function LoginPage() {
           <div>
             <label
               htmlFor="password"
-              className="text-sm font-medium text-gray-700"
+              className="text-sm font-medium text-gray-700 dark:text-gray-300"
             >
               {TEXTS.passwordLabel}
             </label>
@@ -139,10 +141,12 @@ export default function LoginPage() {
         {/* Divider */}
         <div className="relative my-6">
           <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-gray-200"></div>
+            <div className="w-full border-t border-gray-200 dark:border-gray-700"></div>
           </div>
           <div className="relative flex justify-center text-sm">
-            <span className="px-2 bg-white text-gray-500">Or</span>
+            <span className="px-2 bg-white dark:bg-zinc-950 text-gray-500 dark:text-gray-400">
+              Or
+            </span>
           </div>
         </div>
 
@@ -167,11 +171,11 @@ export default function LoginPage() {
         </div>
 
         {/* Sign Up Link */}
-        <p className="mt-8 text-center text-sm text-gray-600">
+        <p className="mt-8 text-center text-sm text-gray-600 dark:text-gray-400">
           {TEXTS.signUpText}{' '}
           <Link
             href="/signup"
-            className="font-semibold text-blue-600 hover:text-blue-500"
+            className="font-semibold text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300"
           >
             {TEXTS.signUpLink}
           </Link>

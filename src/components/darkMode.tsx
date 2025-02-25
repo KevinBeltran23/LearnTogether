@@ -4,8 +4,7 @@
 
 import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
-import { Moon, Sun } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
 
 export function DarkModeToggle() {
   const { theme, setTheme } = useTheme();
@@ -18,16 +17,12 @@ export function DarkModeToggle() {
   if (!mounted) return null; // Prevent hydration mismatch
 
   return (
-    <Button
-      variant="ghost"
-      size="icon"
-      onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-    >
-      {theme === 'dark' ? (
-        <Sun className="h-5 w-5" />
-      ) : (
-        <Moon className="h-5 w-5" />
-      )}
-    </Button>
+    <div className="flex items-center">
+      <Switch
+        checked={theme === 'dark'}
+        onCheckedChange={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+        aria-label="Toggle Dark Mode"
+      />
+    </div>
   );
 }

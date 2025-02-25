@@ -84,7 +84,7 @@ export default function CreateProfile() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen">
+      <div className="flex justify-center items-center h-screen bg-gray-50 dark:bg-zinc-900">
         <Spinner />
       </div>
     );
@@ -92,13 +92,13 @@ export default function CreateProfile() {
 
   return (
     <div>
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 sm:p-6 md:p-8">
+      <div className="min-h-screen bg-gray-50 dark:bg-zinc-900 p-4 sm:p-6 md:p-8">
         <div className="flex flex-col pt-16 sm:pt-24 max-w-6xl mx-auto space-y-6">
           <div className="space-y-1">
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
               {TEXTS.title}
             </h1>
-            <p className="text-sm text-gray-600 dark:text-gray-300">
+            <p className="text-sm text-gray-600 dark:text-gray-400">
               {TEXTS.subtitle}
             </p>
           </div>
@@ -108,13 +108,18 @@ export default function CreateProfile() {
             onSubmit={handleSubmit}
           >
             <div className="flex-1">
-              <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm space-y-6">
+              <div className="bg-white dark:bg-zinc-950 p-6 rounded-lg shadow-sm dark:shadow-zinc-800/20 space-y-6">
                 {/* Personal Info Section */}
                 <section className="space-y-4">
                   <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
                     {TEXTS.personalInfo}
                   </h2>
-                  <Label htmlFor="name">{TEXTS.name}</Label>
+                  <Label
+                    htmlFor="name"
+                    className="text-gray-700 dark:text-gray-300"
+                  >
+                    {TEXTS.name}
+                  </Label>
                   <Input
                     id="name"
                     value={formData.name}
@@ -123,7 +128,12 @@ export default function CreateProfile() {
                     required
                   />
 
-                  <Label htmlFor="username">{TEXTS.username}</Label>
+                  <Label
+                    htmlFor="username"
+                    className="text-gray-700 dark:text-gray-300"
+                  >
+                    {TEXTS.username}
+                  </Label>
                   <Input
                     id="username"
                     value={formData.username}
@@ -132,7 +142,12 @@ export default function CreateProfile() {
                     required
                   />
 
-                  <Label htmlFor="bio">{TEXTS.bio}</Label>
+                  <Label
+                    htmlFor="bio"
+                    className="text-gray-700 dark:text-gray-300"
+                  >
+                    {TEXTS.bio}
+                  </Label>
                   <Textarea
                     id="bio"
                     value={formData.bio}
@@ -141,7 +156,12 @@ export default function CreateProfile() {
                     required
                   />
 
-                  <Label htmlFor="location">{TEXTS.location}</Label>
+                  <Label
+                    htmlFor="location"
+                    className="text-gray-700 dark:text-gray-300"
+                  >
+                    {TEXTS.location}
+                  </Label>
                   <Input
                     id="location"
                     value={formData.location}
@@ -151,14 +171,19 @@ export default function CreateProfile() {
                   />
                 </section>
 
-                <hr className="my-4" />
+                <hr className="my-4 border-gray-200 dark:border-gray-700" />
 
                 {/* Academic Info Section */}
                 <section className="space-y-4">
                   <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
                     {TEXTS.academicInfo}
                   </h2>
-                  <Label htmlFor="school">{TEXTS.school}</Label>
+                  <Label
+                    htmlFor="school"
+                    className="text-gray-700 dark:text-gray-300"
+                  >
+                    {TEXTS.school}
+                  </Label>
                   <Input
                     id="school"
                     value={formData.school}
@@ -166,7 +191,12 @@ export default function CreateProfile() {
                     placeholder="Your institution"
                   />
 
-                  <Label htmlFor="major">{TEXTS.major}</Label>
+                  <Label
+                    htmlFor="major"
+                    className="text-gray-700 dark:text-gray-300"
+                  >
+                    {TEXTS.major}
+                  </Label>
                   <Input
                     id="major"
                     value={formData.major}
@@ -175,7 +205,12 @@ export default function CreateProfile() {
                     required
                   />
 
-                  <Label htmlFor="year">{TEXTS.year}</Label>
+                  <Label
+                    htmlFor="year"
+                    className="text-gray-700 dark:text-gray-300"
+                  >
+                    {TEXTS.year}
+                  </Label>
                   <Input
                     id="year"
                     value={formData.year}
@@ -184,7 +219,12 @@ export default function CreateProfile() {
                     required
                   />
 
-                  <Label htmlFor="interests">{TEXTS.interests}</Label>
+                  <Label
+                    htmlFor="interests"
+                    className="text-gray-700 dark:text-gray-300"
+                  >
+                    {TEXTS.interests}
+                  </Label>
                   <Input
                     id="interests"
                     value={formData.interests}
@@ -194,14 +234,19 @@ export default function CreateProfile() {
                   />
                 </section>
 
-                <hr className="my-4" />
+                <hr className="my-4 border-gray-200 dark:border-gray-700" />
 
                 {/* Study Preferences Section */}
                 <section className="space-y-4">
                   <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
                     {TEXTS.studyPreferences}
                   </h2>
-                  <Label htmlFor="studyStyle">{TEXTS.studyStyle}</Label>
+                  <Label
+                    htmlFor="studyStyle"
+                    className="text-gray-700 dark:text-gray-300"
+                  >
+                    {TEXTS.studyStyle}
+                  </Label>
                   <Input
                     id="studyStyle"
                     value={formData.studyStyle}
@@ -210,7 +255,12 @@ export default function CreateProfile() {
                     required
                   />
 
-                  <Label htmlFor="environment">{TEXTS.environment}</Label>
+                  <Label
+                    htmlFor="environment"
+                    className="text-gray-700 dark:text-gray-300"
+                  >
+                    {TEXTS.environment}
+                  </Label>
                   <Input
                     id="environment"
                     value={formData.environment}
@@ -221,7 +271,12 @@ export default function CreateProfile() {
                     required
                   />
 
-                  <Label htmlFor="groupSize">{TEXTS.groupSize}</Label>
+                  <Label
+                    htmlFor="groupSize"
+                    className="text-gray-700 dark:text-gray-300"
+                  >
+                    {TEXTS.groupSize}
+                  </Label>
                   <Input
                     id="groupSize"
                     value={formData.groupSize}
@@ -230,7 +285,12 @@ export default function CreateProfile() {
                     required
                   />
 
-                  <Label htmlFor="subjects">{TEXTS.subjects}</Label>
+                  <Label
+                    htmlFor="subjects"
+                    className="text-gray-700 dark:text-gray-300"
+                  >
+                    {TEXTS.subjects}
+                  </Label>
                   <Input
                     id="subjects"
                     value={formData.subjects}
@@ -240,14 +300,17 @@ export default function CreateProfile() {
                   />
                 </section>
 
-                <hr className="my-4" />
+                <hr className="my-4 border-gray-200 dark:border-gray-700" />
 
                 {/* Availability Section */}
                 <section className="space-y-4">
                   <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
                     {TEXTS.availability}
                   </h2>
-                  <Label htmlFor="preferredTimes">
+                  <Label
+                    htmlFor="preferredTimes"
+                    className="text-gray-700 dark:text-gray-300"
+                  >
                     {TEXTS.preferredStudyTimes}
                   </Label>
                   <Input
@@ -260,7 +323,12 @@ export default function CreateProfile() {
                     required
                   />
 
-                  <Label htmlFor="timeZone">{TEXTS.timeZone}</Label>
+                  <Label
+                    htmlFor="timeZone"
+                    className="text-gray-700 dark:text-gray-300"
+                  >
+                    {TEXTS.timeZone}
+                  </Label>
                   <Input
                     id="timeZone"
                     value={formData.timeZone}
@@ -269,7 +337,12 @@ export default function CreateProfile() {
                     required
                   />
 
-                  <Label htmlFor="frequency">{TEXTS.studyFrequency}</Label>
+                  <Label
+                    htmlFor="frequency"
+                    className="text-gray-700 dark:text-gray-300"
+                  >
+                    {TEXTS.studyFrequency}
+                  </Label>
                   <Input
                     id="frequency"
                     value={formData.frequency}
@@ -279,7 +352,7 @@ export default function CreateProfile() {
                   />
                 </section>
 
-                <hr className="my-4" />
+                <hr className="my-4 border-gray-200 dark:border-gray-700" />
 
                 {/* Privacy Settings Section */}
                 <section className="space-y-4">
@@ -322,7 +395,7 @@ export default function CreateProfile() {
                 </section>
 
                 {/* Create Profile Button */}
-                <div className="pt-4 border-t">
+                <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
                   <Button type="submit" className="w-auto">
                     {TEXTS.createProfileButton}
                   </Button>

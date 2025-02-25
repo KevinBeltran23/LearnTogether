@@ -21,23 +21,7 @@ export default function Sidebar() {
   const pathname = usePathname();
 
   // State for group items
-  const [groupItems, setGroupItems] = useState<string[]>(DUMMY_GROUP_ITEMS);
-
-  // Example effect to simulate fetching data from the backend
-  useEffect(() => {
-    // Simulate fetching data
-    const fetchGroupItems = async () => {
-      // Replace this with your actual fetch call
-      // const response = await fetch('/api/group-items');
-      // const data = await response.json();
-      // setGroupItems(data);
-
-      // For now, we will just use the dummy items
-      setGroupItems(DUMMY_GROUP_ITEMS);
-    };
-
-    fetchGroupItems();
-  }, []);
+  const [groupItems] = useState<string[]>(DUMMY_GROUP_ITEMS);
 
   // Handle click outside
   useEffect(() => {

@@ -23,7 +23,6 @@ import { Modal } from '@/components/modal';
 import { CreatePostForm } from '@/components/createPostForm';
 import { useState, useEffect } from 'react';
 import { useSearch } from '@/context/searchContext';
-import { DarkModeToggle } from '@/components/darkMode';
 
 const TEXTS = {
   title: 'StudyBuddy',
@@ -90,7 +89,10 @@ export function Header() {
             </Button>
 
             {/* Logo */}
-            <Link href="/feed" className="flex items-center space-x-2">
+            <Link
+              href="/feed"
+              className="flex items-center space-x-2 hover:scale-105 transition-transform duration-200"
+            >
               <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold">S</span>
               </div>
@@ -124,7 +126,6 @@ export function Header() {
             >
               {TEXTS.notifications}
             </Link>
-            <DarkModeToggle />
           </nav>
 
           {/* Right Section */}
@@ -139,6 +140,7 @@ export function Header() {
                       setSearchQuery(searchQuery);
                     }}
                     className="flex items-center absolute right-0 top-1/2 -translate-y-1/2 bg-white dark:bg-gray-900"
+                    aria-label="Search"
                   >
                     <input
                       type="text"
@@ -177,7 +179,7 @@ export function Header() {
             {/* User Dropdown - Im going to try to make this a componenet from dropdown.tsx just was a bit different */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="rounded-full">
+                <Button variant="ghost" size="icon" aria-label="User">
                   <FontAwesomeIcon
                     icon={faUser}
                     className="h-5 w-5 text-gray-900 dark:text-white"
