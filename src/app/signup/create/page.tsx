@@ -12,7 +12,6 @@ import Spinner from '@/components/ui/spinner';
 import { useRequireAuth } from '@/context/authContext';
 import { Textarea } from '@/components/ui/textarea';
 
-// Constant for text strings
 const TEXTS = {
   title: 'Create Profile',
   subtitle: 'Fill in your details to create your profile',
@@ -28,6 +27,21 @@ const TEXTS = {
   studyAvailability: 'Study Availability',
   studyAvailabilityDescription: 'Show your availability calendar to others',
   createProfileButton: 'Create Profile',
+  name: 'Name',
+  username: 'Username',
+  bio: 'Bio',
+  location: 'Location',
+  school: 'School',
+  major: 'Major',
+  year: 'Year',
+  interests: 'Interests',
+  studyStyle: 'Study Style',
+  environment: 'Environment',
+  groupSize: 'Group Size',
+  subjects: 'Subjects',
+  preferredStudyTimes: 'Preferred Study Times',
+  timeZone: 'Time Zone',
+  studyFrequency: 'Study Frequency',
 };
 
 export default function CreateProfile() {
@@ -100,7 +114,7 @@ export default function CreateProfile() {
                   <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
                     {TEXTS.personalInfo}
                   </h2>
-                  <Label htmlFor="name">Name</Label>
+                  <Label htmlFor="name">{TEXTS.name}</Label>
                   <Input
                     id="name"
                     value={formData.name}
@@ -109,7 +123,7 @@ export default function CreateProfile() {
                     required
                   />
 
-                  <Label htmlFor="username">Username</Label>
+                  <Label htmlFor="username">{TEXTS.username}</Label>
                   <Input
                     id="username"
                     value={formData.username}
@@ -118,7 +132,7 @@ export default function CreateProfile() {
                     required
                   />
 
-                  <Label htmlFor="bio">Bio</Label>
+                  <Label htmlFor="bio">{TEXTS.bio}</Label>
                   <Textarea
                     id="bio"
                     value={formData.bio}
@@ -127,7 +141,7 @@ export default function CreateProfile() {
                     required
                   />
 
-                  <Label htmlFor="location">Location</Label>
+                  <Label htmlFor="location">{TEXTS.location}</Label>
                   <Input
                     id="location"
                     value={formData.location}
@@ -144,7 +158,7 @@ export default function CreateProfile() {
                   <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
                     {TEXTS.academicInfo}
                   </h2>
-                  <Label htmlFor="school">School</Label>
+                  <Label htmlFor="school">{TEXTS.school}</Label>
                   <Input
                     id="school"
                     value={formData.school}
@@ -152,7 +166,7 @@ export default function CreateProfile() {
                     placeholder="Your institution"
                   />
 
-                  <Label htmlFor="major">Field of Study/Major</Label>
+                  <Label htmlFor="major">{TEXTS.major}</Label>
                   <Input
                     id="major"
                     value={formData.major}
@@ -161,7 +175,7 @@ export default function CreateProfile() {
                     required
                   />
 
-                  <Label htmlFor="year">Year/Level</Label>
+                  <Label htmlFor="year">{TEXTS.year}</Label>
                   <Input
                     id="year"
                     value={formData.year}
@@ -170,7 +184,7 @@ export default function CreateProfile() {
                     required
                   />
 
-                  <Label htmlFor="interests">Academic Interests</Label>
+                  <Label htmlFor="interests">{TEXTS.interests}</Label>
                   <Input
                     id="interests"
                     value={formData.interests}
@@ -187,7 +201,7 @@ export default function CreateProfile() {
                   <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
                     {TEXTS.studyPreferences}
                   </h2>
-                  <Label htmlFor="studyStyle">Preferred Study Style</Label>
+                  <Label htmlFor="studyStyle">{TEXTS.studyStyle}</Label>
                   <Input
                     id="studyStyle"
                     value={formData.studyStyle}
@@ -196,9 +210,7 @@ export default function CreateProfile() {
                     required
                   />
 
-                  <Label htmlFor="environment">
-                    Preferred Study Environment
-                  </Label>
+                  <Label htmlFor="environment">{TEXTS.environment}</Label>
                   <Input
                     id="environment"
                     value={formData.environment}
@@ -209,7 +221,7 @@ export default function CreateProfile() {
                     required
                   />
 
-                  <Label htmlFor="groupSize">Preferred Group Size</Label>
+                  <Label htmlFor="groupSize">{TEXTS.groupSize}</Label>
                   <Input
                     id="groupSize"
                     value={formData.groupSize}
@@ -218,7 +230,7 @@ export default function CreateProfile() {
                     required
                   />
 
-                  <Label htmlFor="subjects">Subjects Looking to Study</Label>
+                  <Label htmlFor="subjects">{TEXTS.subjects}</Label>
                   <Input
                     id="subjects"
                     value={formData.subjects}
@@ -235,7 +247,9 @@ export default function CreateProfile() {
                   <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
                     {TEXTS.availability}
                   </h2>
-                  <Label htmlFor="preferredTimes">Preferred Study Times</Label>
+                  <Label htmlFor="preferredTimes">
+                    {TEXTS.preferredStudyTimes}
+                  </Label>
                   <Input
                     id="preferredTimes"
                     value={formData.preferredTimes}
@@ -246,7 +260,7 @@ export default function CreateProfile() {
                     required
                   />
 
-                  <Label htmlFor="timeZone">Time Zone</Label>
+                  <Label htmlFor="timeZone">{TEXTS.timeZone}</Label>
                   <Input
                     id="timeZone"
                     value={formData.timeZone}
@@ -255,7 +269,7 @@ export default function CreateProfile() {
                     required
                   />
 
-                  <Label htmlFor="frequency">Study Frequency</Label>
+                  <Label htmlFor="frequency">{TEXTS.studyFrequency}</Label>
                   <Input
                     id="frequency"
                     value={formData.frequency}

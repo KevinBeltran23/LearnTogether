@@ -28,7 +28,6 @@ interface CreatePostFormProps {
   onCancel: () => void;
 }
 
-// Constant for text strings
 const TEXTS = {
   title: 'Create Post',
   description: 'Fill in the details to create your post',
@@ -67,8 +66,8 @@ export function CreatePostForm({ onSubmit, onCancel }: CreatePostFormProps) {
   };
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault(); // Prevent default form submission
-    handleCreatePost(); // Call the post creation function
+    e.preventDefault();
+    handleCreatePost();
   };
 
   return (

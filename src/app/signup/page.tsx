@@ -1,5 +1,7 @@
 'use client';
 
+// this is fine for now
+
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Input } from '@/components/ui/input';
@@ -8,6 +10,18 @@ import { useCreateUserWithEmailAndPassword } from 'react-firebase-hooks/auth';
 import { auth } from '@/lib/firebaseconfig';
 
 import Link from 'next/link';
+
+const TEXTS = {
+  title: 'Create Account',
+  subtitle: 'Please sign up to continue',
+  emailLabel: 'Email',
+  passwordLabel: 'Password',
+  confirmPasswordLabel: 'Confirm Password',
+  createAccountButton: 'Create Account',
+  signInLink: 'Sign in',
+  errorAlert: 'An error occurred during signup',
+  signInLinkText: 'Already have an account?',
+};
 
 export default function SignupPage() {
   const [email, setEmail] = useState('');
@@ -41,21 +55,19 @@ export default function SignupPage() {
       if (err instanceof Error) {
         setError(err.message);
       } else {
-        setError('An error occurred during signup');
+        setError(TEXTS.errorAlert);
       }
     }
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="w-full min-h-screen sm:min-h-fit sm:w-[24rem] sm:rounded-xl p-6 sm:p-8 bg-white sm:shadow-lg flex flex-col justify-center">
         <section className="mb-8 text-center">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-            Create Account
+            {TEXTS.title}
           </h1>
-          <p className="mt-2 text-sm text-gray-600">
-            Please sign up to continue
-          </p>
+          <p className="mt-2 text-sm text-gray-600">{TEXTS.subtitle}</p>
         </section>
 
         {/* Error Alert */}
@@ -76,7 +88,7 @@ export default function SignupPage() {
               htmlFor="email"
               className="text-sm font-medium text-gray-700"
             >
-              Email
+              {TEXTS.emailLabel}
             </label>
             <Input
               id="email"
@@ -94,7 +106,7 @@ export default function SignupPage() {
               htmlFor="password"
               className="text-sm font-medium text-gray-700"
             >
-              Password
+              {TEXTS.passwordLabel}
             </label>
             <Input
               id="password"
@@ -112,7 +124,7 @@ export default function SignupPage() {
               htmlFor="confirmPassword"
               className="text-sm font-medium text-gray-700"
             >
-              Confirm Password
+              {TEXTS.confirmPasswordLabel}
             </label>
             <Input
               id="confirmPassword"
@@ -126,21 +138,21 @@ export default function SignupPage() {
           </div>
 
           <Button type="submit" className="w-full h-11 text-base">
-            Create Account
+            {TEXTS.createAccountButton}
           </Button>
         </form>
 
         {/* Sign In Link */}
         <p className="mt-8 text-center text-sm text-gray-600">
-          Already have an account?{' '}
+          {TEXTS.signInLinkText}{' '}
           <Link
             href="/"
             className="font-semibold text-blue-600 hover:text-blue-500"
           >
-            Sign in
+            {TEXTS.signInLink}
           </Link>
         </p>
       </div>
-    </main>
+    </div>
   );
 }

@@ -1,5 +1,7 @@
 'use client';
 
+// this is fine for now
+
 import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -17,6 +19,35 @@ import {
 import { useRequireAuth } from '@/context/authContext';
 import { MobileSectionDropdown } from '@/components/mobileSectionDropdown';
 
+const TEXTS = {
+  title: 'Settings',
+  subtitle: 'Manage your account settings and preferences',
+  displaySection: 'Display',
+  accountSection: 'Account',
+  notificationsSection: 'Notifications',
+  privacySection: 'Privacy',
+  securitySection: 'Security',
+  darkModeLabel: 'Dark Mode',
+  darkModeDescription: 'Enable dark mode for the application',
+  emailNotificationsLabel: 'Email Notifications',
+  emailNotificationsDescription:
+    'Receive email notifications about your activities',
+  publicProfileLabel: 'Public Profile',
+  publicProfileDescription: 'Anyone can view your profile',
+  searchEngineLabel: 'Search Engine Indexing',
+  searchEngineDescription: 'Allow search engines to index your profile',
+  twoFactorAuthLabel: 'Two-Factor Authentication',
+  twoFactorAuthDescription:
+    'Secure your account with two-factor authentication',
+  changePasswordLabel: 'Change Password',
+  saveChangesButton: 'Save Changes',
+  nameLabel: 'Name',
+  emailLabel: 'Email',
+  usernameLabel: 'Username',
+  passwordLabel: 'Password',
+  confirmPasswordLabel: 'Confirm Password',
+};
+
 export default function Settings() {
   const { user, loading } = useRequireAuth();
   const [darkMode, setDarkMode] = useState(false);
@@ -31,14 +62,16 @@ export default function Settings() {
         return (
           <div className="space-y-6">
             <div className="flex items-center justify-between pb-4 border-b">
-              <h2 className="text-xl font-semibold text-gray-900">Display</h2>
+              <h2 className="text-xl font-semibold text-gray-900">
+                {TEXTS.displaySection}
+              </h2>
             </div>
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label className="text-base">Dark Mode</Label>
+                  <Label className="text-base">{TEXTS.darkModeLabel}</Label>
                   <p className="text-sm text-gray-500">
-                    Enable dark mode for the application
+                    {TEXTS.darkModeDescription}
                   </p>
                 </div>
                 <Switch checked={darkMode} onCheckedChange={setDarkMode} />
@@ -50,18 +83,20 @@ export default function Settings() {
         return (
           <div className="space-y-6">
             <div className="flex items-center justify-between pb-4 border-b">
-              <h2 className="text-xl font-semibold text-gray-900">Account</h2>
+              <h2 className="text-xl font-semibold text-gray-900">
+                {TEXTS.accountSection}
+              </h2>
             </div>
             <div className="space-y-4">
               <div>
                 <Label htmlFor="name" className="text-sm font-medium">
-                  Name
+                  {TEXTS.nameLabel}
                 </Label>
                 <Input id="name" placeholder="Your name" className="w-full" />
               </div>
               <div>
                 <Label htmlFor="email" className="text-sm font-medium">
-                  Email
+                  {TEXTS.emailLabel}
                 </Label>
                 <Input
                   id="email"
@@ -72,7 +107,7 @@ export default function Settings() {
               </div>
               <div>
                 <Label htmlFor="username" className="text-sm font-medium">
-                  Username
+                  {TEXTS.usernameLabel}
                 </Label>
                 <Input
                   id="username"
@@ -88,15 +123,17 @@ export default function Settings() {
           <div className="space-y-6">
             <div className="flex items-center justify-between pb-4 border-b">
               <h2 className="text-xl font-semibold text-gray-900">
-                Notifications
+                {TEXTS.notificationsSection}
               </h2>
             </div>
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label className="text-base">Email Notifications</Label>
+                  <Label className="text-base">
+                    {TEXTS.emailNotificationsLabel}
+                  </Label>
                   <p className="text-sm text-gray-500">
-                    Receive email notifications about your activities
+                    {TEXTS.emailNotificationsDescription}
                   </p>
                 </div>
                 <Switch
@@ -111,23 +148,27 @@ export default function Settings() {
         return (
           <div className="space-y-6">
             <div className="flex items-center justify-between pb-4 border-b">
-              <h2 className="text-xl font-semibold text-gray-900">Privacy</h2>
+              <h2 className="text-xl font-semibold text-gray-900">
+                {TEXTS.privacySection}
+              </h2>
             </div>
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label className="text-base">Public Profile</Label>
+                  <Label className="text-base">
+                    {TEXTS.publicProfileLabel}
+                  </Label>
                   <p className="text-sm text-gray-500">
-                    Anyone can view your profile
+                    {TEXTS.publicProfileDescription}
                   </p>
                 </div>
                 <Switch />
               </div>
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label className="text-base">Search Engine Indexing</Label>
+                  <Label className="text-base">{TEXTS.searchEngineLabel}</Label>
                   <p className="text-sm text-gray-500">
-                    Allow search engines to index your profile
+                    {TEXTS.searchEngineDescription}
                   </p>
                 </div>
                 <Switch />
@@ -139,21 +180,25 @@ export default function Settings() {
         return (
           <div className="space-y-6">
             <div className="flex items-center justify-between pb-4 border-b">
-              <h2 className="text-xl font-semibold text-gray-900">Security</h2>
+              <h2 className="text-xl font-semibold text-gray-900">
+                {TEXTS.securitySection}
+              </h2>
             </div>
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label className="text-base">Two-Factor Authentication</Label>
+                  <Label className="text-base">
+                    {TEXTS.twoFactorAuthLabel}
+                  </Label>
                   <p className="text-sm text-gray-500">
-                    Secure your account with two-factor authentication
+                    {TEXTS.twoFactorAuthDescription}
                   </p>
                 </div>
                 <Switch />
               </div>
               <div>
                 <Label htmlFor="password" className="text-sm font-medium">
-                  Change Password
+                  {TEXTS.changePasswordLabel}
                 </Label>
                 <Input
                   id="password"
@@ -182,21 +227,19 @@ export default function Settings() {
     <div className="min-h-screen bg-gray-50 p-4 sm:p-6 md:p-8">
       <div className="flex flex-col pt-16 sm:pt-24 max-w-6xl mx-auto space-y-6">
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-gray-900">Settings</h2>
-          <p className="text-sm text-gray-600">
-            Manage your account settings and preferences
-          </p>
+          <h2 className="text-2xl font-bold text-gray-900">{TEXTS.title}</h2>
+          <p className="text-sm text-gray-600">{TEXTS.subtitle}</p>
         </div>
 
         <div className="flex flex-col md:flex-row md:space-x-6 space-y-6 md:space-y-0">
           {/* Mobile Dropdown */}
           <MobileSectionDropdown
             sections={[
-              { name: 'Display', icon: faDisplay },
-              { name: 'Account', icon: faKey },
-              { name: 'Notifications', icon: faBell },
-              { name: 'Privacy', icon: faGlobe },
-              { name: 'Security', icon: faShieldAlt },
+              { name: TEXTS.displaySection, icon: faDisplay },
+              { name: TEXTS.accountSection, icon: faKey },
+              { name: TEXTS.notificationsSection, icon: faBell },
+              { name: TEXTS.privacySection, icon: faGlobe },
+              { name: TEXTS.securitySection, icon: faShieldAlt },
             ]}
             selectedSection={selectedSection}
             onSectionChange={setSelectedSection}
@@ -207,11 +250,11 @@ export default function Settings() {
             <nav className="bg-white p-3 rounded-lg shadow-sm">
               <ul className="space-y-1">
                 {[
-                  { name: 'Display', icon: faKey },
-                  { name: 'Account', icon: faKey },
-                  { name: 'Notifications', icon: faBell },
-                  { name: 'Privacy', icon: faGlobe },
-                  { name: 'Security', icon: faShieldAlt },
+                  { name: TEXTS.displaySection, icon: faDisplay },
+                  { name: TEXTS.accountSection, icon: faKey },
+                  { name: TEXTS.notificationsSection, icon: faBell },
+                  { name: TEXTS.privacySection, icon: faGlobe },
+                  { name: TEXTS.securitySection, icon: faShieldAlt },
                 ].map((item) => (
                   <li key={item.name}>
                     <button
@@ -240,7 +283,7 @@ export default function Settings() {
             <div className="bg-white p-6 rounded-lg shadow-sm space-y-6">
               {renderSection()}
               <div className="pt-4 border-t">
-                <Button className="w-auto">Save Changes</Button>
+                <Button className="w-auto">{TEXTS.saveChangesButton}</Button>
               </div>
             </div>
           </main>

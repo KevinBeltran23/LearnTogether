@@ -1,5 +1,7 @@
 'use client';
 
+// this is fine for now
+
 import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
 import { Moon, Sun } from 'lucide-react';
