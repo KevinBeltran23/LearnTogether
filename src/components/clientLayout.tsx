@@ -1,5 +1,7 @@
 'use client';
 
+// this is fine for now
+
 import { usePathname } from 'next/navigation';
 import { Header } from '@/components/header';
 import Footer from '@/components/footer';
@@ -11,7 +13,8 @@ export default function ClientLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const isAuthPage = pathname === '/' || pathname === '/signup';
+  const isAuthPage =
+    pathname === '/' || pathname === '/signup' || pathname === '/signup/create';
 
   // Paths where create post button should be hidden
   const hideCreatePost = ['/settings', '/messages'];

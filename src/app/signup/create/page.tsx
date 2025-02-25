@@ -1,5 +1,7 @@
 'use client';
 
+// this is fine for now
+
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Input } from '@/components/ui/input';
@@ -8,56 +10,63 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import Spinner from '@/components/ui/spinner';
 import { useRequireAuth } from '@/context/authContext';
+import { Textarea } from '@/components/ui/textarea';
+
+// Constant for text strings
+const TEXTS = {
+  title: 'Create Profile',
+  subtitle: 'Fill in your details to create your profile',
+  personalInfo: 'Personal Info',
+  academicInfo: 'Academic Info',
+  studyPreferences: 'Study Preferences',
+  availability: 'Availability',
+  privacy: 'Privacy',
+  publicProfile: 'Public Profile',
+  publicProfileDescription: 'Allow others to view your profile',
+  showLocation: 'Show Location',
+  showLocationDescription: 'Display your location to other users',
+  studyAvailability: 'Study Availability',
+  studyAvailabilityDescription: 'Show your availability calendar to others',
+  createProfileButton: 'Create Profile',
+};
 
 export default function CreateProfile() {
   const { user, loading } = useRequireAuth();
   const router = useRouter();
-  const [publicProfile, setPublicProfile] = useState(true);
 
-  // New state variables for user entries
-  const [name, setName] = useState('');
-  const [username, setUsername] = useState('');
-  const [bio, setBio] = useState('');
-  const [location, setLocation] = useState('');
-  const [school, setSchool] = useState('');
-  const [major, setMajor] = useState('');
-  const [year, setYear] = useState('');
-  const [interests, setInterests] = useState('');
-  const [studyStyle, setStudyStyle] = useState('');
-  const [environment, setEnvironment] = useState('');
-  const [groupSize, setGroupSize] = useState('');
-  const [subjects, setSubjects] = useState('');
-  const [preferredTimes, setPreferredTimes] = useState('');
-  const [timeZone, setTimeZone] = useState('');
-  const [frequency, setFrequency] = useState('');
+  console.log(user);
 
-  // Function to handle profile creation
+  const [formData, setFormData] = useState({
+    name: '',
+    username: '',
+    bio: '',
+    location: '',
+    school: '',
+    major: '',
+    year: '',
+    interests: '',
+    studyStyle: '',
+    environment: '',
+    groupSize: '',
+    subjects: '',
+    preferredTimes: '',
+    timeZone: '',
+    frequency: '',
+    publicProfile: true,
+  });
+
   const handleCreateProfile = () => {
-    // Simulate updating the user profile
-    const updatedProfile = {
-      name,
-      username,
-      bio,
-      location,
-      school,
-      major,
-      year,
-      interests,
-      studyStyle,
-      environment,
-      groupSize,
-      subjects,
-      preferredTimes,
-      timeZone,
-      frequency,
-      publicProfile,
-    };
-
-    console.log('Profile updated:', updatedProfile);
     router.push('/feed');
   };
 
-  console.log(user);
+  const handleChange = (field: string, value: string) => {
+    setFormData({ ...formData, [field]: value });
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault(); // Prevent default form submission
+    handleCreateProfile(); // Call the profile creation function
+  };
 
   if (loading) {
     return (
@@ -68,305 +77,245 @@ export default function CreateProfile() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 sm:p-6 md:p-8">
-      <div className="flex flex-col pt-16 sm:pt-24 max-w-6xl mx-auto space-y-6">
-        <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Create Profile
-          </h2>
-          <p className="text-sm text-gray-600 dark:text-gray-300">
-            Fill in your details to create your profile
-          </p>
-        </div>
+    <div>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 sm:p-6 md:p-8">
+        <div className="flex flex-col pt-16 sm:pt-24 max-w-6xl mx-auto space-y-6">
+          <div className="space-y-1">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+              {TEXTS.title}
+            </h1>
+            <p className="text-sm text-gray-600 dark:text-gray-300">
+              {TEXTS.subtitle}
+            </p>
+          </div>
 
-        <div className="flex flex-col md:flex-row md:space-x-6 space-y-6 md:space-y-0">
-          {/* Main Content */}
-          <main className="flex-1">
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm space-y-6">
-              {/* Personal Info Section */}
-              <div className="space-y-4">
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-                  Personal Info
-                </h3>
-                <Label
-                  htmlFor="name"
-                  className="text-sm font-medium text-gray-700 dark:text-gray-300"
-                >
-                  Name
-                </Label>
-                <Input
-                  id="name"
-                  placeholder="Your name"
-                  className="w-full mb-4"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                />
-
-                <Label
-                  htmlFor="username"
-                  className="text-sm font-medium text-gray-700 dark:text-gray-300"
-                >
-                  Username
-                </Label>
-                <Input
-                  id="username"
-                  placeholder="Your username"
-                  className="w-full mb-4"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                />
-
-                <Label
-                  htmlFor="bio"
-                  className="text-sm font-medium text-gray-700 dark:text-gray-300"
-                >
-                  Bio
-                </Label>
-                <Input
-                  id="bio"
-                  placeholder="Tell others about yourself"
-                  className="w-full mb-4"
-                  value={bio}
-                  onChange={(e) => setBio(e.target.value)}
-                />
-
-                <Label
-                  htmlFor="location"
-                  className="text-sm font-medium text-gray-700 dark:text-gray-300"
-                >
-                  Location
-                </Label>
-                <Input
-                  id="location"
-                  placeholder="City, Country"
-                  className="w-full mb-4"
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                />
-              </div>
-              <hr className="my-4" /> {/* Section Break */}
-              {/* Academic Info Section */}
-              <div className="space-y-4">
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-                  Academic Info
-                </h3>
-                <Label
-                  htmlFor="school"
-                  className="text-sm font-medium text-gray-700 dark:text-gray-300"
-                >
-                  School/University
-                </Label>
-                <Input
-                  id="school"
-                  placeholder="Your institution"
-                  className="w-full mb-4"
-                  value={school}
-                  onChange={(e) => setSchool(e.target.value)}
-                />
-
-                <Label
-                  htmlFor="major"
-                  className="text-sm font-medium text-gray-700 dark:text-gray-300"
-                >
-                  Field of Study/Major
-                </Label>
-                <Input
-                  id="major"
-                  placeholder="Your field of study"
-                  className="w-full mb-4"
-                  value={major}
-                  onChange={(e) => setMajor(e.target.value)}
-                />
-
-                <Label
-                  htmlFor="year"
-                  className="text-sm font-medium text-gray-700 dark:text-gray-300"
-                >
-                  Year/Level
-                </Label>
-                <Input
-                  id="year"
-                  placeholder="e.g., Freshman, Senior, Graduate"
-                  className="w-full mb-4"
-                  value={year}
-                  onChange={(e) => setYear(e.target.value)}
-                />
-
-                <Label
-                  htmlFor="interests"
-                  className="text-sm font-medium text-gray-700 dark:text-gray-300"
-                >
-                  Academic Interests
-                </Label>
-                <Input
-                  id="interests"
-                  placeholder="e.g., Machine Learning, Literature, Biology"
-                  className="w-full mb-4"
-                  value={interests}
-                  onChange={(e) => setInterests(e.target.value)}
-                />
-              </div>
-              <hr className="my-4" /> {/* Section Break */}
-              {/* Study Preferences Section */}
-              <div className="space-y-4">
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-                  Study Preferences
-                </h3>
-                <Label
-                  htmlFor="study-style"
-                  className="text-sm font-medium text-gray-700 dark:text-gray-300"
-                >
-                  Preferred Study Style
-                </Label>
-                <Input
-                  id="study-style"
-                  placeholder="e.g., Group discussions, Silent study, Project collaboration"
-                  className="w-full mb-4"
-                  value={studyStyle}
-                  onChange={(e) => setStudyStyle(e.target.value)}
-                />
-
-                <Label
-                  htmlFor="environment"
-                  className="text-sm font-medium text-gray-700 dark:text-gray-300"
-                >
-                  Preferred Study Environment
-                </Label>
-                <Input
-                  id="environment"
-                  placeholder="e.g., Library, Coffee shop, Online"
-                  className="w-full mb-4"
-                  value={environment}
-                  onChange={(e) => setEnvironment(e.target.value)}
-                />
-
-                <Label
-                  htmlFor="group-size"
-                  className="text-sm font-medium text-gray-700 dark:text-gray-300"
-                >
-                  Preferred Group Size
-                </Label>
-                <Input
-                  id="group-size"
-                  placeholder="e.g., 2-3 people, 4-6 people"
-                  className="w-full mb-4"
-                  value={groupSize}
-                  onChange={(e) => setGroupSize(e.target.value)}
-                />
-
-                <Label
-                  htmlFor="subjects"
-                  className="text-sm font-medium text-gray-700 dark:text-gray-300"
-                >
-                  Subjects Looking to Study
-                </Label>
-                <Input
-                  id="subjects"
-                  placeholder="List subjects you want to study with others"
-                  className="w-full mb-4"
-                  value={subjects}
-                  onChange={(e) => setSubjects(e.target.value)}
-                />
-              </div>
-              <hr className="my-4" /> {/* Section Break */}
-              {/* Availability Section */}
-              <div className="space-y-4">
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-                  Availability
-                </h3>
-                <Label
-                  htmlFor="preferred-times"
-                  className="text-sm font-medium text-gray-700 dark:text-gray-300"
-                >
-                  Preferred Study Times
-                </Label>
-                <Input
-                  id="preferred-times"
-                  placeholder="e.g., Weekday evenings, Weekend afternoons"
-                  className="w-full mb-4"
-                  value={preferredTimes}
-                  onChange={(e) => setPreferredTimes(e.target.value)}
-                />
-
-                <Label
-                  htmlFor="time-zone"
-                  className="text-sm font-medium text-gray-700 dark:text-gray-300"
-                >
-                  Time Zone
-                </Label>
-                <Input
-                  id="time-zone"
-                  placeholder="Your time zone"
-                  className="w-full mb-4"
-                  value={timeZone}
-                  onChange={(e) => setTimeZone(e.target.value)}
-                />
-
-                <Label
-                  htmlFor="frequency"
-                  className="text-sm font-medium text-gray-700 dark:text-gray-300"
-                >
-                  Study Frequency
-                </Label>
-                <Input
-                  id="frequency"
-                  placeholder="e.g., Weekly, Bi-weekly, As needed"
-                  className="w-full mb-4"
-                  value={frequency}
-                  onChange={(e) => setFrequency(e.target.value)}
-                />
-              </div>
-              <hr className="my-4" /> {/* Section Break */}
-              {/* Privacy Settings Section */}
-              <div className="space-y-4">
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-                  Privacy
-                </h3>
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label className="text-base text-gray-700 dark:text-gray-300">
-                      Public Profile
-                    </Label>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                      Allow others to view your profile
-                    </p>
-                  </div>
-                  <Switch
-                    checked={publicProfile}
-                    onCheckedChange={setPublicProfile}
+          <form
+            className="flex flex-col md:flex-row md:space-x-6 space-y-6 md:space-y-0"
+            onSubmit={handleSubmit}
+          >
+            <div className="flex-1">
+              <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm space-y-6">
+                {/* Personal Info Section */}
+                <section className="space-y-4">
+                  <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                    {TEXTS.personalInfo}
+                  </h2>
+                  <Label htmlFor="name">Name</Label>
+                  <Input
+                    id="name"
+                    value={formData.name}
+                    onChange={(e) => handleChange('name', e.target.value)}
+                    placeholder="Your name"
+                    required
                   />
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label className="text-base text-gray-700 dark:text-gray-300">
-                      Show Location
-                    </Label>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                      Display your location to other users
-                    </p>
+
+                  <Label htmlFor="username">Username</Label>
+                  <Input
+                    id="username"
+                    value={formData.username}
+                    onChange={(e) => handleChange('username', e.target.value)}
+                    placeholder="Your username"
+                    required
+                  />
+
+                  <Label htmlFor="bio">Bio</Label>
+                  <Textarea
+                    id="bio"
+                    value={formData.bio}
+                    onChange={(e) => handleChange('bio', e.target.value)}
+                    placeholder="Tell others about yourself"
+                    required
+                  />
+
+                  <Label htmlFor="location">Location</Label>
+                  <Input
+                    id="location"
+                    value={formData.location}
+                    onChange={(e) => handleChange('location', e.target.value)}
+                    placeholder="City, Country"
+                    required
+                  />
+                </section>
+
+                <hr className="my-4" />
+
+                {/* Academic Info Section */}
+                <section className="space-y-4">
+                  <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                    {TEXTS.academicInfo}
+                  </h2>
+                  <Label htmlFor="school">School</Label>
+                  <Input
+                    id="school"
+                    value={formData.school}
+                    onChange={(e) => handleChange('school', e.target.value)}
+                    placeholder="Your institution"
+                  />
+
+                  <Label htmlFor="major">Field of Study/Major</Label>
+                  <Input
+                    id="major"
+                    value={formData.major}
+                    onChange={(e) => handleChange('major', e.target.value)}
+                    placeholder="Your field of study"
+                    required
+                  />
+
+                  <Label htmlFor="year">Year/Level</Label>
+                  <Input
+                    id="year"
+                    value={formData.year}
+                    onChange={(e) => handleChange('year', e.target.value)}
+                    placeholder="e.g., Freshman, Senior, Graduate"
+                    required
+                  />
+
+                  <Label htmlFor="interests">Academic Interests</Label>
+                  <Input
+                    id="interests"
+                    value={formData.interests}
+                    onChange={(e) => handleChange('interests', e.target.value)}
+                    placeholder="e.g., Machine Learning, Literature, Biology"
+                    required
+                  />
+                </section>
+
+                <hr className="my-4" />
+
+                {/* Study Preferences Section */}
+                <section className="space-y-4">
+                  <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                    {TEXTS.studyPreferences}
+                  </h2>
+                  <Label htmlFor="studyStyle">Preferred Study Style</Label>
+                  <Input
+                    id="studyStyle"
+                    value={formData.studyStyle}
+                    onChange={(e) => handleChange('studyStyle', e.target.value)}
+                    placeholder="e.g., Group discussions, Silent study"
+                    required
+                  />
+
+                  <Label htmlFor="environment">
+                    Preferred Study Environment
+                  </Label>
+                  <Input
+                    id="environment"
+                    value={formData.environment}
+                    onChange={(e) =>
+                      handleChange('environment', e.target.value)
+                    }
+                    placeholder="e.g., Library, Coffee shop"
+                    required
+                  />
+
+                  <Label htmlFor="groupSize">Preferred Group Size</Label>
+                  <Input
+                    id="groupSize"
+                    value={formData.groupSize}
+                    onChange={(e) => handleChange('groupSize', e.target.value)}
+                    placeholder="e.g., 2-3 people"
+                    required
+                  />
+
+                  <Label htmlFor="subjects">Subjects Looking to Study</Label>
+                  <Input
+                    id="subjects"
+                    value={formData.subjects}
+                    onChange={(e) => handleChange('subjects', e.target.value)}
+                    placeholder="List subjects you want to study"
+                    required
+                  />
+                </section>
+
+                <hr className="my-4" />
+
+                {/* Availability Section */}
+                <section className="space-y-4">
+                  <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                    {TEXTS.availability}
+                  </h2>
+                  <Label htmlFor="preferredTimes">Preferred Study Times</Label>
+                  <Input
+                    id="preferredTimes"
+                    value={formData.preferredTimes}
+                    onChange={(e) =>
+                      handleChange('preferredTimes', e.target.value)
+                    }
+                    placeholder="e.g., Weekday evenings"
+                    required
+                  />
+
+                  <Label htmlFor="timeZone">Time Zone</Label>
+                  <Input
+                    id="timeZone"
+                    value={formData.timeZone}
+                    onChange={(e) => handleChange('timeZone', e.target.value)}
+                    placeholder="Your time zone"
+                    required
+                  />
+
+                  <Label htmlFor="frequency">Study Frequency</Label>
+                  <Input
+                    id="frequency"
+                    value={formData.frequency}
+                    onChange={(e) => handleChange('frequency', e.target.value)}
+                    placeholder="e.g., Weekly, Bi-weekly"
+                    required
+                  />
+                </section>
+
+                <hr className="my-4" />
+
+                {/* Privacy Settings Section */}
+                <section className="space-y-4">
+                  <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                    {TEXTS.privacy}
+                  </h2>
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label className="text-base text-gray-700 dark:text-gray-300">
+                        {TEXTS.publicProfile}
+                      </Label>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        {TEXTS.publicProfileDescription}
+                      </p>
+                    </div>
+                    <Switch /> {/* need to add this to the form data */}
                   </div>
-                  <Switch />
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label className="text-base text-gray-700 dark:text-gray-300">
-                      Study Availability
-                    </Label>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                      Show your availability calendar to others
-                    </p>
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label className="text-base text-gray-700 dark:text-gray-300">
+                        {TEXTS.showLocation}
+                      </Label>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        {TEXTS.showLocationDescription}
+                      </p>
+                    </div>
+                    <Switch /> {/* need to add this to the form data */}
                   </div>
-                  <Switch />
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label className="text-base text-gray-700 dark:text-gray-300">
+                        {TEXTS.studyAvailability}
+                      </Label>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        {TEXTS.studyAvailabilityDescription}
+                      </p>
+                    </div>
+                    <Switch /> {/* need to add this to the form data */}
+                  </div>
+                </section>
+
+                {/* Create Profile Button */}
+                <div className="pt-4 border-t">
+                  <Button type="submit" className="w-auto">
+                    {TEXTS.createProfileButton}
+                  </Button>
                 </div>
-              </div>
-              {/* Create Profile Button */}
-              <div className="pt-4 border-t">
-                <Button className="w-auto" onClick={handleCreateProfile}>
-                  Create Profile
-                </Button>
               </div>
             </div>
-          </main>
+          </form>
         </div>
       </div>
     </div>
