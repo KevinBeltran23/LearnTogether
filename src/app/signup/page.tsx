@@ -36,7 +36,7 @@ export default function SignupPage() {
       setEmail('');
       setPassword('');
       setConfirmPassword('');
-      router.push('/feed');
+      router.push('/signup/create');
     } catch (err) {
       if (err instanceof Error) {
         setError(err.message);

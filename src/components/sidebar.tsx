@@ -5,10 +5,12 @@ import { useSidebar } from '@/context/sidebarContext';
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUsers } from '@fortawesome/free-solid-svg-icons';
+import { usePathname } from 'next/navigation';
 
 export default function Sidebar() {
   const { isSidebarOpen, closeSidebar } = useSidebar();
   const sidebarRef = useRef<HTMLDivElement>(null);
+  const pathname = usePathname();
 
   // Handle click outside
   useEffect(() => {
@@ -25,6 +27,14 @@ export default function Sidebar() {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [closeSidebar]);
+
+  // Check if the current path is the create profile route
+  const isCreateProfileRoute = pathname === '/profile/create';
+
+  // Render nothing if on the create profile route
+  if (isCreateProfileRoute) {
+    return null;
+  }
 
   return (
     <>
