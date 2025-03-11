@@ -1,7 +1,5 @@
 'use client';
 
-// this is fine for now
-
 import { useState, useEffect, useRef, useCallback } from 'react';
 import PostCard from '@/components/postcard';
 import Spinner from '@/components/ui/spinner';
