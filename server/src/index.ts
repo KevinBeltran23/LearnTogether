@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import { MongoClient } from "mongodb";
 import { registerPostsRoutes } from "./routes/posts";
 import cors from 'cors';
-import { registerAuthRoutes } from "./routes/auth";
+import { registerAuthRoutes, verifyAuthToken } from "./routes/auth";
 import { registerUsersRoutes } from "./routes/users";
 
 dotenv.config(); // Read the .env file in the current working directory, and load values into process.env.
@@ -23,7 +23,12 @@ async function setUpServer() {
         const collectionInfos = await mongoClient.db().listCollections().toArray();
         console.log("Collections in the database:", collectionInfos.map(collectionInfo => collectionInfo.name));
 
+        app.get("/hello", (req: Request, res: Response) => {
+            res.json({ message: "Hello, world!" });
+        });
+
         registerAuthRoutes(app, mongoClient);
+        app.use("/api/*", verifyAuthToken);
         registerPostsRoutes(app, mongoClient);
         registerUsersRoutes(app, mongoClient);
         
