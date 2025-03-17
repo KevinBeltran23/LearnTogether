@@ -23,8 +23,8 @@ async function setUpServer() {
         const collectionInfos = await mongoClient.db().listCollections().toArray();
         console.log("Collections in the database:", collectionInfos.map(collectionInfo => collectionInfo.name));
 
-        registerPostsRoutes(app, mongoClient);
         registerAuthRoutes(app, mongoClient);
+        registerPostsRoutes(app, mongoClient);
         registerUsersRoutes(app, mongoClient);
         
         app.get("*", (req: Request, res: Response) => {

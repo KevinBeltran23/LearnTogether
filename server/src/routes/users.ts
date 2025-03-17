@@ -1,9 +1,9 @@
 import express, { Request, Response } from "express";
 import { MongoClient } from "mongodb";
-import { authenticateUser } from "middleware/auth";
+import { verifyAuthToken } from "../routes/auth";
 
 export function registerUsersRoutes(app: express.Application, mongoClient: MongoClient) {
-    app.get("/api/users/:id", authenticateUser, async (req: Request, res: Response) => {
+    app.get("/api/users/:id", verifyAuthToken, async (req: Request, res: Response) => {
         try {
             // get a users public profile
             console.log("not implemented");
@@ -13,7 +13,7 @@ export function registerUsersRoutes(app: express.Application, mongoClient: Mongo
         }
     });
 
-    app.put("/api/users/:id", authenticateUser, async (req: Request, res: Response) => {
+    app.put("/api/users/:id", verifyAuthToken, async (req: Request, res: Response) => {
         try {
             // update a users profile
             console.log("not implemented");
@@ -23,7 +23,7 @@ export function registerUsersRoutes(app: express.Application, mongoClient: Mongo
         }
     });
 
-    app.delete("/api/users/:id", authenticateUser, async (req: Request, res: Response) => {
+    app.delete("/api/users/:id", verifyAuthToken, async (req: Request, res: Response) => {
         try {
             // delete a users profile
             console.log("not implemented");

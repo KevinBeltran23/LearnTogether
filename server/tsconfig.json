@@ -9,7 +9,7 @@
     "moduleResolution": "NodeNext",
     "forceConsistentCasingInFileNames": true,
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["*"]
     }
   },
   "include": ["src/**/*.ts"],
