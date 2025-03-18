@@ -14,8 +14,8 @@ class CredentialsProvider {
         }
         this.collection = mongoClient.db().collection(COLLECTION_NAME);
     }
-    async registerUser(username, plaintextPassword) {
-        const existingUser = await this.collection.findOne({ username });
+    async registerUser(email, plaintextPassword) {
+        const existingUser = await this.collection.findOne({ email });
         if (existingUser) {
             return false; // User already exists
         }
@@ -23,13 +23,13 @@ class CredentialsProvider {
         const salt = await bcrypt_1.default.genSalt(10);
         const hashedPassword = await bcrypt_1.default.hash(plaintextPassword, salt);
         await this.collection.insertOne({
-            username: username,
+            email: email,
             password: hashedPassword
         });
         return true; // Registration successful
     }
-    async verifyPassword(username, plaintextPassword) {
-        const userRecord = await this.collection.findOne({ username });
+    async verifyPassword(email, plaintextPassword) {
+        const userRecord = await this.collection.findOne({ email });
         if (!userRecord) {
             return false; // User does not exist
         }

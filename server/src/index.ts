@@ -1,6 +1,5 @@
 import express, { Request, Response } from "express";
 import dotenv from "dotenv";
-import { registerPostsRoutes } from "./routes/posts";
 import cors from 'cors';
 import { registerAuthRoutes, verifyAuthToken } from "./routes/auth";
 import { registerUsersRoutes } from "./routes/users";
@@ -15,6 +14,9 @@ app.use(cors());
 
 async function setUpServer() {
     try {
+        // Connect to MongoDB using Mongoose (for schema-based operations)
+        await connectMongoose();
+        console.log("Mongoose connected - Schemas initialized");
         const mongoClient = await connectMongo();
         
         app.get("/hello", (req: Request, res: Response) => {
@@ -23,7 +25,6 @@ async function setUpServer() {
 
         registerAuthRoutes(app, mongoClient);
         app.use("/api/*", verifyAuthToken);
-        registerPostsRoutes(app, mongoClient);
         registerUsersRoutes(app, mongoClient);
         
         app.get("*", (req: Request, res: Response) => {

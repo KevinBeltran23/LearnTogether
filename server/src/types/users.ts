@@ -113,7 +113,6 @@ export interface PrivacySettings {
 }
 
 export interface SecuritySettings {
-  twoFactorEnabled: boolean;
   lastPasswordChange: Date;
 }
 
@@ -124,7 +123,6 @@ export interface AccountSettings {
 
 export interface IUser extends Document {
   email: string;
-  password: string;
   username: string;
   bio?: string;
   location?: string;

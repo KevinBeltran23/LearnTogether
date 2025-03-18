@@ -13,8 +13,8 @@ export class CredentialsProvider {
         this.collection = mongoClient.db().collection<ICredentialsDocument>(COLLECTION_NAME);
     }
 
-    async registerUser(username: string, plaintextPassword: string) {
-        const existingUser = await this.collection.findOne({ username });
+    async registerUser(email: string, plaintextPassword: string) {
+        const existingUser = await this.collection.findOne({ email });
         if (existingUser) {
             return false; // User already exists
         }
@@ -24,15 +24,15 @@ export class CredentialsProvider {
         const hashedPassword = await bcrypt.hash(plaintextPassword, salt);
 
         await this.collection.insertOne({
-            username: username,
+            email: email,
             password: hashedPassword
         });
 
         return true; // Registration successful
     }
 
-    async verifyPassword(username: string, plaintextPassword: string): Promise<boolean> {
-        const userRecord = await this.collection.findOne({ username });
+    async verifyPassword(email: string, plaintextPassword: string): Promise<boolean> {
+        const userRecord = await this.collection.findOne({ email });
         if (!userRecord) {
             return false; // User does not exist
         }

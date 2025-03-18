@@ -1,0 +1,89 @@
+@baseUrl = http://localhost:8000
+@authToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImJydWgiLCJpYXQiOjE3NDE5MTE3NTgsImV4cCI6MTc0MTk5ODE1OH0.c1cmUcw2rnLfjhdHDDBeGSQur-eT0TekXNV1VRj7OpU
+
+### Health Check
+GET {{baseUrl}}/hello
+
+### User Registration
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "username": "testuser",
+  "password": "password123",
+  "preferredStudyStyle": "VISUAL",
+  "preferredStudyEnvironment": "LIBRARY",
+  "preferredGroupSize": "SMALL_GROUP",
+  "subjectsLookingToStudy": ["Mathematics", "Computer Science"],
+  "preferredStudyTime": "Evenings",
+  "timeZone": "UTC_MINUS_8",
+  "studyFrequency": "WEEKLY",
+  "bio": "Computer Science student looking for study partners",
+  "institution": "Example University",
+  "fieldOfStudy": "Computer Science",
+  "yearLevel": "Junior",
+  "location": "San Francisco"
+}
+
+### User Login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "password123"
+}
+
+### Get User Profile
+GET {{baseUrl}}/api/users/profile
+Authorization: Bearer {{authToken}}
+
+### Update User Profile
+PUT {{baseUrl}}/api/users/profile
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "bio": "Updated bio information",
+  "location": "Seattle",
+  "preferredStudyEnvironment": "CAFE",
+  "displaySettings": {
+    "darkMode": true,
+    "fontSize": "large"
+  }
+}
+
+### Find Study Partners
+GET {{baseUrl}}/api/users/study-partners?subjects=Mathematics,Physics&preferredStudyEnvironment=LIBRARY
+Authorization: Bearer {{authToken}}
+
+### Find Study Partners by Location
+GET {{baseUrl}}/api/users/study-partners?location=San%20Francisco
+Authorization: Bearer {{authToken}}
+
+### Delete User Account
+DELETE {{baseUrl}}/api/users/profile
+Authorization: Bearer {{authToken}}
+
+### Register Second Test User (for testing study partner matching)
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "partner@example.com",
+  "username": "studypartner",
+  "password": "password123",
+  "preferredStudyStyle": "AUDITORY",
+  "preferredStudyEnvironment": "LIBRARY",
+  "preferredGroupSize": "PAIR",
+  "subjectsLookingToStudy": ["Mathematics", "Physics"],
+  "preferredStudyTime": "Mornings",
+  "timeZone": "UTC_MINUS_8",
+  "studyFrequency": "DAILY",
+  "bio": "Physics major looking for study groups",
+  "institution": "Example University",
+  "fieldOfStudy": "Physics",
+  "yearLevel": "Senior",
+  "location": "San Francisco"
+}

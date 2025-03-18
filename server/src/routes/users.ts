@@ -21,15 +21,34 @@ export const registerUsersRoutes = (app: express.Application, mongoClient: Mongo
         res.status(404).json({ error: 'User not found' });
       }
       
-      // Remove sensitive information
       const userProfile = user?.toObject();
       if (userProfile) {
-        delete userProfile.password;
-        delete userProfile.securitySettings;
         res.json(userProfile);
       }
     } catch (error) {
       console.error('Error fetching user profile:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+  // Create new user profile
+  router.post('/profile', async (req: Request, res: Response) => {
+    try {
+      // Assuming user ID is set in req.user by the verifyAuthToken middleware
+      const userData = (req as any).user;
+
+      if (!userData) {
+        res.status(401).json({ error: 'Unauthorized' });
+      }
+      
+      const user = await userService.createUser(userData);
+      
+      const userProfile = user?.toObject();
+      if (userProfile) {
+        res.json(userProfile);
+      }
+    } catch (error) {
+      console.error('Error creating user profile:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });
@@ -52,11 +71,7 @@ export const registerUsersRoutes = (app: express.Application, mongoClient: Mongo
         res.status(404).json({ error: 'User not found' });
       }
       
-      // Remove sensitive information
       const userProfile = updatedUser?.toObject();
-      delete userProfile.password;
-      delete userProfile.securitySettings;
-      
       res.json(userProfile);
     } catch (error) {
       console.error('Error updating user profile:', error);

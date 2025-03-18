@@ -33,10 +33,10 @@ export function verifyAuthToken(
     }
 }
 
-function generateAuthToken(username: string): Promise<string> {
+function generateAuthToken(email: string): Promise<string> {
     return new Promise<string>((resolve, reject) => {
         jwt.sign(
-            { username: username },
+            { email: email },
             signatureKey as string,
             { expiresIn: "1d" },
             (error: any, token: any) => {
@@ -52,20 +52,20 @@ export function registerAuthRoutes(app: express.Application, mongoClient: MongoC
 
     app.post("/auth/register", async (req: Request, res: Response) => {
         try {
-            const { username, password } = req.body;
+            const { email, password } = req.body;
 
-            if (!username || !password) {
+            if (!email || !password) {
                 res.status(400).send({
                     error: "Bad request",
-                    message: "Missing username or password"
+                    message: "Missing email or password"
                 });
             }
 
-            const registrationSuccess = await credentialsProvider.registerUser(username, password);
+            const registrationSuccess = await credentialsProvider.registerUser(email, password);
             if (!registrationSuccess) {
                 res.status(400).send({
                     error: "Bad request",
-                    message: "Username already taken"
+                    message: "email already taken"
                 });
             }
 
@@ -78,27 +78,27 @@ export function registerAuthRoutes(app: express.Application, mongoClient: MongoC
 
     app.post("/auth/login", async (req: Request, res: Response) => {
         try {
-            const { username, password } = req.body;
+            const { email, password } = req.body;
 
-            // Check for missing username or password
-            if (!username || !password) {
+            // Check for missing email or password
+            if (!email || !password) {
                 res.status(400).send({
                     error: "Bad request",
-                    message: "Missing username or password"
+                    message: "Missing email or password"
                 });
             }
 
             // Verify the user's password
-            const isPasswordValid = await credentialsProvider.verifyPassword(username, password);
+            const isPasswordValid = await credentialsProvider.verifyPassword(email, password);
             if (!isPasswordValid) {
                 res.status(401).send({
                     error: "Unauthorized",
-                    message: "Incorrect username or password"
+                    message: "Incorrect email or password"
                 });
             }
 
             // Generate a JWT token
-            const token = await generateAuthToken(username);
+            const token = await generateAuthToken(email);
             res.send({ token: token });
         } catch (error) {
             console.error("Error logging in:", error);

@@ -19,11 +19,6 @@ const usersSchema: Schema<IUser> = new mongoose.Schema(
             unique: true,
             trim: true
         },
-        password: {
-            type: String,
-            required: true,
-            trim: true
-        },
         username: {
             type: String,
             required: true,
@@ -184,10 +179,6 @@ const usersSchema: Schema<IUser> = new mongoose.Schema(
             }
         },
         securitySettings: {
-            twoFactorEnabled: {
-                type: Boolean,
-                default: false
-            },
             lastPasswordChange: {
                 type: Date,
                 default: Date.now
@@ -206,7 +197,7 @@ const usersSchema: Schema<IUser> = new mongoose.Schema(
     },
     { 
         collection: "users",
-        timestamps: true // This will automatically add createdAt and updatedAt fields
+        timestamps: true 
     }
 );
 

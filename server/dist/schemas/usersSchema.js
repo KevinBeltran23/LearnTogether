@@ -12,11 +12,6 @@ const usersSchema = new mongoose_1.default.Schema({
         unique: true,
         trim: true
     },
-    password: {
-        type: String,
-        required: true,
-        trim: true
-    },
     username: {
         type: String,
         required: true,
@@ -177,10 +172,6 @@ const usersSchema = new mongoose_1.default.Schema({
         }
     },
     securitySettings: {
-        twoFactorEnabled: {
-            type: Boolean,
-            default: false
-        },
         lastPasswordChange: {
             type: Date,
             default: Date.now
@@ -198,7 +189,7 @@ const usersSchema = new mongoose_1.default.Schema({
     }
 }, {
     collection: "users",
-    timestamps: true // This will automatically add createdAt and updatedAt fields
+    timestamps: true
 });
 // Create indexes for improved query performance
 usersSchema.index({ email: 1 }, { unique: true });
