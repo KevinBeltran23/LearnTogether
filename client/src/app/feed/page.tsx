@@ -4,8 +4,8 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import PostCard from '@/components/postcard';
 import Spinner from '@/components/ui/spinner';
 import Filterbar from '@/components/filterbar';
-import { useRequireAuth } from '@/context/authContext';
 import { useSearch } from '@/context/searchContext';
+import { ProtectedComponent } from '@/context/authContext';
 
 const PAGE_SIZE = 5; // Number of posts to load per batch
 
@@ -23,13 +23,10 @@ const STATIC_POSTS = Array.from({ length: 50 }, (_, i) => ({
 
 export default function FeedPage() {
   const { searchQuery } = useSearch();
-  const { user, loading } = useRequireAuth();
   const [postList, setPostList] = useState(STATIC_POSTS.slice(0, PAGE_SIZE));
   const [isFetching, setIsFetching] = useState(false);
   const observerRef = useRef<IntersectionObserver | null>(null);
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
-
-  console.log(user);
 
   const [filters, setFilters] = useState({
     sortBy: 'Most Recent',
@@ -89,34 +86,28 @@ export default function FeedPage() {
 
     return () => observerRef.current?.disconnect();
   }, [fetchMorePosts]);
-
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <Spinner />
-      </div>
-    );
-  }
-
+  
   return (
-    <div className="p-8">
-      <main className="flex gap-8">
-        <section className="flex-grow space-y-6 space-x-8">
-          <Filterbar filters={filters} setFilters={setFilters} />
+    <ProtectedComponent>
+      <div className="p-8">
+        <main className="flex gap-8">
+          <section className="flex-grow space-y-6 space-x-8">
+            <Filterbar filters={filters} setFilters={setFilters} />
 
-          {/* Feed of posts */}
-          <div className="space-y-4">
-            {filteredPosts.map((post) => (
-              <PostCard key={post.id} {...post} />
-            ))}
-          </div>
+            {/* Feed of posts */}
+            <div className="space-y-4">
+              {filteredPosts.map((post) => (
+                <PostCard key={post.id} {...post} />
+              ))}
+            </div>
 
-          {/* Loading Indicator */}
-          {isFetching && <Spinner />}
+            {/* Loading Indicator */}
+            {isFetching && <Spinner />}
 
-          <div ref={loadMoreRef} className="h-10" />
-        </section>
-      </main>
-    </div>
+            <div ref={loadMoreRef} className="h-10" />
+          </section>
+        </main>
+      </div>
+    </ProtectedComponent>
   );
 }

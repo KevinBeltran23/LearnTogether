@@ -8,10 +8,8 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import Spinner from '@/components/ui/spinner';
-import { useRequireAuth } from '@/context/authContext';
 import { Textarea } from '@/components/ui/textarea';
-
+import { ProtectedComponent } from '@/context/authContext';
 const TEXTS = {
   title: 'Create Profile',
   subtitle: 'Fill in your details to create your profile',
@@ -45,11 +43,7 @@ const TEXTS = {
 };
 
 export default function CreateProfile() {
-  const { user, loading } = useRequireAuth();
   const router = useRouter();
-
-  console.log(user);
-
   const [formData, setFormData] = useState({
     name: '',
     username: '',
@@ -82,15 +76,8 @@ export default function CreateProfile() {
     handleCreateProfile(); // Call the profile creation function
   };
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-screen bg-gray-50 dark:bg-zinc-900">
-        <Spinner />
-      </div>
-    );
-  }
-
   return (
+    <ProtectedComponent>
     <div>
       <div className="min-h-screen bg-gray-50 dark:bg-zinc-900 p-4 sm:p-6 md:p-8">
         <div className="flex flex-col pt-16 sm:pt-24 max-w-6xl mx-auto space-y-6">
@@ -406,5 +393,6 @@ export default function CreateProfile() {
         </div>
       </div>
     </div>
+    </ProtectedComponent>
   );
 }

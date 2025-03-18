@@ -8,14 +8,13 @@ import { registerUsersRoutes } from "./routes/users";
 
 dotenv.config(); // Read the .env file in the current working directory, and load values into process.env.
 const PORT = process.env.PORT || 8000;
-const staticDir = process.env.STATIC_DIR || "public";
 
 const { MONGO_USER, MONGO_PWD, MONGO_CLUSTER, DB_NAME } = process.env;
 const connectionString = `mongodb+srv://${MONGO_USER}:${MONGO_PWD}@${MONGO_CLUSTER}/${DB_NAME}`;
 
 const app = express();
+app.use(express.json());
 app.use(cors()); 
-app.use(express.static(staticDir));
 
 async function setUpServer() {
     try {

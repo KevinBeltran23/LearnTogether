@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUsers } from '@fortawesome/free-solid-svg-icons';
 import { usePathname } from 'next/navigation';
+import { ProtectedComponent } from '@/context/authContext';
 
 // Define dummy group items
 const DUMMY_GROUP_ITEMS = ['Group A', 'Group B', 'Group C']; // Dummy items for now
@@ -48,7 +49,7 @@ export default function Sidebar() {
   }
 
   return (
-    <>
+    <ProtectedComponent>
       {/* Overlay for mobile */}
       {isSidebarOpen && (
         <div
@@ -95,6 +96,6 @@ export default function Sidebar() {
           </ul>
         </div>
       </aside>
-    </>
+    </ProtectedComponent>
   );
 }

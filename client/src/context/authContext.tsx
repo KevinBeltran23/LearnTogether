@@ -1,53 +1,51 @@
 'use client';
 
-// probably fine for now
-
-import { createContext, useContext, useEffect, useState } from 'react';
-import { User, onAuthStateChanged, signOut } from 'firebase/auth';
-import { auth } from '@/lib/firebaseconfig';
+import { createContext, useContext, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 interface AuthContextType {
-  user: User | null;
-  loading: boolean;
-  logout: () => Promise<void>;
-  isAuthenticated: boolean;
+  token: string | null;
+  setToken: (token: string | null) => void;
+  logout: () => void;
+  isLoading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  // Initialize token from localStorage if it exists
+  const [token, setToken] = useState<string | null>(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('token');
+    }
+    return null;
+  });
+  const [isLoading, setIsLoading] = useState(true);
+
   const router = useRouter();
 
+  // Update localStorage when token changes
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user);
-      setIsAuthenticated(!!user);
-      setLoading(false);
-    });
-
-    return () => unsubscribe();
-  }, []);
-
-  const logout = async () => {
-    try {
-      await signOut(auth);
-      setUser(null);
-      setIsAuthenticated(false);
-      router.push('/');
-    } catch (error) {
-      console.error('Logout error:', error);
+    // Initialize auth state
+    setIsLoading(false);
+    
+    if (token) {
+      localStorage.setItem('token', token);
+    } else {
+      localStorage.removeItem('token');
     }
+  }, [token]);
+
+  const logout = () => {
+    setToken(null);
+    router.push('/');
   };
 
   const value = {
-    user,
-    loading,
+    token,
+    setToken,
     logout,
-    isAuthenticated,
+    isLoading,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
@@ -61,16 +59,28 @@ export function useAuth() {
   return context;
 }
 
-// Helper hook for protected routes
-export function useRequireAuth(redirectUrl: string = '/') {
-  const { user, loading } = useAuth();
+// Simple hook to protect routes
+function useRequireAuth() {
+  const { token, isLoading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (!loading && !user) {
-      router.push(redirectUrl);
+    if (!isLoading && !token) {
+      // Immediate redirect if no token
+      router.replace('/');
     }
-  }, [user, loading, router, redirectUrl]);
+  }, [token, isLoading, router]);
 
-  return { user, loading };
+  // Return authentication status to allow conditional rendering
+  return { isAuthenticated: !!token && !isLoading, isLoading };
+}
+
+// New component for protecting routes
+export function ProtectedComponent({ children }: { children: React.ReactNode }) {
+  const { isAuthenticated, isLoading } = useRequireAuth();
+  
+  if (isLoading) {
+    return null; 
+  }
+  return isAuthenticated ? <>{children}</> : null;
 }

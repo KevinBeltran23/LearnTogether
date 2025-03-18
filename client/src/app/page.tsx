@@ -4,12 +4,13 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { useSignInWithEmailAndPassword } from 'react-firebase-hooks/auth';
-import { auth } from '@/lib/firebaseconfig';
-import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { sendPostRequest } from '@/requests/sendPostRequest';
 import Link from 'next/link';
+import { useAuth } from '@/context/authContext';
 
-// Constant for text strings
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
+// Updated TEXTS constant
 const TEXTS = {
   title: 'Welcome Back',
   subtitle: 'Please sign in to continue',
@@ -20,8 +21,8 @@ const TEXTS = {
   guestSignInButton: 'Continue as Guest',
   signUpText: "Don't have an account?",
   errorAlert: 'An error occurred during login',
-  invalidCredentials: 'Invalid email or password',
-  googleLoginError: 'Failed to login with Google',
+  invalidCredentials: 'Incorrect username or password',
+  loadingMessage: 'Logging in...',
   signUpLink: 'Sign up',
 };
 
@@ -29,47 +30,55 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-
-  const [signInWithEmailAndPassword] = useSignInWithEmailAndPassword(auth);
+  const { setToken } = useAuth();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
 
     try {
-      const res = await signInWithEmailAndPassword(email, password);
-      if (!res) {
-        setError(TEXTS.invalidCredentials);
-        return;
-      }
+      const response = await sendPostRequest(`${API_URL}/auth/login`, {
+        username: email, // Using email as username
+        password,
+      });
+
+      const result = await response.json();
+      const authToken = result.token;
+
+      // Store the token (consider using a more secure method)
+      setToken(authToken);
+
       setEmail('');
       setPassword('');
+      
+      // Redirect to feed page after successful login
       router.push('/feed');
-    } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError(TEXTS.errorAlert);
+    } catch (error) {
+      console.error("Login error:", error);
+      let errorMessage = TEXTS.errorAlert;
+
+      if ((error as Error).message?.includes('401')) {
+        errorMessage = TEXTS.invalidCredentials;
+      } else if ((error as Error).message) {
+        try {
+          const errorData = JSON.parse((error as Error).message);
+          errorMessage = errorData.message || errorData.error || errorMessage;
+        } catch {
+          errorMessage = (error as Error).message;
+        }
       }
+
+      setError(errorMessage);
+    } finally {
+      setIsLoading(false);
     }
   };
 
+  // Optional: Modify or remove Google login if not implementing OAuth
   const handleGoogleLogin = async () => {
-    try {
-      const provider = new GoogleAuthProvider();
-      const result = await signInWithPopup(auth, provider);
-      if (!result) {
-        setError(TEXTS.googleLoginError);
-        return;
-      }
-      router.push('/feed');
-    } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError(TEXTS.errorAlert);
-      }
-    }
+    setError('Google login is not implemented yet');
   };
 
   return (
@@ -112,6 +121,7 @@ export default function LoginPage() {
               onChange={(e) => setEmail(e.target.value)}
               required
               className="w-full"
+              disabled={isLoading}
             />
           </div>
 
@@ -130,11 +140,16 @@ export default function LoginPage() {
               onChange={(e) => setPassword(e.target.value)}
               required
               className="w-full"
+              disabled={isLoading}
             />
           </div>
 
-          <Button type="submit" className="w-full h-11 text-base">
-            {TEXTS.signInButton}
+          <Button 
+            type="submit" 
+            className="w-full h-11 text-base"
+            disabled={isLoading}
+          >
+            {isLoading ? TEXTS.loadingMessage : TEXTS.signInButton}
           </Button>
         </form>
 

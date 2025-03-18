@@ -7,7 +7,6 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import Spinner from '@/components/ui/spinner';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faDisplay,
@@ -16,7 +15,6 @@ import {
   faGlobe,
   faShieldAlt,
 } from '@fortawesome/free-solid-svg-icons';
-import { useRequireAuth } from '@/context/authContext';
 import { MobileSectionDropdown } from '@/components/mobileSectionDropdown';
 import { DarkModeToggle } from '@/components/darkMode';
 
@@ -50,11 +48,8 @@ const TEXTS = {
 };
 
 export default function Settings() {
-  const { user, loading } = useRequireAuth();
   const [notifications, setNotifications] = useState(true);
   const [selectedSection, setSelectedSection] = useState('Display');
-
-  console.log(user);
 
   const renderSection = () => {
     // I am using h2 right here because the h1 is already used in the html calling this component
@@ -235,14 +230,6 @@ export default function Settings() {
         return null;
     }
   };
-
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-screen dark:bg-zinc-900">
-        <Spinner />
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-zinc-900 p-4 sm:p-6 md:p-8">

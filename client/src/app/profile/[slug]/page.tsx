@@ -11,6 +11,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { ProtectedComponent } from '@/context/authContext';
 
 // Dummy profile data
 const dummyProfile = {
@@ -67,6 +68,7 @@ const TEXTS = {
 
 export default function ProfileView() {
   return (
+    <ProtectedComponent>
     <div className="min-h-screen bg-gray-50 dark:bg-zinc-900 p-4 sm:p-6 md:p-8">
       <div className="max-w-3xl mx-auto space-y-6">
         {/* Profile Header */}
@@ -223,5 +225,6 @@ export default function ProfileView() {
         </section>
       </div>
     </div>
+    </ProtectedComponent>
   );
 }

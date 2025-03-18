@@ -17,12 +17,13 @@ import {
   faUser,
   faMagnifyingGlass,
 } from '@fortawesome/free-solid-svg-icons';
-import { useAuth } from '@/context/authContext';
 import { useSidebar } from '@/context/sidebarContext';
 import { Modal } from '@/components/modal';
 import { CreatePostForm } from '@/components/createPostForm';
 import { useState, useEffect } from 'react';
 import { useSearch } from '@/context/searchContext';
+import { useAuth } from '@/context/authContext';
+import { ProtectedComponent } from '@/context/authContext';
 
 const TEXTS = {
   title: 'StudyBuddy',
@@ -36,7 +37,6 @@ const TEXTS = {
 };
 
 export function Header() {
-  const { logout } = useAuth();
   const { toggleSidebar } = useSidebar();
   const pathname = usePathname();
   const [isCreatePostOpen, setIsCreatePostOpen] = useState(false);
@@ -59,20 +59,14 @@ export function Header() {
     }
   }, [isSearchVisible, searchQuery]);
 
-  const handleLogout = async () => {
-    try {
-      await logout();
-    } catch (error) {
-      console.error('Logout failed:', error);
-    }
-  };
-
   const isActive = (path: string) => pathname === path;
+  const { logout } = useAuth();
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-10 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
-      <div className="w-full px-4">
-        <div className="flex justify-between items-center h-16">
+    <ProtectedComponent>
+      <header className="fixed top-0 left-0 right-0 z-10 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
+        <div className="w-full px-4">
+          <div className="flex justify-between items-center h-16">
           {/* Left Section */}
           <div className="flex items-center space-x-4">
             {/* Hamburger Menu */}
@@ -208,7 +202,7 @@ export function Header() {
                 </DropdownMenuItem>
                 <DropdownMenuItem>
                   <button
-                    onClick={handleLogout}
+                    onClick={logout}
                     className="text-gray-900 dark:text-white"
                   >
                     {TEXTS.signOut}
@@ -243,5 +237,6 @@ export function Header() {
         />
       </Modal>
     </header>
+    </ProtectedComponent>
   );
 }

@@ -12,12 +12,11 @@ const auth_1 = require("./routes/auth");
 const users_1 = require("./routes/users");
 dotenv_1.default.config(); // Read the .env file in the current working directory, and load values into process.env.
 const PORT = process.env.PORT || 8000;
-const staticDir = process.env.STATIC_DIR || "public";
 const { MONGO_USER, MONGO_PWD, MONGO_CLUSTER, DB_NAME } = process.env;
 const connectionString = `mongodb+srv://${MONGO_USER}:${MONGO_PWD}@${MONGO_CLUSTER}/${DB_NAME}`;
 const app = (0, express_1.default)();
+app.use(express_1.default.json());
 app.use((0, cors_1.default)());
-app.use(express_1.default.static(staticDir));
 async function setUpServer() {
     try {
         const mongoClient = await mongodb_1.MongoClient.connect(connectionString);
@@ -27,6 +26,7 @@ async function setUpServer() {
             res.json({ message: "Hello, world!" });
         });
         (0, auth_1.registerAuthRoutes)(app, mongoClient);
+        app.use("/api/*", auth_1.verifyAuthToken);
         (0, posts_1.registerPostsRoutes)(app, mongoClient);
         (0, users_1.registerUsersRoutes)(app, mongoClient);
         app.get("*", (req, res) => {

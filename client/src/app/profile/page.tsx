@@ -15,9 +15,8 @@ import {
   faClock,
   faGraduationCap,
 } from '@fortawesome/free-solid-svg-icons';
-import Spinner from '@/components/ui/spinner';
-import { useRequireAuth } from '@/context/authContext';
 import { MobileSectionDropdown } from '@/components/mobileSectionDropdown';
+import { ProtectedComponent } from '@/context/authContext'; 
 
 const TEXTS = {
   title: 'Edit Profile',
@@ -54,13 +53,10 @@ const TEXTS = {
 };
 
 export default function EditProfile() {
-  const { user, loading } = useRequireAuth();
   const [selectedSection, setSelectedSection] = useState(
     TEXTS.personalInfoSection,
   );
   const [publicProfile, setPublicProfile] = useState(true);
-
-  console.log(user);
 
   const sections = [
     { name: TEXTS.personalInfoSection, icon: faUser },
@@ -382,18 +378,11 @@ export default function EditProfile() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-screen dark:bg-zinc-900">
-        <Spinner />
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-zinc-900 p-4 sm:p-6 md:p-8">
-      <div className="flex flex-col pt-16 sm:pt-24 max-w-6xl mx-auto space-y-6">
-        <div className="space-y-1">
+    <ProtectedComponent>
+      <div className="min-h-screen bg-gray-50 dark:bg-zinc-900 p-4 sm:p-6 md:p-8">
+        <div className="flex flex-col pt-16 sm:pt-24 max-w-6xl mx-auto space-y-6">
+          <div className="space-y-1">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
             {TEXTS.title}
           </h1>
@@ -453,5 +442,6 @@ export default function EditProfile() {
         </div>
       </div>
     </div>
+    </ProtectedComponent>
   );
 }

@@ -1,15 +1,15 @@
 'use client';
 
-// this is fine for now
-
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { useCreateUserWithEmailAndPassword } from 'react-firebase-hooks/auth';
-import { auth } from '@/lib/firebaseconfig';
+import { sendPostRequest } from '@/requests/sendPostRequest';
+import { useAuth } from '@/context/authContext';
 
 import Link from 'next/link';
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const TEXTS = {
   title: 'Create Account',
@@ -21,6 +21,10 @@ const TEXTS = {
   signInLink: 'Sign in',
   errorAlert: 'An error occurred during signup',
   signInLinkText: 'Already have an account?',
+  loadingMessage: 'Creating your account...',
+  loginRedirect: 'Account created! Please proceed to login.',
+  registrationError: 'An error occurred during registration',
+  userExists: 'Username already exists.',
 };
 
 export default function SignupPage() {
@@ -28,35 +32,72 @@ export default function SignupPage() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-
-  const [createUserWithEmailAndPassword] =
-    useCreateUserWithEmailAndPassword(auth);
-
+  const { setToken } = useAuth();
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
 
     if (password !== confirmPassword) {
       setError('Passwords do not match');
+      setIsLoading(false);
       return;
     }
 
     try {
-      const res = await createUserWithEmailAndPassword(email, password);
-      if (!res) {
-        setError('Failed to create account');
-        return;
+      console.log('Sending registration data:', { username: email, password });
+      // Register the user
+      const response = await sendPostRequest(`${API_URL}/auth/register`, { 
+        username: email,
+        password 
+      });
+
+      console.log(response);
+
+      // Try to login immediately after successful registration
+      try {
+        const loginResponse = await sendPostRequest(`${API_URL}/auth/login`, { 
+          username: email, 
+          password 
+        });
+        
+        const result = await loginResponse.json();
+        const authToken = result.token;
+        
+        // Store the token (you might want to use a more secure method)
+        setToken(authToken);
+        
+        // Clear form
+        setEmail('');
+        setPassword('');
+        setConfirmPassword('');
+        
+        // Redirect to create profile page
+        router.push('/signup/create');
+      } catch (loginError) {
+        // Registration worked but login failed
+        setError(TEXTS.loginRedirect);
+        setTimeout(() => router.push('/'), 1500);
       }
-      setEmail('');
-      setPassword('');
-      setConfirmPassword('');
-      router.push('/signup/create');
-    } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError(TEXTS.errorAlert);
+    } catch (error) {
+      console.error("Registration error:", error);
+      let errorMessage = TEXTS.registrationError;
+      
+      if ((error as Error).message?.includes('400')) {
+        errorMessage = TEXTS.userExists;
+      } else if ((error as Error).message) {
+        try {
+          const errorData = JSON.parse((error as Error).message);
+          errorMessage = errorData.message || errorData.error || errorMessage;
+        } catch {
+          errorMessage = (error as Error).message;
+        }
       }
+      
+      setError(errorMessage);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -139,8 +180,8 @@ export default function SignupPage() {
             />
           </div>
 
-          <Button type="submit" className="w-full h-11 text-base">
-            {TEXTS.createAccountButton}
+          <Button type="submit" className="w-full h-11 text-base" disabled={isLoading}>
+            {isLoading ? TEXTS.loadingMessage : TEXTS.createAccountButton}
           </Button>
         </form>
 
