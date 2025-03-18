@@ -4,24 +4,26 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importDefault(require("mongoose"));
+const users_1 = require("../types/users");
 const usersSchema = new mongoose_1.default.Schema({
-    username: {
-        type: String,
-        required: true,
-        trim: true
-    },
-    password: {
+    email: {
         type: String,
         required: true,
         unique: true,
         trim: true
     },
-    darkMode: {
-        type: Boolean,
+    password: {
+        type: String,
         required: true,
-        default: false,
+        trim: true
     },
-    school: {
+    username: {
+        type: String,
+        required: true,
+        unique: true,
+        trim: true
+    },
+    bio: {
         type: String,
         required: false,
         trim: true,
@@ -31,6 +33,176 @@ const usersSchema = new mongoose_1.default.Schema({
         required: false,
         trim: true,
     },
-}, { collection: "users" });
+    institution: {
+        type: String,
+        required: false,
+        trim: true,
+    },
+    fieldOfStudy: {
+        type: String,
+        required: false,
+        trim: true,
+    },
+    yearLevel: {
+        type: String,
+        required: false,
+        trim: true,
+    },
+    academicInterests: {
+        type: String,
+        required: false,
+        trim: true,
+    },
+    preferredStudyStyle: {
+        type: String,
+        enum: Object.values(users_1.PreferredStudyStyle),
+        required: true,
+        default: users_1.PreferredStudyStyle.MIXED
+    },
+    preferredStudyEnvironment: {
+        type: String,
+        enum: Object.values(users_1.PreferredStudyEnvironment),
+        required: true,
+        default: users_1.PreferredStudyEnvironment.QUIET
+    },
+    preferredGroupSize: {
+        type: String,
+        enum: Object.values(users_1.PreferredGroupSize),
+        required: true,
+        default: users_1.PreferredGroupSize.SMALL_GROUP
+    },
+    subjectsLookingToStudy: {
+        type: [String],
+        required: true,
+        default: []
+    },
+    preferredStudyTime: {
+        type: String,
+        required: true,
+        default: "Afternoons"
+    },
+    timeZone: {
+        type: String,
+        enum: Object.values(users_1.TimeZone),
+        required: true,
+        default: users_1.TimeZone.UTC_MINUS_12 // Default to something sensible for your application
+    },
+    studyFrequency: {
+        type: String,
+        enum: Object.values(users_1.StudyFrequency),
+        required: true,
+        default: users_1.StudyFrequency.WEEKLY
+    },
+    weeklyAvailability: {
+        monday: {
+            type: [String],
+            default: []
+        },
+        tuesday: {
+            type: [String],
+            default: []
+        },
+        wednesday: {
+            type: [String],
+            default: []
+        },
+        thursday: {
+            type: [String],
+            default: []
+        },
+        friday: {
+            type: [String],
+            default: []
+        },
+        saturday: {
+            type: [String],
+            default: []
+        },
+        sunday: {
+            type: [String],
+            default: []
+        }
+    },
+    displaySettings: {
+        darkMode: {
+            type: Boolean,
+            default: false
+        },
+        fontSize: {
+            type: String,
+            default: "medium"
+        },
+        colorScheme: {
+            type: String,
+            default: "default"
+        }
+    },
+    notificationSettings: {
+        email: {
+            type: Boolean,
+            default: true
+        },
+        push: {
+            type: Boolean,
+            default: true
+        },
+        studyRequests: {
+            type: Boolean,
+            default: true
+        },
+        messages: {
+            type: Boolean,
+            default: true
+        },
+        reminders: {
+            type: Boolean,
+            default: true
+        }
+    },
+    privacySettings: {
+        profileVisibility: {
+            type: String,
+            enum: Object.values(users_1.PrivacyLevel),
+            default: users_1.PrivacyLevel.PUBLIC
+        },
+        showLocation: {
+            type: String,
+            enum: Object.values(users_1.ShowLocation),
+            default: users_1.ShowLocation.APPROXIMATE
+        },
+        studyAvailabilityPublicity: {
+            type: String,
+            enum: Object.values(users_1.StudyAvailabilityPublicity),
+            default: users_1.StudyAvailabilityPublicity.CONNECTIONS_ONLY
+        }
+    },
+    securitySettings: {
+        twoFactorEnabled: {
+            type: Boolean,
+            default: false
+        },
+        lastPasswordChange: {
+            type: Date,
+            default: Date.now
+        }
+    },
+    accountSettings: {
+        language: {
+            type: String,
+            default: "en"
+        },
+        emailVerified: {
+            type: Boolean,
+            default: false
+        }
+    }
+}, {
+    collection: "users",
+    timestamps: true // This will automatically add createdAt and updatedAt fields
+});
+// Create indexes for improved query performance
+usersSchema.index({ email: 1 }, { unique: true });
+usersSchema.index({ username: 1 }, { unique: true });
+usersSchema.index({ "subjectsLookingToStudy": 1 });
 const users = mongoose_1.default.model("users", usersSchema);
 exports.default = users;
