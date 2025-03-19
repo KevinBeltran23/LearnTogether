@@ -46,10 +46,10 @@ export default function SignupPage() {
     }
 
     try {
-      console.log('Sending registration data:', { username: email, password });
+      console.log('Sending registration data:', { email, password });
       // Register the user
       const response = await sendPostRequest(`${API_URL}/auth/register`, { 
-        username: email,
+        email,
         password 
       });
 
@@ -58,7 +58,7 @@ export default function SignupPage() {
       // Try to login immediately after successful registration
       try {
         const loginResponse = await sendPostRequest(`${API_URL}/auth/login`, { 
-          username: email, 
+          email, 
           password 
         });
         

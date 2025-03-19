@@ -32,49 +32,29 @@ var __importStar = (this && this.__importStar) || (function () {
         return result;
     };
 })();
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerUsersRoutes = void 0;
-const express_1 = __importDefault(require("express"));
 const userService = __importStar(require("../services/userServices"));
-const registerUsersRoutes = (app, mongoClient) => {
-    const router = express_1.default.Router();
-    // Get current user profile
-    router.get('/profile', async (req, res) => {
-        try {
-            // Assuming user ID is set in req.user by the verifyAuthToken middleware
-            const userId = req.user?.id;
-            if (!userId) {
-                res.status(401).json({ error: 'Unauthorized' });
-            }
-            const user = await userService.getUserById(userId);
-            if (!user) {
-                res.status(404).json({ error: 'User not found' });
-            }
-            const userProfile = user?.toObject();
-            if (userProfile) {
-                res.json(userProfile);
-            }
-        }
-        catch (error) {
-            console.error('Error fetching user profile:', error);
-            res.status(500).json({ error: 'Internal server error' });
-        }
-    });
+const registerUsersRoutes = (app) => {
     // Create new user profile
-    router.post('/profile', async (req, res) => {
+    app.post('/api/users/profile', async (req, res) => {
         try {
-            // Assuming user ID is set in req.user by the verifyAuthToken middleware
-            const userData = req.user;
-            if (!userData) {
-                res.status(401).json({ error: 'Unauthorized' });
+            // The verifyAuthToken middleware has already validated the token
+            // and stored the decoded token info (including email) in res.locals.token
+            const authenticatedEmail = res.locals.token.email;
+            // Use the data from the request body
+            const userData = req.body;
+            // Security check: The email in the request body must match 
+            // the email in the authenticated token
+            if (userData.email !== authenticatedEmail) {
+                res.status(403).json({ error: 'Email in request body must match authenticated user' });
+                return;
             }
+            // Create the user with the data from the request body
             const user = await userService.createUser(userData);
             const userProfile = user?.toObject();
             if (userProfile) {
-                res.json(userProfile);
+                res.status(201).json(userProfile);
             }
         }
         catch (error) {
@@ -82,55 +62,24 @@ const registerUsersRoutes = (app, mongoClient) => {
             res.status(500).json({ error: 'Internal server error' });
         }
     });
-    // Update user profile
-    router.put('/profile', async (req, res) => {
+    // Get current user profile
+    app.get('/api/users/profile', async (req, res) => {
         try {
-            const userId = req.user?.id;
-            if (!userId) {
-                res.status(401).json({ error: 'Unauthorized' });
-            }
-            // Don't allow updating password via this route
-            const { password, ...updates } = req.body;
-            const updatedUser = await userService.updateUser(userId, updates);
-            if (!updatedUser) {
+            // Get the authenticated email from the token
+            const authenticatedEmail = res.locals.token.email;
+            // Find user by the authenticated email
+            const user = await userService.getUserByEmail(authenticatedEmail);
+            if (!user) {
                 res.status(404).json({ error: 'User not found' });
+                return;
             }
-            const userProfile = updatedUser?.toObject();
+            const userProfile = user.toObject();
             res.json(userProfile);
         }
         catch (error) {
-            console.error('Error updating user profile:', error);
+            console.error('Error fetching user profile:', error);
             res.status(500).json({ error: 'Internal server error' });
         }
     });
-    // Find study partners
-    router.get('/study-partners', async (req, res) => {
-        try {
-            const { subjects, preferredStudyStyle, preferredStudyEnvironment, location } = req.query;
-            const criteria = {};
-            if (subjects) {
-                criteria.subjects = Array.isArray(subjects)
-                    ? subjects
-                    : subjects.toString().split(',');
-            }
-            if (preferredStudyStyle) {
-                criteria.preferredStudyStyle = preferredStudyStyle.toString();
-            }
-            if (preferredStudyEnvironment) {
-                criteria.preferredStudyEnvironment = preferredStudyEnvironment.toString();
-            }
-            if (location) {
-                criteria.location = location.toString();
-            }
-            const partners = await userService.findStudyPartners(criteria);
-            res.json(partners);
-        }
-        catch (error) {
-            console.error('Error finding study partners:', error);
-            res.status(500).json({ error: 'Internal server error' });
-        }
-    });
-    // Mount the router
-    app.use('/api/users', router);
 };
 exports.registerUsersRoutes = registerUsersRoutes;

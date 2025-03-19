@@ -40,7 +40,7 @@ export default function LoginPage() {
 
     try {
       const response = await sendPostRequest(`${API_URL}/auth/login`, {
-        username: email, // Using email as username
+        email, 
         password,
       });
 

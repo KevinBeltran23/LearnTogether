@@ -1,7 +1,8 @@
 import express, { Request, Response } from "express";
 import dotenv from "dotenv";
 import cors from 'cors';
-import { registerAuthRoutes, verifyAuthToken } from "./routes/auth";
+import { registerAuthRoutes } from "./routes/auth";
+import { verifyAuthToken } from "./services/authServices";
 import { registerUsersRoutes } from "./routes/users";
 import { connectMongo, connectMongoose } from "./config/db";
 
@@ -23,9 +24,9 @@ async function setUpServer() {
             res.json({ message: "Hello, world!" });
         });
 
-        registerAuthRoutes(app, mongoClient);
+        registerAuthRoutes(app);
         app.use("/api/*", verifyAuthToken);
-        registerUsersRoutes(app, mongoClient);
+        registerUsersRoutes(app);
         
         app.get("*", (req: Request, res: Response) => {
             console.log("none of the routes above me were matched");

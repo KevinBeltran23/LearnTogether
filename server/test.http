@@ -1,32 +1,20 @@
 @baseUrl = http://localhost:8000
-@authToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImJydWgiLCJpYXQiOjE3NDE5MTE3NTgsImV4cCI6MTc0MTk5ODE1OH0.c1cmUcw2rnLfjhdHDDBeGSQur-eT0TekXNV1VRj7OpU
+@authToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJpYXQiOjE3NDIzNTc3MzksImV4cCI6MTc0MjQ0NDEzOX0.EE8LD25ahnnp6pfvZCUz6VzNpekGM7FS9W-izw8mBBA
 
 ### Health Check
 GET {{baseUrl}}/hello
 
-### User Registration
+### 1. Register User Credentials
 POST {{baseUrl}}/auth/register
 Content-Type: application/json
 
 {
   "email": "test@example.com",
-  "username": "testuser",
-  "password": "password123",
-  "preferredStudyStyle": "VISUAL",
-  "preferredStudyEnvironment": "LIBRARY",
-  "preferredGroupSize": "SMALL_GROUP",
-  "subjectsLookingToStudy": ["Mathematics", "Computer Science"],
-  "preferredStudyTime": "Evenings",
-  "timeZone": "UTC_MINUS_8",
-  "studyFrequency": "WEEKLY",
-  "bio": "Computer Science student looking for study partners",
-  "institution": "Example University",
-  "fieldOfStudy": "Computer Science",
-  "yearLevel": "Junior",
-  "location": "San Francisco"
+  "password": "password123"
 }
 
-### User Login
+### 2. Login to get Auth Token
+# Run this after registration and copy the token to the @authToken variable above
 POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
@@ -35,55 +23,93 @@ Content-Type: application/json
   "password": "password123"
 }
 
-### Get User Profile
-GET {{baseUrl}}/api/users/profile
-Authorization: Bearer {{authToken}}
-
-### Update User Profile
-PUT {{baseUrl}}/api/users/profile
-Authorization: Bearer {{authToken}}
+### 3. Create User Profile
+# This creates a full user profile associated with the email in the JWT token
+POST {{baseUrl}}/api/users/profile
 Content-Type: application/json
+Authorization: Bearer {{authToken}}
 
 {
-  "bio": "Updated bio information",
-  "location": "Seattle",
-  "preferredStudyEnvironment": "CAFE",
+  "email": "test@example.com",
+  "username": "testuser",
+  "bio": "Computer Science student looking for study partners",
+  "location": "San Francisco",
+  "institution": "Example University",
+  "fieldOfStudy": "Computer Science",
+  "yearLevel": "Junior",
+  "preferredStudyStyle": "visual",
+  "preferredStudyEnvironment": "library",
+  "preferredGroupSize": "small_group",
+  "subjectsLookingToStudy": ["Mathematics", "Computer Science"],
+  "preferredStudyTime": "Evenings",
+  "timeZone": "UTC-8",
+  "studyFrequency": "weekly",
+  "weeklyAvailability": {
+    "monday": ["14:00-16:00", "18:00-20:00"],
+    "tuesday": ["10:00-12:00"],
+    "wednesday": ["14:00-16:00", "18:00-20:00"],
+    "thursday": ["10:00-12:00"],
+    "friday": ["14:00-16:00"],
+    "saturday": ["10:00-14:00"],
+    "sunday": []
+  },
   "displaySettings": {
     "darkMode": true,
-    "fontSize": "large"
+    "fontSize": "medium",
+    "colorScheme": "blue"
+  },
+  "notificationSettings": {
+    "email": true,
+    "push": true,
+    "studyRequests": true,
+    "messages": true,
+    "reminders": true
+  },
+  "privacySettings": {
+    "profileVisibility": "public",
+    "showLocation": "approximate",
+    "studyAvailabilityPublicity": "connections_only"
+  },
+  "securitySettings": {
+    "lastPasswordChange": "2023-07-15T00:00:00.000Z"
+  },
+  "accountSettings": {
+    "language": "en",
+    "emailVerified": true
   }
 }
 
-### Find Study Partners
-GET {{baseUrl}}/api/users/study-partners?subjects=Mathematics,Physics&preferredStudyEnvironment=LIBRARY
+### 4. Get User Profile
+# Retrieve the user profile using the JWT token
+GET {{baseUrl}}/api/users/profile
 Authorization: Bearer {{authToken}}
 
-### Find Study Partners by Location
-GET {{baseUrl}}/api/users/study-partners?location=San%20Francisco
+### 5. Update User Profile
+PUT {{baseUrl}}/api/users/profile
+Content-Type: application/json
 Authorization: Bearer {{authToken}}
 
-### Delete User Account
-DELETE {{baseUrl}}/api/users/profile
+{
+  "bio": "Updated bio information - now studying AI and Machine Learning",
+  "location": "Seattle",
+  "preferredStudyEnvironment": "CAFE",
+  "subjectsLookingToStudy": ["Mathematics", "Computer Science", "Artificial Intelligence"]
+}
+
+### 6. Find Study Partners
+GET {{baseUrl}}/api/users/study-partners?subjects=Mathematics,Computer%20Science&preferredStudyEnvironment=LIBRARY
 Authorization: Bearer {{authToken}}
 
-### Register Second Test User (for testing study partner matching)
+### 7. Create Another User for Testing
+# First register credentials
 POST {{baseUrl}}/auth/register
 Content-Type: application/json
 
 {
   "email": "partner@example.com",
-  "username": "studypartner",
-  "password": "password123",
-  "preferredStudyStyle": "AUDITORY",
-  "preferredStudyEnvironment": "LIBRARY",
-  "preferredGroupSize": "PAIR",
-  "subjectsLookingToStudy": ["Mathematics", "Physics"],
-  "preferredStudyTime": "Mornings",
-  "timeZone": "UTC_MINUS_8",
-  "studyFrequency": "DAILY",
-  "bio": "Physics major looking for study groups",
-  "institution": "Example University",
-  "fieldOfStudy": "Physics",
-  "yearLevel": "Senior",
-  "location": "San Francisco"
+  "password": "password456"
 }
+
+# Then login to get token
+# POST {{baseUrl}}/auth/login with the credentials above
+# Then create profile with the token

@@ -1,7 +1,5 @@
-import express, { NextFunction, Request, Response } from "express";
-import { MongoClient } from "mongodb";
-import { CredentialsProvider } from "../services/credentialsProvider";
-import jwt from "jsonwebtoken";
+import express, { Request, Response } from "express";
+import { registerUser, verifyPassword, generateAuthToken } from "../services/authServices";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -10,45 +8,7 @@ if (!signatureKey) {
     throw new Error("Missing JWT_SECRET from env file");
 }
 
-export function verifyAuthToken(
-    req: Request,
-    res: Response,
-    next: NextFunction // Call next() to run the next middleware or request handler
-) {
-    const authHeader = req.get("Authorization");
-    // The header should say "Bearer <token string>".  Discard the Bearer part.
-    const token = authHeader && authHeader.split(" ")[1];
-
-    if (!token) {
-        res.status(401).end();
-    } else { // signatureKey already declared as a module-level variable
-        jwt.verify(token, signatureKey as string, (error: any, decoded: any) => {
-            if (decoded) {
-                res.locals.token = decoded;
-                next();
-            } else {
-                res.status(403).end();
-            }
-        });
-    }
-}
-
-function generateAuthToken(email: string): Promise<string> {
-    return new Promise<string>((resolve, reject) => {
-        jwt.sign(
-            { email: email },
-            signatureKey as string,
-            { expiresIn: "1d" },
-            (error: any, token: any) => {
-                if (error) reject(error);
-                else resolve(token as string);
-            }
-        );
-    });
-}
-
-export function registerAuthRoutes(app: express.Application, mongoClient: MongoClient) {
-    const credentialsProvider = new CredentialsProvider(mongoClient);
+export function registerAuthRoutes(app: express.Application) {
 
     app.post("/auth/register", async (req: Request, res: Response) => {
         try {
@@ -61,7 +21,7 @@ export function registerAuthRoutes(app: express.Application, mongoClient: MongoC
                 });
             }
 
-            const registrationSuccess = await credentialsProvider.registerUser(email, password);
+            const registrationSuccess = await registerUser(email, password);
             if (!registrationSuccess) {
                 res.status(400).send({
                     error: "Bad request",
@@ -89,7 +49,7 @@ export function registerAuthRoutes(app: express.Application, mongoClient: MongoC
             }
 
             // Verify the user's password
-            const isPasswordValid = await credentialsProvider.verifyPassword(email, password);
+            const isPasswordValid = await verifyPassword(email, password);
             if (!isPasswordValid) {
                 res.status(401).send({
                     error: "Unauthorized",
