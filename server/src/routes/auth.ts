@@ -8,61 +8,114 @@ if (!signatureKey) {
     throw new Error("Missing JWT_SECRET from env file");
 }
 
-export function registerAuthRoutes(app: express.Application) {
-
+export const registerAuthRoutes = (app: express.Application) => {
+    /**
+     * Register a new user
+     * POST /auth/register
+     */
     app.post("/auth/register", async (req: Request, res: Response) => {
-        try {
-            const { email, password } = req.body;
-
-            if (!email || !password) {
-                res.status(400).send({
-                    error: "Bad request",
-                    message: "Missing email or password"
-                });
-            }
-
-            const registrationSuccess = await registerUser(email, password);
-            if (!registrationSuccess) {
-                res.status(400).send({
-                    error: "Bad request",
-                    message: "email already taken"
-                });
-            }
-
-            res.status(201).send();
-        } catch (error) {
-            console.error("Error signing up:", error);
-            res.status(500).json({ error: "Failed to register user" });
+      try {
+        const { email, password } = req.body;
+  
+        // Validate input
+        if (!email || !password) {
+          res.status(400).json({
+            success: false,
+            message: "Email and password are required"
+          });
+          return;
         }
+  
+        // Try to register user
+        try {
+          const success = await registerUser(email, password);
+          
+          if (!success) {
+            res.status(409).json({
+              success: false,
+              message: "User with this email already exists"
+            });
+            return;
+          }
+  
+          // Generate authentication token
+          const token = await generateAuthToken(email);
+          
+          res.status(201).json({
+            success: true,
+            message: "User registered successfully",
+            token
+          });
+        } catch (authError) {
+          // Handle specific authentication errors
+          console.log("Registration service error:", authError);
+          res.status(400).json({
+            success: false,
+            message: authError instanceof Error ? authError.message : "Registration failed"
+          });
+        }
+      } catch (error) {
+        // Handle unexpected errors
+        console.error("Unexpected registration error:", error);
+        res.status(500).json({
+          success: false,
+          message: "An error occurred during registration"
+        });
+      }
     });
-
+  
+    /**
+     * Login user
+     * POST /auth/login
+     */
     app.post("/auth/login", async (req: Request, res: Response) => {
-        try {
-            const { email, password } = req.body;
-
-            // Check for missing email or password
-            if (!email || !password) {
-                res.status(400).send({
-                    error: "Bad request",
-                    message: "Missing email or password"
-                });
-            }
-
-            // Verify the user's password
-            const isPasswordValid = await verifyPassword(email, password);
-            if (!isPasswordValid) {
-                res.status(401).send({
-                    error: "Unauthorized",
-                    message: "Incorrect email or password"
-                });
-            }
-
-            // Generate a JWT token
-            const token = await generateAuthToken(email);
-            res.send({ token: token });
-        } catch (error) {
-            console.error("Error logging in:", error);
-            res.status(500).json({ error: "Failed to login user" });
+      try {
+        const { email, password } = req.body;
+  
+        // Validate input
+        if (!email || !password) {
+          res.status(400).json({
+            success: false,
+            message: "Email and password are required"
+          });
+          return;
         }
+  
+        try {
+          // Verify password
+          const isValidPassword = await verifyPassword(email, password);
+  
+          if (!isValidPassword) {
+            res.status(401).json({
+              success: false,
+              message: "Invalid email or password"
+            });
+            return;
+          }
+  
+          // Generate authentication token
+          const token = await generateAuthToken(email);
+  
+          res.json({
+            success: true,
+            message: "Login successful",
+            token
+          });
+        } catch (authError) {
+          // Don't expose specific error details to the client for security
+          console.log("Login service error:", authError);
+          res.status(401).json({
+            success: false,
+            message: "Invalid email or password"
+          });
+        }
+      } catch (error) {
+        // Handle unexpected errors
+        console.error("Unexpected login error:", error);
+        res.status(500).json({
+          success: false,
+          message: "An error occurred during login"
+        });
+      }
     });
-}
+  };

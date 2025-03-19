@@ -42,10 +42,13 @@ const registerUsersRoutes = (app) => {
             // The verifyAuthToken middleware has already validated the token
             // and stored the decoded token info (including email) in res.locals.token
             const authenticatedEmail = res.locals.token.email;
+            if (!authenticatedEmail) {
+                res.status(401).json({ error: 'Unauthorized' });
+                return;
+            }
             // Use the data from the request body
             const userData = req.body;
-            // Security check: The email in the request body must match 
-            // the email in the authenticated token
+            // The email in the request body must match the email in the authenticated token
             if (userData.email !== authenticatedEmail) {
                 res.status(403).json({ error: 'Email in request body must match authenticated user' });
                 return;
