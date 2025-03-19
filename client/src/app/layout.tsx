@@ -8,6 +8,7 @@ import ClientLayout from '@/components/clientLayout';
 import { SearchProvider } from '@/context/searchContext';
 import { ThemeProvider } from 'next-themes';
 import { useState, useEffect } from 'react';
+import { ProfileProvider } from '@/context/profileContext';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -45,11 +46,13 @@ export default function RootLayout({
       >
         <ProvidersAfterMount>
           <AuthProvider>
-            <SidebarProvider>
-              <SearchProvider>
-                <ClientLayout>{children}</ClientLayout>
-              </SearchProvider>
-            </SidebarProvider>
+            <ProfileProvider>
+              <SidebarProvider>
+                <SearchProvider>
+                  <ClientLayout>{children}</ClientLayout>
+                </SearchProvider>
+              </SidebarProvider>
+            </ProfileProvider>
           </AuthProvider>
         </ProvidersAfterMount>
       </body>

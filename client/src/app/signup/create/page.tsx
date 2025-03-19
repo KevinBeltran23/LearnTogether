@@ -2,7 +2,7 @@
 
 // this is fine for now
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { ProtectedComponent } from '@/context/authContext';
 import { useAuth } from '@/context/authContext';
+import { useProfile } from '@/context/profileContext';
 import { sendPostRequest } from '@/requests/sendPostRequest';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
@@ -119,7 +120,8 @@ const FREQUENCIES = [
 
 export default function CreateProfile() {
   const router = useRouter();
-  const { token } = useAuth();
+  const { token } = useAuth();  
+  const { setProfile } = useProfile();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [email, setEmail] = useState(localStorage.getItem('userEmail') || '');
@@ -226,10 +228,14 @@ export default function CreateProfile() {
       );
       
       if (response.ok) {
-        // Clear email from localStorage after successful profile creation
-        localStorage.removeItem('userEmail');
-        // If successful, redirect to feed
+        const responseData = await response.json();
+        setProfile(responseData.userProfile || profileData); 
+        console.log(responseData.userProfile); // I need to somehow actually get the user profile from the response
+        console.log(profileData);
         router.push('/feed');
+      } else {
+        const errorData = await response.json();
+        throw new Error(errorData.message || TEXTS.error);
       }
     } catch (err) {
       console.error('Error creating profile:', err);
