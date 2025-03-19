@@ -1,9 +1,16 @@
-export async function sendPostRequest(url, payload) {
+export async function sendPostRequest(url, payload, authToken = null) {
+    const headers = {
+        'Content-Type': 'application/json',
+    };
+    
+    // Add authorization header if token is provided
+    if (authToken) {
+        headers['Authorization'] = `Bearer ${authToken}`;
+    }
+    
     const response = await fetch(url, {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
+        headers: headers,
         body: JSON.stringify(payload),
     });
     

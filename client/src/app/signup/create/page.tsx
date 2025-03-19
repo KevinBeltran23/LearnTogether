@@ -2,7 +2,7 @@
 
 // this is fine for now
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -10,6 +10,12 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { ProtectedComponent } from '@/context/authContext';
+import { useAuth } from '@/context/authContext';
+import { sendPostRequest } from '@/requests/sendPostRequest';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
 const TEXTS = {
   title: 'Create Profile',
   subtitle: 'Fill in your details to create your profile',
@@ -40,40 +46,197 @@ const TEXTS = {
   preferredStudyTimes: 'Preferred Study Times',
   timeZone: 'Time Zone',
   studyFrequency: 'Study Frequency',
+  error: 'An error occurred while creating your profile',
 };
+
+// Study style options based on your enum
+const STUDY_STYLES = [
+  { value: 'visual', label: 'Visual' },
+  { value: 'auditory', label: 'Auditory' },
+  { value: 'reading_writing', label: 'Reading & Writing' },
+  { value: 'kinesthetic', label: 'Kinesthetic' },
+  { value: 'mixed', label: 'Mixed' },
+];
+
+// Study environment options
+const ENVIRONMENTS = [
+  { value: 'quiet', label: 'Quiet' },
+  { value: 'moderate_noise', label: 'Moderate Noise' },
+  { value: 'busy', label: 'Busy' },
+  { value: 'outdoors', label: 'Outdoors' },
+  { value: 'cafe', label: 'Cafe' },
+  { value: 'library', label: 'Library' },
+  { value: 'virtual', label: 'Virtual' },
+];
+
+// Group size options
+const GROUP_SIZES = [
+  { value: 'solo', label: 'Solo' },
+  { value: 'pair', label: 'Pair' },
+  { value: 'small_group', label: 'Small Group (3-5)' },
+  { value: 'medium_group', label: 'Medium Group (6-10)' },
+  { value: 'large_group', label: 'Large Group (10+)' },
+];
+
+// Time zone options (simplified)
+const TIME_ZONES = [
+  { value: 'UTC-12', label: 'UTC-12' },
+  { value: 'UTC-11', label: 'UTC-11' },
+  { value: 'UTC-10', label: 'UTC-10' },
+  { value: 'UTC-9', label: 'UTC-9' },
+  { value: 'UTC-8', label: 'UTC-8 (Pacific Time)' },
+  { value: 'UTC-7', label: 'UTC-7 (Mountain Time)' },
+  { value: 'UTC-6', label: 'UTC-6 (Central Time)' },
+  { value: 'UTC-5', label: 'UTC-5 (Eastern Time)' },
+  { value: 'UTC-4', label: 'UTC-4' },
+  { value: 'UTC-3', label: 'UTC-3' },
+  { value: 'UTC-2', label: 'UTC-2' },
+  { value: 'UTC-1', label: 'UTC-1' },
+  { value: 'UTC', label: 'UTC' },
+  { value: 'UTC+1', label: 'UTC+1' },
+  { value: 'UTC+2', label: 'UTC+2' },
+  { value: 'UTC+3', label: 'UTC+3' },
+  { value: 'UTC+4', label: 'UTC+4' },
+  { value: 'UTC+5', label: 'UTC+5' },
+  { value: 'UTC+6', label: 'UTC+6' },
+  { value: 'UTC+7', label: 'UTC+7' },
+  { value: 'UTC+8', label: 'UTC+8' },
+  { value: 'UTC+9', label: 'UTC+9' },
+  { value: 'UTC+10', label: 'UTC+10' },
+  { value: 'UTC+11', label: 'UTC+11' },
+  { value: 'UTC+12', label: 'UTC+12' },
+];
+
+// Study frequency options
+const FREQUENCIES = [
+  { value: 'daily', label: 'Daily' },
+  { value: 'few_times_week', label: 'Few Times a Week' },
+  { value: 'weekly', label: 'Weekly' },
+  { value: 'biweekly', label: 'Biweekly' },
+  { value: 'monthly', label: 'Monthly' },
+  { value: 'as_needed', label: 'As Needed' },
+];
 
 export default function CreateProfile() {
   const router = useRouter();
+  const { token } = useAuth();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState('');
+  const [email, setEmail] = useState(localStorage.getItem('userEmail') || '');
+  
   const [formData, setFormData] = useState({
-    name: '',
     username: '',
     bio: '',
     location: '',
-    school: '',
-    major: '',
-    year: '',
-    interests: '',
-    studyStyle: '',
-    environment: '',
-    groupSize: '',
-    subjects: '',
-    preferredTimes: '',
-    timeZone: '',
-    frequency: '',
+    institution: '',
+    fieldOfStudy: '',
+    yearLevel: '',
+    academicInterests: '',
+    preferredStudyStyle: 'mixed',
+    preferredStudyEnvironment: 'library',
+    preferredGroupSize: 'small_group',
+    subjectsLookingToStudy: '',
+    preferredStudyTime: 'Afternoons',
+    timeZone: 'UTC-8',
+    studyFrequency: 'weekly',
     publicProfile: true,
+    showLocation: true,
+    studyAvailability: true,
   });
-
-  const handleCreateProfile = () => {
-    router.push('/feed');
-  };
 
   const handleChange = (field: string, value: string) => {
     setFormData({ ...formData, [field]: value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault(); // Prevent default form submission
-    handleCreateProfile(); // Call the profile creation function
+  const handleSubmit = async (e: { preventDefault: () => void; }) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setError('');
+    
+    try {
+      // Transform form data to match API schema
+      const profileData = {
+        email: email, 
+        username: formData.username,
+        bio: formData.bio,
+        location: formData.location,
+        institution: formData.institution,
+        fieldOfStudy: formData.fieldOfStudy,
+        yearLevel: formData.yearLevel,
+        academicInterests: formData.academicInterests,
+        preferredStudyStyle: formData.preferredStudyStyle,
+        preferredStudyEnvironment: formData.preferredStudyEnvironment,
+        preferredGroupSize: formData.preferredGroupSize,
+        subjectsLookingToStudy: formData.subjectsLookingToStudy.split(',').map((s: string) => s.trim()),
+        preferredStudyTime: formData.preferredStudyTime,
+        timeZone: formData.timeZone,
+        studyFrequency: formData.studyFrequency,
+        
+        // Create default weekly availability
+        weeklyAvailability: {
+          monday: [],
+          tuesday: [],
+          wednesday: [],
+          thursday: [],
+          friday: [],
+          saturday: [],
+          sunday: []
+        },
+        
+        // Set default display settings
+        displaySettings: {
+          darkMode: false,
+          fontSize: "medium",
+          colorScheme: "default"
+        },
+        
+        // Set notification settings
+        notificationSettings: {
+          email: true,
+          push: true,
+          studyRequests: true,
+          messages: true,
+          reminders: true
+        },
+        
+        // Set privacy based on form toggles
+        privacySettings: {
+          profileVisibility: formData.publicProfile ? "public" : "private",
+          showLocation: formData.showLocation ? "approximate" : "none",
+          studyAvailabilityPublicity: formData.studyAvailability ? "connections_only" : "private"
+        },
+        
+        // Default security settings
+        securitySettings: {
+          lastPasswordChange: new Date().toISOString()
+        },
+        
+        // Default account settings
+        accountSettings: {
+          language: "en",
+          emailVerified: true
+        }
+      };
+      
+      // Send the request to create user profile
+      const response = await sendPostRequest(
+        `${API_URL}/api/users/profile`, 
+        profileData,
+        token
+      );
+      
+      if (response.ok) {
+        // Clear email from localStorage after successful profile creation
+        localStorage.removeItem('userEmail');
+        // If successful, redirect to feed
+        router.push('/feed');
+      }
+    } catch (err) {
+      console.error('Error creating profile:', err);
+      setError(TEXTS.error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -90,6 +253,12 @@ export default function CreateProfile() {
             </p>
           </div>
 
+          {error && (
+            <div className="p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+              {error}
+            </div>
+          )}
+
           <form
             className="flex flex-col md:flex-row md:space-x-6 space-y-6 md:space-y-0"
             onSubmit={handleSubmit}
@@ -102,20 +271,6 @@ export default function CreateProfile() {
                     {TEXTS.personalInfo}
                   </h2>
                   <Label
-                    htmlFor="name"
-                    className="text-gray-700 dark:text-gray-300"
-                  >
-                    {TEXTS.name}
-                  </Label>
-                  <Input
-                    id="name"
-                    value={formData.name}
-                    onChange={(e) => handleChange('name', e.target.value)}
-                    placeholder="Your name"
-                    required
-                  />
-
-                  <Label
                     htmlFor="username"
                     className="text-gray-700 dark:text-gray-300"
                   >
@@ -124,7 +279,7 @@ export default function CreateProfile() {
                   <Input
                     id="username"
                     value={formData.username}
-                    onChange={(e) => handleChange('username', e.target.value)}
+                    onChange={(e: { target: { value: any; }; }) => handleChange('username', e.target.value)}
                     placeholder="Your username"
                     required
                   />
@@ -138,9 +293,8 @@ export default function CreateProfile() {
                   <Textarea
                     id="bio"
                     value={formData.bio}
-                    onChange={(e) => handleChange('bio', e.target.value)}
+                    onChange={(e: { target: { value: any; }; }) => handleChange('bio', e.target.value)}
                     placeholder="Tell others about yourself"
-                    required
                   />
 
                   <Label
@@ -152,9 +306,8 @@ export default function CreateProfile() {
                   <Input
                     id="location"
                     value={formData.location}
-                    onChange={(e) => handleChange('location', e.target.value)}
+                    onChange={(e: { target: { value: any; }; }) => handleChange('location', e.target.value)}
                     placeholder="City, Country"
-                    required
                   />
                 </section>
 
@@ -166,58 +319,55 @@ export default function CreateProfile() {
                     {TEXTS.academicInfo}
                   </h2>
                   <Label
-                    htmlFor="school"
+                    htmlFor="institution"
                     className="text-gray-700 dark:text-gray-300"
                   >
                     {TEXTS.school}
                   </Label>
                   <Input
-                    id="school"
-                    value={formData.school}
-                    onChange={(e) => handleChange('school', e.target.value)}
+                    id="institution"
+                    value={formData.institution}
+                    onChange={(e: { target: { value: any; }; }) => handleChange('institution', e.target.value)}
                     placeholder="Your institution"
                   />
 
                   <Label
-                    htmlFor="major"
+                    htmlFor="fieldOfStudy"
                     className="text-gray-700 dark:text-gray-300"
                   >
                     {TEXTS.major}
                   </Label>
                   <Input
-                    id="major"
-                    value={formData.major}
-                    onChange={(e) => handleChange('major', e.target.value)}
+                    id="fieldOfStudy"
+                    value={formData.fieldOfStudy}
+                    onChange={(e: { target: { value: any; }; }) => handleChange('fieldOfStudy', e.target.value)}
                     placeholder="Your field of study"
-                    required
                   />
 
                   <Label
-                    htmlFor="year"
+                    htmlFor="yearLevel"
                     className="text-gray-700 dark:text-gray-300"
                   >
                     {TEXTS.year}
                   </Label>
                   <Input
-                    id="year"
-                    value={formData.year}
-                    onChange={(e) => handleChange('year', e.target.value)}
+                    id="yearLevel"
+                    value={formData.yearLevel}
+                    onChange={(e: { target: { value: any; }; }) => handleChange('yearLevel', e.target.value)}
                     placeholder="e.g., Freshman, Senior, Graduate"
-                    required
                   />
 
                   <Label
-                    htmlFor="interests"
+                    htmlFor="academicInterests"
                     className="text-gray-700 dark:text-gray-300"
                   >
                     {TEXTS.interests}
                   </Label>
                   <Input
-                    id="interests"
-                    value={formData.interests}
-                    onChange={(e) => handleChange('interests', e.target.value)}
+                    id="academicInterests"
+                    value={formData.academicInterests}
+                    onChange={(e: { target: { value: any; }; }) => handleChange('academicInterests', e.target.value)}
                     placeholder="e.g., Machine Learning, Literature, Biology"
-                    required
                   />
                 </section>
 
@@ -228,61 +378,81 @@ export default function CreateProfile() {
                   <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
                     {TEXTS.studyPreferences}
                   </h2>
-                  <Label
-                    htmlFor="studyStyle"
-                    className="text-gray-700 dark:text-gray-300"
-                  >
-                    {TEXTS.studyStyle}
-                  </Label>
-                  <Input
-                    id="studyStyle"
-                    value={formData.studyStyle}
-                    onChange={(e) => handleChange('studyStyle', e.target.value)}
-                    placeholder="e.g., Group discussions, Silent study"
-                    required
-                  />
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="preferredStudyStyle">
+                      {TEXTS.studyStyle}
+                    </Label>
+                    <Select 
+                      value={formData.preferredStudyStyle}
+                      onValueChange={(value) => handleChange('preferredStudyStyle', value)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a study style" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {STUDY_STYLES.map((style) => (
+                          <SelectItem key={style.value} value={style.value}>
+                            {style.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="preferredStudyEnvironment">
+                      {TEXTS.environment}
+                    </Label>
+                    <Select 
+                      value={formData.preferredStudyEnvironment}
+                      onValueChange={(value) => handleChange('preferredStudyEnvironment', value)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select environment" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {ENVIRONMENTS.map((env) => (
+                          <SelectItem key={env.value} value={env.value}>
+                            {env.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="preferredGroupSize">
+                      {TEXTS.groupSize}
+                    </Label>
+                    <Select 
+                      value={formData.preferredGroupSize}
+                      onValueChange={(value) => handleChange('preferredGroupSize', value)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select group size" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {GROUP_SIZES.map((size) => (
+                          <SelectItem key={size.value} value={size.value}>
+                            {size.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
 
                   <Label
-                    htmlFor="environment"
-                    className="text-gray-700 dark:text-gray-300"
-                  >
-                    {TEXTS.environment}
-                  </Label>
-                  <Input
-                    id="environment"
-                    value={formData.environment}
-                    onChange={(e) =>
-                      handleChange('environment', e.target.value)
-                    }
-                    placeholder="e.g., Library, Coffee shop"
-                    required
-                  />
-
-                  <Label
-                    htmlFor="groupSize"
-                    className="text-gray-700 dark:text-gray-300"
-                  >
-                    {TEXTS.groupSize}
-                  </Label>
-                  <Input
-                    id="groupSize"
-                    value={formData.groupSize}
-                    onChange={(e) => handleChange('groupSize', e.target.value)}
-                    placeholder="e.g., 2-3 people"
-                    required
-                  />
-
-                  <Label
-                    htmlFor="subjects"
+                    htmlFor="subjectsLookingToStudy"
                     className="text-gray-700 dark:text-gray-300"
                   >
                     {TEXTS.subjects}
                   </Label>
                   <Input
-                    id="subjects"
-                    value={formData.subjects}
-                    onChange={(e) => handleChange('subjects', e.target.value)}
-                    placeholder="List subjects you want to study"
+                    id="subjectsLookingToStudy"
+                    value={formData.subjectsLookingToStudy}
+                    onChange={(e: { target: { value: any; }; }) => handleChange('subjectsLookingToStudy', e.target.value)}
+                    placeholder="List subjects you want to study (comma separated)"
                     required
                   />
                 </section>
@@ -295,48 +465,60 @@ export default function CreateProfile() {
                     {TEXTS.availability}
                   </h2>
                   <Label
-                    htmlFor="preferredTimes"
+                    htmlFor="preferredStudyTime"
                     className="text-gray-700 dark:text-gray-300"
                   >
                     {TEXTS.preferredStudyTimes}
                   </Label>
                   <Input
-                    id="preferredTimes"
-                    value={formData.preferredTimes}
-                    onChange={(e) =>
-                      handleChange('preferredTimes', e.target.value)
-                    }
+                    id="preferredStudyTime"
+                    value={formData.preferredStudyTime}
+                    onChange={(e: { target: { value: any; }; }) => handleChange('preferredStudyTime', e.target.value)}
                     placeholder="e.g., Weekday evenings"
                     required
                   />
 
-                  <Label
-                    htmlFor="timeZone"
-                    className="text-gray-700 dark:text-gray-300"
-                  >
-                    {TEXTS.timeZone}
-                  </Label>
-                  <Input
-                    id="timeZone"
-                    value={formData.timeZone}
-                    onChange={(e) => handleChange('timeZone', e.target.value)}
-                    placeholder="Your time zone"
-                    required
-                  />
+                  <div className="space-y-2">
+                    <Label htmlFor="timeZone">
+                      {TEXTS.timeZone}
+                    </Label>
+                    <Select 
+                      value={formData.timeZone}
+                      onValueChange={(value) => handleChange('timeZone', value)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select time zone" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {TIME_ZONES.map((tz) => (
+                          <SelectItem key={tz.value} value={tz.value}>
+                            {tz.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
 
-                  <Label
-                    htmlFor="frequency"
-                    className="text-gray-700 dark:text-gray-300"
-                  >
-                    {TEXTS.studyFrequency}
-                  </Label>
-                  <Input
-                    id="frequency"
-                    value={formData.frequency}
-                    onChange={(e) => handleChange('frequency', e.target.value)}
-                    placeholder="e.g., Weekly, Bi-weekly"
-                    required
-                  />
+                  <div className="space-y-2">
+                    <Label htmlFor="studyFrequency">
+                      {TEXTS.studyFrequency}
+                    </Label>
+                    <Select 
+                      value={formData.studyFrequency}
+                      onValueChange={(value) => handleChange('studyFrequency', value)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select frequency" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {FREQUENCIES.map((freq) => (
+                          <SelectItem key={freq.value} value={freq.value}>
+                            {freq.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </section>
 
                 <hr className="my-4 border-gray-200 dark:border-gray-700" />
@@ -355,7 +537,10 @@ export default function CreateProfile() {
                         {TEXTS.publicProfileDescription}
                       </p>
                     </div>
-                    <Switch /> {/* need to add this to the form data */}
+                    <Switch 
+                      checked={formData.publicProfile}
+                      onCheckedChange={(checked: any) => handleChange('publicProfile', checked)}
+                    />
                   </div>
                   <div className="flex items-center justify-between">
                     <div className="space-y-0.5">
@@ -366,7 +551,10 @@ export default function CreateProfile() {
                         {TEXTS.showLocationDescription}
                       </p>
                     </div>
-                    <Switch /> {/* need to add this to the form data */}
+                    <Switch 
+                      checked={formData.showLocation}
+                      onCheckedChange={(checked: any) => handleChange('showLocation', checked)}
+                    />
                   </div>
                   <div className="flex items-center justify-between">
                     <div className="space-y-0.5">
@@ -377,14 +565,21 @@ export default function CreateProfile() {
                         {TEXTS.studyAvailabilityDescription}
                       </p>
                     </div>
-                    <Switch /> {/* need to add this to the form data */}
+                    <Switch 
+                      checked={formData.studyAvailability}
+                      onCheckedChange={(checked: any) => handleChange('studyAvailability', checked)}
+                    />
                   </div>
                 </section>
 
                 {/* Create Profile Button */}
                 <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
-                  <Button type="submit" className="w-auto">
-                    {TEXTS.createProfileButton}
+                  <Button 
+                    type="submit" 
+                    className="w-auto"
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? 'Creating...' : TEXTS.createProfileButton}
                   </Button>
                 </div>
               </div>

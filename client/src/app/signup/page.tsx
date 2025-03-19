@@ -54,6 +54,9 @@ export default function SignupPage() {
       });
 
       console.log(response);
+      
+      // Store email in localStorage for profile creation
+      localStorage.setItem('userEmail', email);
 
       // Try to login immediately after successful registration
       try {
