@@ -84,5 +84,24 @@ const registerUsersRoutes = (app) => {
             res.status(500).json({ error: 'Internal server error' });
         }
     });
+    // Get user profile by slug (username)
+    app.get('/api/users/profile/:slug', async (req, res) => {
+        try {
+            // Get the slug from the request parameters
+            const slug = req.params.slug;
+            // Find user by the slug
+            const user = await userService.getUserByUsername(slug);
+            if (!user) {
+                res.status(404).json({ error: 'User not found' });
+                return;
+            }
+            const userProfile = user.toObject();
+            res.json(userProfile);
+        }
+        catch (error) {
+            console.error('Error fetching user profile:', error);
+            res.status(500).json({ error: 'Internal server error' });
+        }
+    });
 };
 exports.registerUsersRoutes = registerUsersRoutes;

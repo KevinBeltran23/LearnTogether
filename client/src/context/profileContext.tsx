@@ -183,30 +183,23 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
     if (!isAuthenticated || !token) {
       return false;
     }
-
-    try {
-      setLoading(true);
-      setError(null);
-      
-      const response = await sendGetRequest(`${API_URL}/api/users/profile`, token);
-      
-      if (response.ok) {
-        const profileData = await response.json();
-        setProfile(profileData);
-        return true;
-      } else {
-        // If 404, maybe the user hasn't created a profile yet
-        if (response.status === 404) {
-          // Just leave profile as null
-          return false;
-        }
-        throw new Error('Failed to fetch profile');
+  
+    setLoading(true);
+    setError(null);
+  
+    const response = await sendGetRequest(`${API_URL}/api/users/profile`, token);
+  
+    if (response.error) {
+      console.error('Error fetching profile:', response.error);
+  
+      // Handle 404 separately (e.g., user hasn't created a profile yet)
+      if (response.status === 404) {
+        return false;
       }
-    } catch (err) {
-      console.error('Error fetching profile:', err);
-      setError(err instanceof Error ? err.message : 'Failed to load profile data');
-      
-      // Try to load from localStorage as fallback
+  
+      setError(response.error || 'Failed to load profile data');
+  
+      // Try to load from localStorage as a fallback
       const savedProfile = localStorage.getItem('userProfile');
       if (savedProfile) {
         try {
@@ -216,10 +209,13 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
           console.error('Error parsing saved profile:', parseErr);
         }
       }
+  
       return false;
-    } finally {
-      setLoading(false);
     }
+  
+    setProfile(response.data);
+    setLoading(false);
+    return true;
   };
 
   // Load profile from localStorage on mount

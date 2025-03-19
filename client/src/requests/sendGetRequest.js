@@ -2,31 +2,32 @@ export async function sendGetRequest(url, authToken = null) {
     const headers = {
         'Content-Type': 'application/json',
     };
-    
-    // Add authorization header if token is provided
+
     if (authToken) {
         headers['Authorization'] = `Bearer ${authToken}`;
     }
-    
+
     const response = await fetch(url, {
         method: 'GET',
-        headers: headers,
+        headers,
     });
-    
-    // Check if the response is OK
+
     if (!response.ok) {
         const contentType = response.headers.get("content-type");
-        
-        if (contentType && contentType.includes("application/json")) {
-            // If the error response is JSON, parse it
+        let errorMessage = response.statusText;
+
+        if (contentType?.includes("application/json")) {
             const errorData = await response.json();
-            throw new Error(JSON.stringify(errorData));
+            errorMessage = errorData.message || JSON.stringify(errorData);
         } else {
-            // If the error is text or other format
-            const errorText = await response.text();
-            throw new Error(`${response.status}: ${errorText || 'An error occurred'}`);
+            errorMessage = await response.text();
         }
+
+        return { error: true, status: response.status, message: errorMessage };
     }
-    
-    return response; // Return the entire response object
+
+    const contentType = response.headers.get("content-type");
+    const data = contentType?.includes("application/json") ? await response.json() : await response.text();
+
+    return { error: false, status: response.status, data };
 }
