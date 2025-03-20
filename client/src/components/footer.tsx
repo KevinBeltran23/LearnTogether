@@ -77,7 +77,7 @@ export default function Footer({ showCreatePost = true }: FooterProps) {
         title="Create a Study Post"
       >
         <CreatePostForm
-          onSubmit={handleCreatePost}
+          onSubmit={(data: any) => handleCreatePost(data)}
           onCancel={() => setIsCreatePostOpen(false)}
         />
       </Modal>

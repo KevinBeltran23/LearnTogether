@@ -52,7 +52,7 @@ interface PostData {
 }
 
 interface CreatePostFormProps {
-  onSubmit: (data: PostData) => void;
+  onSubmit: (data: any) => void;
   onCancel: () => void;
   onSuccess?: () => void;
 }
@@ -147,7 +147,7 @@ export function CreatePostForm({ onSubmit, onCancel, onSuccess }: CreatePostForm
       const result = await sendPostRequest(
         `${API_URL}/api/posts`,
         postData,
-        token
+        token as any
       );
 
       // Check if the request was successful

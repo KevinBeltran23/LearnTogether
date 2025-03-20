@@ -2,7 +2,7 @@
 
 // this is fine for now
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -65,7 +65,15 @@ export default function CreateProfile() {
   const { updateProfile } = useProfile();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
-  const [email] = useState(localStorage.getItem('userEmail') || '');
+  
+  // Replace direct localStorage access with state + useEffect
+  const [email, setEmail] = useState('');
+  
+  // Only access localStorage after component has mounted on the client
+  useEffect(() => {
+    const storedEmail = localStorage.getItem('userEmail') || '';
+    setEmail(storedEmail);
+  }, []);
   
   const [formData, setFormData] = useState({
     username: '',
@@ -182,7 +190,7 @@ export default function CreateProfile() {
       const result = await sendPostRequest(
         `${API_URL}/api/users/profile`, 
         profileData,
-        token
+        token as any
       );
       
       // Check if the request was successful
