@@ -178,37 +178,51 @@ export default function CreateProfile() {
 
       console.log('Sending profile data:', profileData);
       
-      // Send the request to create user profile
-      const response = await sendPostRequest(
+      // Send the request to create user profile using our improved sendPostRequest function
+      const result = await sendPostRequest(
         `${API_URL}/api/users/profile`, 
         profileData,
-        token as any
+        token
       );
       
-      if (response.ok) {
-        const responseData = await response.json();
-        if (responseData) {
-          localStorage.setItem('userProfile', JSON.stringify(responseData));
-          await updateProfile(responseData);
-          console.log('Profile created and context updated successfully');
-        }
-        
-        window.location.replace('/feed'); // trigger full reload for user population and profile context update
+      // Check if the request was successful
+      if (!result.ok) {
+        // Handle different error status codes
+        if (result.status === 400) {
+          if (result.error?.message?.includes('username')) {
+            setError('Username already exists or is invalid. Please choose another username.');
+          } else {
+            setError(result.error?.message || 'Invalid profile data. Please check your inputs.');
+          }
+        } else if (result.status === 401) {
+          setError('Your session has expired. Please log in again.');
+        } else if (result.status === 403) {
+          setError('You do not have permission to create a profile.');
+        } else if (result.status === 422) {
+          setError('Profile data validation failed. Please check your inputs.');
+        } else if (result.status >= 500) {
+          setError('Server error. Please try again later.');
         } else {
-        // Handle error response
-        let errorMessage = 'Failed to create profile';
-        try {
-          const errorData = await response.json();
-          errorMessage = errorData.error || errorData.message || errorMessage;
-        } catch (e) {
-          // If parsing JSON fails, use status text
-          errorMessage = `${response.status}: ${response.statusText || errorMessage}`;
+          // Use the error message from the response if available
+          setError(result.error?.message || TEXTS.error);
         }
-        throw new Error(errorMessage);
+        return;
       }
-    } catch (err) {
-      console.error('Error creating profile:', err);
-      setError(err instanceof Error ? err.message : TEXTS.error);
+      
+      // If we reach here, profile creation was successful
+      // Store the profile data in local storage
+      if (result.data) {
+        localStorage.setItem('userProfile', JSON.stringify(result.data));
+        await updateProfile(result.data);
+        console.log('Profile created and context updated successfully');
+      }
+      
+      // Redirect to feed page after successful profile creation
+      window.location.replace('/feed');
+    } catch (error) {
+      // This should rarely happen with the new implementation
+      console.error('Unexpected error creating profile:', error);
+      setError('An unexpected error occurred. Please try again.');
     } finally {
       setIsSubmitting(false);
     }

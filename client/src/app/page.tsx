@@ -17,8 +17,6 @@ const TEXTS = {
   emailLabel: 'Email',
   passwordLabel: 'Password',
   signInButton: 'Sign In',
-  googleSignInButton: 'Continue with Google',
-  guestSignInButton: 'Continue as Guest',
   signUpText: "Don't have an account?",
   errorAlert: 'An error occurred during login',
   invalidCredentials: 'Incorrect username or password',
@@ -37,17 +35,35 @@ export default function LoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setError('');
 
     try {
-      const response = await sendPostRequest(`${API_URL}/auth/login`, {
+      const result = await sendPostRequest(`${API_URL}/auth/login`, {
         email, 
         password,
       });
 
-      const result = await response.json();
-      const authToken = result.token;
+      if (!result.ok) {
+        // Handle different error status codes
+        if (result.status === 401) {
+          setError(TEXTS.invalidCredentials);
+        } else if (result.status === 403) {
+          setError('Access forbidden. Your account may be suspended.');
+        } else if (result.status === 429) {
+          setError('Too many login attempts. Please try again later.');
+        } else if (result.status >= 500) {
+          setError('Server error. Please try again later.');
+        } else {
+          // Use the error message from the response if available
+          setError(result.error?.message || TEXTS.errorAlert);
+        }
+        return;
+      }
 
-      // Store the token (consider using a more secure method)
+      // Successfully logged in
+      const authToken = result.data.token;
+
+      // Store the token
       setToken(authToken);
 
       setEmail('');
@@ -56,29 +72,12 @@ export default function LoginPage() {
       // Redirect to feed page after successful login
       router.push('/feed');
     } catch (error) {
-      console.error("Login error:", error);
-      let errorMessage = TEXTS.errorAlert;
-
-      if ((error as Error).message?.includes('401')) {
-        errorMessage = TEXTS.invalidCredentials;
-      } else if ((error as Error).message) {
-        try {
-          const errorData = JSON.parse((error as Error).message);
-          errorMessage = errorData.message || errorData.error || errorMessage;
-        } catch {
-          errorMessage = (error as Error).message;
-        }
-      }
-
-      setError(errorMessage);
+      // This should rarely happen with the new implementation
+      console.error("Unexpected login error:", error);
+      setError('An unexpected error occurred. Please try again.');
     } finally {
       setIsLoading(false);
     }
-  };
-
-  // Optional: Modify or remove Google login if not implementing OAuth
-  const handleGoogleLogin = async () => {
-    setError('Google login is not implemented yet');
   };
 
   return (
@@ -152,38 +151,6 @@ export default function LoginPage() {
             {isLoading ? TEXTS.loadingMessage : TEXTS.signInButton}
           </Button>
         </form>
-
-        {/* Divider */}
-        <div className="relative my-6">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-gray-200 dark:border-gray-700"></div>
-          </div>
-          <div className="relative flex justify-center text-sm">
-            <span className="px-2 bg-white dark:bg-zinc-950 text-gray-500 dark:text-gray-400">
-              Or
-            </span>
-          </div>
-        </div>
-
-        {/* Social Login */}
-        <div className="space-y-3">
-          <Button
-            onClick={handleGoogleLogin}
-            variant="outline"
-            className="w-full h-11 text-base font-medium"
-          >
-            {TEXTS.googleSignInButton}
-          </Button>
-
-          <Button
-            variant="outline"
-            className="w-full h-11 text-base font-medium"
-          >
-            <Link href="/feed" className="w-full">
-              {TEXTS.guestSignInButton}
-            </Link>
-          </Button>
-        </div>
 
         {/* Sign Up Link */}
         <p className="mt-8 text-center text-sm text-gray-600 dark:text-gray-400">

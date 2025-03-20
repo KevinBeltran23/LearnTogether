@@ -38,6 +38,7 @@ export default function SignupPage() {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setError('');
 
     if (password !== confirmPassword) {
       setError('Passwords do not match');
@@ -48,57 +49,64 @@ export default function SignupPage() {
     try {
       console.log('Sending registration data:', { email, password });
       // Register the user
-      const response = await sendPostRequest(`${API_URL}/auth/register`, { 
+      const registrationResult = await sendPostRequest(`${API_URL}/auth/register`, { 
         email,
         password 
       });
 
-      console.log(response);
+      console.log(registrationResult);
       
+      // Check if registration failed
+      if (!registrationResult.ok) {
+        // Handle different registration error cases
+        if (registrationResult.status === 400) {
+          setError(TEXTS.userExists);
+        } else if (registrationResult.status === 422) {
+          setError('Invalid email or password format. Please check your input.');
+        } else if (registrationResult.status >= 500) {
+          setError('Server error during registration. Please try again later.');
+        } else {
+          // Use the error message from the response if available
+          setError(registrationResult.error?.message || TEXTS.registrationError);
+        }
+        return;
+      }
+      
+      // If we reach here, registration was successful
       // Store email in localStorage for profile creation
       localStorage.setItem('userEmail', email);
 
       // Try to login immediately after successful registration
-      try {
-        const loginResponse = await sendPostRequest(`${API_URL}/auth/login`, { 
-          email, 
-          password 
-        });
-        
-        const result = await loginResponse.json();
-        const authToken = result.token;
-        
-        // Store the token (you might want to use a more secure method)
-        setToken(authToken);
-        
-        // Clear form
-        setEmail('');
-        setPassword('');
-        setConfirmPassword('');
-        
-        // Redirect to create profile page
-        router.push('/signup/create');
-      } catch (loginError) {
+      const loginResult = await sendPostRequest(`${API_URL}/auth/login`, { 
+        email, 
+        password 
+      });
+      
+      if (!loginResult.ok) {
         // Registration worked but login failed
         setError(TEXTS.loginRedirect);
         setTimeout(() => router.push('/'), 1500);
+        return;
       }
+      
+      // Login successful
+      const authToken = loginResult.data.token;
+      
+      // Store the token
+      setToken(authToken);
+      
+      // Clear form
+      setEmail('');
+      setPassword('');
+      setConfirmPassword('');
+      
+      // Redirect to create profile page
+      router.push('/signup/create');
+      
     } catch (error) {
-      console.error("Registration error:", error);
-      let errorMessage = TEXTS.registrationError;
-      
-      if ((error as Error).message?.includes('400')) {
-        errorMessage = TEXTS.userExists;
-      } else if ((error as Error).message) {
-        try {
-          const errorData = JSON.parse((error as Error).message);
-          errorMessage = errorData.message || errorData.error || errorMessage;
-        } catch {
-          errorMessage = (error as Error).message;
-        }
-      }
-      
-      setError(errorMessage);
+      // This should rarely happen with the new implementation
+      console.error("Unexpected error during registration flow:", error);
+      setError('An unexpected error occurred. Please try again.');
     } finally {
       setIsLoading(false);
     }

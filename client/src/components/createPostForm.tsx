@@ -143,26 +143,44 @@ export function CreatePostForm({ onSubmit, onCancel, onSuccess }: CreatePostForm
         institution: formData.institution,
       };
 
-      // Send the request to your API
-      const response = await sendPostRequest(
+      // Send the request to your API using improved sendPostRequest
+      const result = await sendPostRequest(
         `${API_URL}/api/posts`,
         postData,
-        token as any
+        token
       );
 
-      if (response.ok) {
-        const newPost = await response.json();
-        onSubmit(newPost);
-        if (onSuccess) {
-          onSuccess();
+      // Check if the request was successful
+      if (!result.ok) {
+        // Handle different error status codes
+        if (result.status === 400) {
+          setError(result.error?.message || 'Invalid post data. Please check your inputs.');
+        } else if (result.status === 401) {
+          setError('Your session has expired. Please log in again.');
+        } else if (result.status === 403) {
+          setError('You do not have permission to create a post.');
+        } else if (result.status === 422) {
+          setError('Post validation failed. Please check your inputs and try again.');
+        } else if (result.status >= 500) {
+          setError('Server error. Please try again later.');
+        } else {
+          // Use the error message from the response if available
+          setError(result.error?.message || 'Failed to create post');
         }
-      } else {
-        const errorData = await response.json();
-        setError(errorData.error || 'Failed to create post');
+        return;
+      }
+
+      // If request was successful, pass the post data to the onSubmit handler
+      onSubmit(result.data);
+      
+      // Call the onSuccess callback if provided
+      if (onSuccess) {
+        onSuccess();
       }
     } catch (err) {
-      console.error('Error creating post:', err);
-      setError('An error occurred while creating your post');
+      // This should rarely happen with the new implementation
+      console.error('Unexpected error creating post:', err);
+      setError('An unexpected error occurred. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
