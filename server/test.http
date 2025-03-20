@@ -9,7 +9,7 @@ POST {{baseUrl}}/auth/register
 Content-Type: application/json
 
 {
-  "email": "test@example.com",
+  "email": "hello@example.com",
   "password": "password123"
 }
 
@@ -19,7 +19,7 @@ POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
 {
-  "email": "test@example.com",
+  "email": "hello@example.com",
   "password": "password123"
 }
 
@@ -37,10 +37,11 @@ Authorization: Bearer {{authToken}}
   "institution": "Example University",
   "fieldOfStudy": "Computer Science",
   "yearLevel": "Junior",
-  "preferredStudyStyle": "visual",
+  "academicInterests": "AI, Machine Learning, Web Development",
+  "preferredStudyStyle": "work together",
   "preferredStudyEnvironment": "library",
   "preferredGroupSize": "small_group",
-  "subjectsLookingToStudy": ["Mathematics", "Computer Science"],
+  "subjectsLookingToStudy": ["Mathematics", "Computer Science", "Physics"],
   "preferredStudyTime": "Evenings",
   "timeZone": "UTC-8",
   "studyFrequency": "weekly",

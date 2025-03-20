@@ -17,7 +17,7 @@ import { Badge } from '@/components/ui/badge';
 import { ProtectedComponent } from '@/context/authContext';
 import { useAuth } from '@/context/authContext';
 import { sendGetRequest } from '@/requests/sendGetRequest';
-import { UserProfile } from '@/context/profileContext';
+import { IUser } from '../../../../server/src/types/users';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -47,7 +47,7 @@ export default function ProfileView() {
   const slug = params?.slug as string;
   const { token } = useAuth();
   
-  const [profileData, setProfileData] = useState<UserProfile | null>(null);
+  const [profileData, setProfileData] = useState<IUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   

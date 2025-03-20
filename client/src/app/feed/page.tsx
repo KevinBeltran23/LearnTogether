@@ -1,32 +1,23 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import PostCard from '@/components/postcard';
 import Spinner from '@/components/ui/spinner';
 import Filterbar from '@/components/filterbar';
 import { useSearch } from '@/context/searchContext';
+import { useAuth } from '@/context/authContext';
 import { ProtectedComponent } from '@/context/authContext';
+import { sendGetRequest } from '@/requests/sendGetRequest';
+import { IPost } from '../../../../server/src/types/posts';
 
-const PAGE_SIZE = 5; // Number of posts to load per batch
-
-const STATIC_POSTS = Array.from({ length: 50 }, (_, i) => ({
-  id: `post-${i + 1}`,
-  user: `User ${i + 1}`,
-  learningType: i % 2 === 0 ? 'Group Study' : 'One-on-One',
-  location: i % 3 === 0 ? 'Online' : 'In-Person',
-  title: `Study Session for Subject ${i + 1}`,
-  description: `Looking for someone to study Subject ${i + 1} with. Open to discussions and problem-solving!`,
-  school: i % 4 === 0 ? `School ${Math.floor(i / 4) + 1}` : null,
-  availability: 'Weeknights & Weekends',
-  subjects: [`Subject ${i + 1}`, `Topic ${(i % 5) + 1}`],
-}));
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export default function FeedPage() {
+  const { token } = useAuth();
   const { searchQuery } = useSearch();
-  const [postList, setPostList] = useState(STATIC_POSTS.slice(0, PAGE_SIZE));
-  const [isFetching, setIsFetching] = useState(false);
-  const observerRef = useRef<IntersectionObserver | null>(null);
-  const loadMoreRef = useRef<HTMLDivElement | null>(null);
+  const [posts, setPosts] = useState<IPost[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const [filters, setFilters] = useState({
     sortBy: 'Most Recent',
@@ -34,77 +25,107 @@ export default function FeedPage() {
     topic: '',
   });
 
-  const filteredPosts = postList.filter((post) => {
+  // Fetch posts from the API
+  useEffect(() => {
+    async function fetchPosts() {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const response = await sendGetRequest(`${API_URL}/api/posts`, token as any);
+        
+        if (response.error) {
+          setError(`Failed to fetch posts: ${response.message}`);
+        } else {
+          setPosts(response.data);
+        }
+      } catch (err) {
+        console.error('Error fetching posts:', err);
+        setError('An unexpected error occurred while fetching posts');
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchPosts();
+  }, [token]);
+
+  // Filter posts based on search query and filters
+  const filteredPosts = posts.filter((post) => {
     const searchMatch =
       searchQuery === '' ||
       post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      post.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      post.subjects.some((subject) =>
+      (post.description?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false) ||
+      post.subjectsLookingToStudy?.some((subject) =>
         subject.toLowerCase().includes(searchQuery.toLowerCase()),
       );
 
-    return (
-      searchMatch &&
-      (!filters.type || post.learningType === filters.type) &&
-      (!filters.topic || post.subjects.includes(filters.topic))
+    // Map your filters to the actual post schema
+    const typeMatch = !filters.type || post.preferredStudyStyle.toLowerCase() === filters.type.toLowerCase();
+    const topicMatch = !filters.topic || post.subjectsLookingToStudy?.some(
+      subject => subject.toLowerCase() === filters.topic.toLowerCase()
     );
+
+    return searchMatch && typeMatch && topicMatch;
   });
 
-  // Simulate fetching more posts when scrolled to the bottom
-  const fetchMorePosts = useCallback(() => {
-    if (isFetching) return;
-    setIsFetching(true);
-
-    setTimeout(() => {
-      // Calculate how many posts to add
-      const nextPosts = STATIC_POSTS.slice(
-        postList.length,
-        postList.length + PAGE_SIZE,
-      );
-
-      if (nextPosts.length > 0) {
-        setPostList((prev) => [...prev, ...nextPosts]);
-      }
-
-      setIsFetching(false);
-    }, 1000); // Simulate network delay
-  }, [isFetching, postList]);
-
-  useEffect(() => {
-    if (!loadMoreRef.current) return;
-
-    observerRef.current = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          fetchMorePosts();
-        }
-      },
-      { rootMargin: '200px' },
-    );
-
-    observerRef.current.observe(loadMoreRef.current);
-
-    return () => observerRef.current?.disconnect();
-  }, [fetchMorePosts]);
+  // Sort posts based on the selected sort option
+  const sortedPosts = [...filteredPosts].sort((a, b) => {
+    if (filters.sortBy === 'Most Recent') {
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    }
+    // Add other sorting options as needed
+    return 0;
+  });
   
   return (
     <ProtectedComponent>
       <div className="p-8">
         <main className="flex gap-8">
-          <section className="flex-grow space-y-6 space-x-8">
+          <section className="flex-grow space-y-6">
             <Filterbar filters={filters} setFilters={setFilters} />
 
-            {/* Feed of posts */}
-            <div className="space-y-4">
-              {filteredPosts.map((post) => (
-                <PostCard key={post.id} {...post} />
-              ))}
-            </div>
+            {/* Error message if needed */}
+            {error && (
+              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+                {error}
+              </div>
+            )}
 
-            {/* Loading Indicator */}
-            {isFetching && <Spinner />}
-
-            <div ref={loadMoreRef} className="h-10" />
+            {/* Loading indicator */}
+            {isLoading ? (
+              <div className="flex justify-center py-8">
+                <Spinner />
+              </div>
+            ) : (
+              <>
+                {/* Feed of posts */}
+                {sortedPosts.length > 0 ? (
+                  <div className="space-y-4">
+                    {sortedPosts.map((post) => (
+                      <PostCard 
+                        key={post._id as string} 
+                        id={post._id as string}
+                        title={post.title}
+                        description={post.description || ''}
+                        learningType={post.preferredStudyStyle}
+                        location={post.preferredStudyEnvironment}
+                        school={post.institution || undefined}
+                        availability={post.preferredStudyTime}
+                        subjects={post.subjectsLookingToStudy || []}
+                        groupSize={post.preferredGroupSize}
+                        frequency={post.studyFrequency}
+                        createdAt={post.createdAt?.toString() || new Date().toISOString()}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-gray-500">
+                    No posts found. Create a new post to get started!
+                  </div>
+                )}
+              </>
+            )}
           </section>
         </main>
       </div>

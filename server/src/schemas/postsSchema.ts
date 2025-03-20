@@ -25,7 +25,7 @@ const postsSchema: Schema<IPost> = new mongoose.Schema(
             type: String,
             enum: Object.values(PreferredStudyStyle),
             required: true,
-            default: PreferredStudyStyle.MIXED
+            default: PreferredStudyStyle.ANY
         },
         subjectsLookingToStudy: {
             type: [String],
@@ -36,13 +36,13 @@ const postsSchema: Schema<IPost> = new mongoose.Schema(
             type: String,
             enum: Object.values(PreferredStudyEnvironment),
             required: true,
-            default: PreferredStudyEnvironment.QUIET
+            default: PreferredStudyEnvironment.ANY
         },
         preferredGroupSize: {
             type: String,
             enum: Object.values(PreferredGroupSize),
             required: true,
-            default: PreferredGroupSize.SMALL_GROUP
+            default: PreferredGroupSize.ANY
         },
         preferredStudyTime: {
             type: String,

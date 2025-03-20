@@ -1,17 +1,15 @@
 import { Document } from "mongoose";
 
 export enum PreferredStudyStyle {
-  VISUAL = "visual",
-  AUDITORY = "auditory",
-  READING_WRITING = "reading_writing",
-  KINESTHETIC = "kinesthetic",
-  MIXED = "mixed"
+  SILENT = "silent study",
+  WORK_TOGETHER = "work together",
+  TUTORING = "tutoring",
+  ANY = "no preference"
 }
 
 export enum PreferredStudyEnvironment {
   QUIET = "quiet",
-  MODERATE_NOISE = "moderate_noise",
-  BUSY = "busy",
+  ANY = "no preference",
   OUTDOORS = "outdoors",
   CAFE = "cafe",
   LIBRARY = "library",
@@ -19,11 +17,11 @@ export enum PreferredStudyEnvironment {
 }
 
 export enum PreferredGroupSize {
-  SOLO = "solo",
   PAIR = "pair",
   SMALL_GROUP = "small_group",
   MEDIUM_GROUP = "medium_group",
-  LARGE_GROUP = "large_group"
+  LARGE_GROUP = "large_group",
+  ANY = "no preference"
 }
 
 export enum TimeZone {

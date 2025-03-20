@@ -24,6 +24,7 @@
     "autoprefixer": "^10.4.20",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "date-fns": "^4.1.0",
     "firebase": "^10.14.1",
     "firebaseui": "^6.1.0",
     "lucide-react": "^0.475.0",

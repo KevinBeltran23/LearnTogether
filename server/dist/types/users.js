@@ -3,17 +3,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.StudyAvailabilityPublicity = exports.ShowLocation = exports.PrivacyLevel = exports.StudyFrequency = exports.TimeZone = exports.PreferredGroupSize = exports.PreferredStudyEnvironment = exports.PreferredStudyStyle = void 0;
 var PreferredStudyStyle;
 (function (PreferredStudyStyle) {
-    PreferredStudyStyle["VISUAL"] = "visual";
-    PreferredStudyStyle["AUDITORY"] = "auditory";
-    PreferredStudyStyle["READING_WRITING"] = "reading_writing";
-    PreferredStudyStyle["KINESTHETIC"] = "kinesthetic";
-    PreferredStudyStyle["MIXED"] = "mixed";
+    PreferredStudyStyle["SILENT"] = "silent study";
+    PreferredStudyStyle["WORK_TOGETHER"] = "work together";
+    PreferredStudyStyle["TUTORING"] = "tutoring";
+    PreferredStudyStyle["ANY"] = "no preference";
 })(PreferredStudyStyle || (exports.PreferredStudyStyle = PreferredStudyStyle = {}));
 var PreferredStudyEnvironment;
 (function (PreferredStudyEnvironment) {
     PreferredStudyEnvironment["QUIET"] = "quiet";
-    PreferredStudyEnvironment["MODERATE_NOISE"] = "moderate_noise";
-    PreferredStudyEnvironment["BUSY"] = "busy";
+    PreferredStudyEnvironment["ANY"] = "no preference";
     PreferredStudyEnvironment["OUTDOORS"] = "outdoors";
     PreferredStudyEnvironment["CAFE"] = "cafe";
     PreferredStudyEnvironment["LIBRARY"] = "library";
@@ -21,11 +19,11 @@ var PreferredStudyEnvironment;
 })(PreferredStudyEnvironment || (exports.PreferredStudyEnvironment = PreferredStudyEnvironment = {}));
 var PreferredGroupSize;
 (function (PreferredGroupSize) {
-    PreferredGroupSize["SOLO"] = "solo";
     PreferredGroupSize["PAIR"] = "pair";
     PreferredGroupSize["SMALL_GROUP"] = "small_group";
     PreferredGroupSize["MEDIUM_GROUP"] = "medium_group";
     PreferredGroupSize["LARGE_GROUP"] = "large_group";
+    PreferredGroupSize["ANY"] = "no preference";
 })(PreferredGroupSize || (exports.PreferredGroupSize = PreferredGroupSize = {}));
 var TimeZone;
 (function (TimeZone) {

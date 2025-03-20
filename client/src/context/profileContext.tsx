@@ -4,66 +4,17 @@ import { createContext, useContext, useState, useEffect, ReactNode } from 'react
 import { useAuth } from './authContext';
 import { sendGetRequest } from '@/requests/sendGetRequest';
 import { sendPutRequest } from '@/requests/sendPutRequest';
+import { IUser } from '../../../server/src/types/users';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 // Define the profile structure based on your schema
-export interface UserProfile {
-  email: string;
-  username: string;
-  bio?: string;
-  location?: string;
-  institution?: string;
-  fieldOfStudy?: string;
-  yearLevel?: string;
-  academicInterests?: string;
-  preferredStudyStyle: string;
-  preferredStudyEnvironment: string;
-  preferredGroupSize: string;
-  subjectsLookingToStudy: string[];
-  preferredStudyTime: string;
-  timeZone: string;
-  studyFrequency: string;
-  weeklyAvailability: {
-    monday: string[];
-    tuesday: string[];
-    wednesday: string[];
-    thursday: string[];
-    friday: string[];
-    saturday: string[];
-    sunday: string[];
-  };
-  displaySettings: {
-    darkMode: boolean;
-    fontSize: string;
-    colorScheme: string;
-  };
-  notificationSettings: {
-    email: boolean;
-    push: boolean;
-    studyRequests: boolean;
-    messages: boolean;
-    reminders: boolean;
-  };
-  privacySettings: {
-    profileVisibility: string;
-    showLocation: string;
-    studyAvailabilityPublicity: string;
-  };
-  securitySettings: {
-    lastPasswordChange: string;
-  };
-  accountSettings: {
-    language: string;
-    emailVerified: boolean;
-  };
-}
 
 // Define context type with methods
 interface ProfileContextType {
-  profile: UserProfile | null;
+  profile: IUser | null;
   isLoading: boolean;
-  updateProfile: (updates: Partial<UserProfile>) => Promise<boolean>;
+  updateProfile: (updates: Partial<IUser>) => Promise<boolean>;
   refreshProfile: () => Promise<void>;
   clearProfile: () => void;
 }
@@ -74,7 +25,7 @@ const ProfileContext = createContext<ProfileContextType | undefined>(undefined);
 // Provider component
 export function ProfileProvider({ children }: { children: ReactNode }) {
   const { token } = useAuth();
-  const [profile, setProfile] = useState<UserProfile | null>(() => {
+  const [profile, setProfile] = useState<IUser | null>(() => {
     if (typeof window !== 'undefined') {
       const savedProfile = localStorage.getItem('userProfile');
       if (savedProfile) {
@@ -91,7 +42,7 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   // Fetch profile from API
-  const fetchProfile = async (): Promise<UserProfile | null> => {
+  const fetchProfile = async (): Promise<IUser | null> => {
     if (!token) return null;
 
     try {
@@ -101,7 +52,6 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
         return response.data;
       }
       
-      console.error('Error fetching profile:', response.message);
       return null;
     } catch (error) {
       console.error('Unexpected error fetching profile:', error);
@@ -110,7 +60,7 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
   };
 
   // Update profile with new data
-  const updateProfile = async (updates: Partial<UserProfile>): Promise<boolean> => {
+  const updateProfile = async (updates: Partial<IUser>): Promise<boolean> => {
     if (!token || !profile) return false;
     
     try {

@@ -18,70 +18,7 @@ import {
 import { MobileSectionDropdown } from '@/components/mobileSectionDropdown';
 import { ProtectedComponent } from '@/context/authContext';
 import { useProfile } from '@/context/profileContext';
-
-// Enums matching the server types
-enum PreferredStudyStyle {
-  VISUAL = "visual",
-  AUDITORY = "auditory",
-  READING_WRITING = "reading_writing",
-  KINESTHETIC = "kinesthetic",
-  MIXED = "mixed"
-}
-
-enum PreferredStudyEnvironment {
-  QUIET = "quiet",
-  MODERATE_NOISE = "moderate_noise",
-  BUSY = "busy",
-  OUTDOORS = "outdoors",
-  CAFE = "cafe",
-  LIBRARY = "library",
-  VIRTUAL = "virtual"
-}
-
-enum PreferredGroupSize {
-  SOLO = "solo",
-  PAIR = "pair",
-  SMALL_GROUP = "small_group",
-  MEDIUM_GROUP = "medium_group",
-  LARGE_GROUP = "large_group"
-}
-
-enum TimeZone {
-  UTC_MINUS_12 = "UTC-12",
-  UTC_MINUS_11 = "UTC-11",
-  UTC_MINUS_10 = "UTC-10",
-  UTC_MINUS_9 = "UTC-9",
-  UTC_MINUS_8 = "UTC-8",
-  UTC_MINUS_7 = "UTC-7",
-  UTC_MINUS_6 = "UTC-6",
-  UTC_MINUS_5 = "UTC-5",
-  UTC_MINUS_4 = "UTC-4",
-  UTC_MINUS_3 = "UTC-3",
-  UTC_MINUS_2 = "UTC-2",
-  UTC_MINUS_1 = "UTC-1",
-  UTC = "UTC",
-  UTC_PLUS_1 = "UTC+1",
-  UTC_PLUS_2 = "UTC+2",
-  UTC_PLUS_3 = "UTC+3",
-  UTC_PLUS_4 = "UTC+4",
-  UTC_PLUS_5 = "UTC+5",
-  UTC_PLUS_6 = "UTC+6",
-  UTC_PLUS_7 = "UTC+7",
-  UTC_PLUS_8 = "UTC+8",
-  UTC_PLUS_9 = "UTC+9",
-  UTC_PLUS_10 = "UTC+10",
-  UTC_PLUS_11 = "UTC+11",
-  UTC_PLUS_12 = "UTC+12"
-}
-
-enum StudyFrequency {
-  DAILY = "daily",
-  FEW_TIMES_WEEK = "few_times_week",
-  WEEKLY = "weekly",
-  BIWEEKLY = "biweekly",
-  MONTHLY = "monthly",
-  AS_NEEDED = "as_needed"
-}
+import { PreferredStudyStyle, PreferredStudyEnvironment, PreferredGroupSize, TimeZone, StudyFrequency } from '../../../../server/src/types/users';
 
 const TEXTS = {
   title: 'Edit Profile',
@@ -164,8 +101,8 @@ export default function EditProfile() {
     fieldOfStudy: '',
     yearLevel: '',
     academicInterests: '',
-    preferredStudyStyle: PreferredStudyStyle.MIXED,
-    preferredStudyEnvironment: PreferredStudyEnvironment.QUIET,
+    preferredStudyStyle: PreferredStudyStyle.ANY,
+    preferredStudyEnvironment: PreferredStudyEnvironment.ANY,
     preferredGroupSize: PreferredGroupSize.SMALL_GROUP,
     subjectsLookingToStudy: [],
     preferredStudyTime: '',
@@ -184,9 +121,9 @@ export default function EditProfile() {
         fieldOfStudy: profile.fieldOfStudy || '',
         yearLevel: profile.yearLevel || '',
         academicInterests: profile.academicInterests || '',
-        preferredStudyStyle: (profile.preferredStudyStyle as PreferredStudyStyle) || PreferredStudyStyle.MIXED,
-        preferredStudyEnvironment: (profile.preferredStudyEnvironment as PreferredStudyEnvironment) || PreferredStudyEnvironment.QUIET,
-        preferredGroupSize: (profile.preferredGroupSize as PreferredGroupSize) || PreferredGroupSize.SMALL_GROUP,
+        preferredStudyStyle: (profile.preferredStudyStyle as PreferredStudyStyle) || PreferredStudyStyle.ANY,
+        preferredStudyEnvironment: (profile.preferredStudyEnvironment as PreferredStudyEnvironment) || PreferredStudyEnvironment.ANY,
+        preferredGroupSize: (profile.preferredGroupSize as PreferredGroupSize) || PreferredGroupSize.ANY,
         subjectsLookingToStudy: profile.subjectsLookingToStudy || [],
         preferredStudyTime: profile.preferredStudyTime || '',
         timeZone: (profile.timeZone as TimeZone) || TimeZone.UTC,

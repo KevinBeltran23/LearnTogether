@@ -24,7 +24,7 @@ import {
   PreferredStudyEnvironment, 
   PreferredGroupSize, 
   StudyFrequency 
-} from '@/types/study-types'; // You'll need to create this file
+} from '../../../server/src/types/users'; // You'll need to create this file
 
 // Mapped to match your backend API
 interface PostData {
@@ -85,10 +85,10 @@ export function CreatePostForm({ onSubmit, onCancel, onSuccess }: CreatePostForm
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    preferredStudyStyle: profile?.preferredStudyStyle || PreferredStudyStyle.MIXED,
+    preferredStudyStyle: profile?.preferredStudyStyle || PreferredStudyStyle.ANY,
     subjectsLookingToStudy: profile?.subjectsLookingToStudy?.join(', ') || '',
-    preferredStudyEnvironment: profile?.preferredStudyEnvironment || PreferredStudyEnvironment.QUIET,
-    preferredGroupSize: profile?.preferredGroupSize || PreferredGroupSize.SMALL_GROUP,
+    preferredStudyEnvironment: profile?.preferredStudyEnvironment || PreferredStudyEnvironment.ANY,
+    preferredGroupSize: profile?.preferredGroupSize || PreferredGroupSize.ANY,
     preferredStudyTime: profile?.preferredStudyTime || 'Afternoons',
     studyFrequency: profile?.studyFrequency || StudyFrequency.WEEKLY,
     location: profile?.location || '',
@@ -214,11 +214,10 @@ export function CreatePostForm({ onSubmit, onCancel, onSuccess }: CreatePostForm
                 <SelectValue placeholder="Select learning style" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value={PreferredStudyStyle.VISUAL}>Visual</SelectItem>
-                <SelectItem value={PreferredStudyStyle.AUDITORY}>Auditory</SelectItem>
-                <SelectItem value={PreferredStudyStyle.READING_WRITING}>Reading/Writing</SelectItem>
-                <SelectItem value={PreferredStudyStyle.KINESTHETIC}>Kinesthetic</SelectItem>
-                <SelectItem value={PreferredStudyStyle.MIXED}>Mixed</SelectItem>
+                <SelectItem value={PreferredStudyStyle.SILENT}>Silent</SelectItem>
+                <SelectItem value={PreferredStudyStyle.WORK_TOGETHER}>Work Together</SelectItem>
+                <SelectItem value={PreferredStudyStyle.TUTORING}>Tutoring</SelectItem>
+                <SelectItem value={PreferredStudyStyle.ANY}>No Preference</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -234,11 +233,11 @@ export function CreatePostForm({ onSubmit, onCancel, onSuccess }: CreatePostForm
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value={PreferredStudyEnvironment.QUIET}>Quiet</SelectItem>
-                <SelectItem value={PreferredStudyEnvironment.MODERATE}>Moderate</SelectItem>
-                <SelectItem value={PreferredStudyEnvironment.NOISY}>Noisy</SelectItem>
+                <SelectItem value={PreferredStudyEnvironment.ANY}>No Preference</SelectItem>
                 <SelectItem value={PreferredStudyEnvironment.LIBRARY}>Library</SelectItem>
                 <SelectItem value={PreferredStudyEnvironment.CAFE}>Cafe</SelectItem>
                 <SelectItem value={PreferredStudyEnvironment.OUTDOORS}>Outdoors</SelectItem>
+                <SelectItem value={PreferredStudyEnvironment.VIRTUAL}>Virtual</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -253,11 +252,11 @@ export function CreatePostForm({ onSubmit, onCancel, onSuccess }: CreatePostForm
                 <SelectValue placeholder="Select group size" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value={PreferredGroupSize.SOLO}>Solo</SelectItem>
                 <SelectItem value={PreferredGroupSize.PAIR}>Pair</SelectItem>
                 <SelectItem value={PreferredGroupSize.SMALL_GROUP}>Small Group (3-5)</SelectItem>
                 <SelectItem value={PreferredGroupSize.MEDIUM_GROUP}>Medium Group (6-10)</SelectItem>
                 <SelectItem value={PreferredGroupSize.LARGE_GROUP}>Large Group (10+)</SelectItem>
+                <SelectItem value={PreferredGroupSize.ANY}>No Preference</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -311,7 +310,7 @@ export function CreatePostForm({ onSubmit, onCancel, onSuccess }: CreatePostForm
                 <SelectItem value={StudyFrequency.WEEKLY}>Weekly</SelectItem>
                 <SelectItem value={StudyFrequency.BIWEEKLY}>Bi-weekly</SelectItem>
                 <SelectItem value={StudyFrequency.MONTHLY}>Monthly</SelectItem>
-                <SelectItem value={StudyFrequency.ONE_TIME}>One-time</SelectItem>
+                <SelectItem value={StudyFrequency.AS_NEEDED}>As Needed</SelectItem>
               </SelectContent>
             </Select>
           </div>

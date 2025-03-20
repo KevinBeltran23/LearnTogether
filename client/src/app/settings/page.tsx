@@ -3,7 +3,6 @@
 // this is fine for now
 
 import { useState, useEffect } from 'react';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
@@ -12,13 +11,18 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faDisplay,
-  faKey,
   faBell,
   faGlobe,
-  faShieldAlt,
 } from '@fortawesome/free-solid-svg-icons';
 import { MobileSectionDropdown } from '@/components/mobileSectionDropdown';
 import { useProfile } from '@/context/profileContext';
+
+// Import the exact types from the server
+import { 
+  PrivacyLevel,
+  ShowLocation,
+  StudyAvailabilityPublicity
+} from '../../../../server/src/types/users';
 
 const TEXTS = {
   title: 'Settings',
@@ -26,7 +30,6 @@ const TEXTS = {
   displaySection: 'Display',
   notificationsSection: 'Notifications',
   privacySection: 'Privacy',
-  securitySection: 'Security',
   darkModeLabel: 'Dark Mode',
   darkModeDescription: 'Enable dark mode for the application',
   fontSizeLabel: 'Font Size',
@@ -44,23 +47,19 @@ const TEXTS = {
   messagesDescription: 'Get notified about new messages',
   remindersLabel: 'Reminders',
   remindersDescription: 'Get reminders for scheduled study sessions',
-  publicProfileLabel: 'Public Profile',
-  publicProfileDescription: 'Anyone can view your profile',
-  showLocationLabel: 'Show Location',
+  profileVisibilityLabel: 'Profile Visibility',
+  profileVisibilityDescription: 'Control who can view your profile',
+  showLocationLabel: 'Location Sharing',
   showLocationDescription: 'Control how your location is shared',
   studyAvailabilityLabel: 'Study Availability',
   studyAvailabilityDescription: 'Control who can see your availability',
-  twoFactorAuthLabel: 'Two-Factor Authentication',
-  twoFactorAuthDescription:
-    'Secure your account with two-factor authentication',
-  changePasswordLabel: 'Change Password',
   saveChangesButton: 'Save Changes',
   savingStatus: 'Saving...',
   savedStatus: 'Changes saved!',
   errorStatus: 'Error saving changes',
 };
 
-// Define type for settings data
+// Define type for settings data - matching server types exactly
 interface SettingsData {
   displaySettings: {
     darkMode: boolean;
@@ -75,9 +74,9 @@ interface SettingsData {
     reminders: boolean;
   };
   privacySettings: {
-    profileVisibility: string;
-    showLocation: string;
-    studyAvailabilityPublicity: string;
+    profileVisibility: PrivacyLevel;
+    showLocation: ShowLocation;
+    studyAvailabilityPublicity: StudyAvailabilityPublicity;
   };
 }
 
@@ -105,9 +104,9 @@ export default function Settings() {
       reminders: true,
     },
     privacySettings: {
-      profileVisibility: 'public',
-      showLocation: 'approximate',
-      studyAvailabilityPublicity: 'connections_only',
+      profileVisibility: PrivacyLevel.PUBLIC,
+      showLocation: ShowLocation.APPROXIMATE,
+      studyAvailabilityPublicity: StudyAvailabilityPublicity.CONNECTIONS_ONLY,
     },
   });
 
@@ -115,9 +114,9 @@ export default function Settings() {
   useEffect(() => {
     if (profile) {
       setSettingsData({
-        displaySettings: profile.displaySettings,
-        notificationSettings: profile.notificationSettings,
-        privacySettings: profile.privacySettings,
+        displaySettings: profile.displaySettings || settingsData.displaySettings,
+        notificationSettings: profile.notificationSettings || settingsData.notificationSettings,
+        privacySettings: profile.privacySettings || settingsData.privacySettings,
       });
     }
   }, [profile]);
@@ -149,7 +148,12 @@ export default function Settings() {
     setSaveStatus(TEXTS.savingStatus);
     
     try {
-      const success = await updateProfile(settingsData);
+      // Only update the specific settings fields we care about
+      const success = await updateProfile({
+        displaySettings: settingsData.displaySettings,
+        notificationSettings: settingsData.notificationSettings,
+        privacySettings: settingsData.privacySettings,
+      });
       
       if (success) {
         setSaveStatus(TEXTS.savedStatus);
@@ -167,9 +171,7 @@ export default function Settings() {
 
   const renderSection = () => {
     if (isLoading) {
-      return (
-        <Spinner />
-      );
+      return <Spinner />;
     }
 
     switch (selectedSection) {
@@ -362,10 +364,10 @@ export default function Settings() {
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label className="text-base dark:text-gray-200">
-                  {TEXTS.publicProfileLabel}
+                  {TEXTS.profileVisibilityLabel}
                 </Label>
                 <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
-                  {TEXTS.publicProfileDescription}
+                  {TEXTS.profileVisibilityDescription}
                 </p>
                 <Select 
                   value={settingsData.privacySettings.profileVisibility}
@@ -377,10 +379,10 @@ export default function Settings() {
                     <SelectValue placeholder="Select visibility" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="public">Public</SelectItem>
-                    <SelectItem value="students_only">Students Only</SelectItem>
-                    <SelectItem value="connections_only">Connections Only</SelectItem>
-                    <SelectItem value="private">Private</SelectItem>
+                    <SelectItem value={PrivacyLevel.PUBLIC}>Public</SelectItem>
+                    <SelectItem value={PrivacyLevel.STUDENTS_ONLY}>Students Only</SelectItem>
+                    <SelectItem value={PrivacyLevel.CONNECTIONS_ONLY}>Connections Only</SelectItem>
+                    <SelectItem value={PrivacyLevel.PRIVATE}>Private</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -402,9 +404,9 @@ export default function Settings() {
                     <SelectValue placeholder="Select location sharing" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="exact">Exact Location</SelectItem>
-                    <SelectItem value="approximate">Approximate Location</SelectItem>
-                    <SelectItem value="none">Don't Show</SelectItem>
+                    <SelectItem value={ShowLocation.EXACT}>Exact Location</SelectItem>
+                    <SelectItem value={ShowLocation.APPROXIMATE}>Approximate Location</SelectItem>
+                    <SelectItem value={ShowLocation.NONE}>Don't Show</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -426,49 +428,11 @@ export default function Settings() {
                     <SelectValue placeholder="Select availability sharing" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="public">Public</SelectItem>
-                    <SelectItem value="connections_only">Connections Only</SelectItem>
-                    <SelectItem value="private">Private</SelectItem>
+                    <SelectItem value={StudyAvailabilityPublicity.PUBLIC}>Public</SelectItem>
+                    <SelectItem value={StudyAvailabilityPublicity.CONNECTIONS_ONLY}>Connections Only</SelectItem>
+                    <SelectItem value={StudyAvailabilityPublicity.PRIVATE}>Private</SelectItem>
                   </SelectContent>
                 </Select>
-              </div>
-            </div>
-          </div>
-        );
-      case 'Security':
-        return (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between pb-4 border-b dark:border-gray-700">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                {TEXTS.securitySection}
-              </h2>
-            </div>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label className="text-base dark:text-gray-200">
-                    {TEXTS.twoFactorAuthLabel}
-                  </Label>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    {TEXTS.twoFactorAuthDescription}
-                  </p>
-                </div>
-                <Switch />
-              </div>
-              <div>
-                <Label
-                  htmlFor="password"
-                  className="text-sm font-medium dark:text-gray-200"
-                >
-                  {TEXTS.changePasswordLabel}
-                </Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="New password"
-                  className="w-full dark:bg-gray-800 dark:border-gray-700 dark:text-white"
-                  disabled
-                />
               </div>
             </div>
           </div>
@@ -482,7 +446,6 @@ export default function Settings() {
     { name: TEXTS.displaySection, icon: faDisplay },
     { name: TEXTS.notificationsSection, icon: faBell },
     { name: TEXTS.privacySection, icon: faGlobe },
-    { name: TEXTS.securitySection, icon: faShieldAlt },
   ];
 
   return (
