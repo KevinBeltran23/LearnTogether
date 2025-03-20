@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.findStudyPartners = exports.deleteUser = exports.updateUser = exports.getUserByUsername = exports.getUserByEmail = exports.getUserById = exports.createUser = void 0;
+exports.findStudyPartners = exports.deleteUser = exports.updateUserByEmail = exports.updateUserById = exports.getUserByUsername = exports.getUserByEmail = exports.getUserById = exports.createUser = void 0;
 const usersSchema_1 = __importDefault(require("../schemas/usersSchema"));
 /**
  * Create a new user
@@ -59,9 +59,9 @@ const getUserByUsername = async (username) => {
 };
 exports.getUserByUsername = getUserByUsername;
 /**
- * Update user
+ * Update user by ID
  */
-const updateUser = async (userId, updates) => {
+const updateUserById = async (userId, updates) => {
     try {
         return await usersSchema_1.default.findByIdAndUpdate(userId, { $set: updates }, { new: true, runValidators: true });
     }
@@ -70,7 +70,20 @@ const updateUser = async (userId, updates) => {
         throw error;
     }
 };
-exports.updateUser = updateUser;
+exports.updateUserById = updateUserById;
+/**
+ * Update user by email
+ */
+const updateUserByEmail = async (email, updates) => {
+    try {
+        return await usersSchema_1.default.findOneAndUpdate({ email }, { $set: updates }, { new: true, runValidators: true });
+    }
+    catch (error) {
+        console.error(`Error updating user with email ${email}:`, error);
+        throw error;
+    }
+};
+exports.updateUserByEmail = updateUserByEmail;
 /**
  * Delete user
  */

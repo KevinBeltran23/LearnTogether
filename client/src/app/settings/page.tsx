@@ -2,11 +2,13 @@
 
 // this is fine for now
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
+import Spinner from '@/components/ui/spinner';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faDisplay,
@@ -16,7 +18,7 @@ import {
   faShieldAlt,
 } from '@fortawesome/free-solid-svg-icons';
 import { MobileSectionDropdown } from '@/components/mobileSectionDropdown';
-import { DarkModeToggle } from '@/components/darkMode';
+import { useProfile } from '@/context/profileContext';
 
 const TEXTS = {
   title: 'Settings',
@@ -28,31 +30,149 @@ const TEXTS = {
   securitySection: 'Security',
   darkModeLabel: 'Dark Mode',
   darkModeDescription: 'Enable dark mode for the application',
+  fontSizeLabel: 'Font Size',
+  fontSizeDescription: 'Choose your preferred font size',
+  colorSchemeLabel: 'Color Scheme',
+  colorSchemeDescription: 'Select your preferred color theme',
   emailNotificationsLabel: 'Email Notifications',
   emailNotificationsDescription:
     'Receive email notifications about your activities',
+  pushNotificationsLabel: 'Push Notifications',
+  pushNotificationsDescription: 'Receive push notifications',
+  studyRequestsLabel: 'Study Requests',
+  studyRequestsDescription: 'Get notified about study requests',
+  messagesLabel: 'Messages',
+  messagesDescription: 'Get notified about new messages',
+  remindersLabel: 'Reminders',
+  remindersDescription: 'Get reminders for scheduled study sessions',
   publicProfileLabel: 'Public Profile',
   publicProfileDescription: 'Anyone can view your profile',
-  searchEngineLabel: 'Search Engine Indexing',
-  searchEngineDescription: 'Allow search engines to index your profile',
+  showLocationLabel: 'Show Location',
+  showLocationDescription: 'Control how your location is shared',
+  studyAvailabilityLabel: 'Study Availability',
+  studyAvailabilityDescription: 'Control who can see your availability',
   twoFactorAuthLabel: 'Two-Factor Authentication',
   twoFactorAuthDescription:
     'Secure your account with two-factor authentication',
   changePasswordLabel: 'Change Password',
   saveChangesButton: 'Save Changes',
-  nameLabel: 'Name',
-  emailLabel: 'Email',
-  usernameLabel: 'Username',
-  passwordLabel: 'Password',
-  confirmPasswordLabel: 'Confirm Password',
+  savingStatus: 'Saving...',
+  savedStatus: 'Changes saved!',
+  errorStatus: 'Error saving changes',
 };
 
+// Define type for settings data
+interface SettingsData {
+  displaySettings: {
+    darkMode: boolean;
+    fontSize: string;
+    colorScheme: string;
+  };
+  notificationSettings: {
+    email: boolean;
+    push: boolean;
+    studyRequests: boolean;
+    messages: boolean;
+    reminders: boolean;
+  };
+  privacySettings: {
+    profileVisibility: string;
+    showLocation: string;
+    studyAvailabilityPublicity: string;
+  };
+}
+
+// Define valid section keys as a type
+type SectionKey = keyof SettingsData;
+
 export default function Settings() {
-  const [notifications, setNotifications] = useState(true);
+  const { profile, isLoading, updateProfile } = useProfile();
   const [selectedSection, setSelectedSection] = useState('Display');
+  const [saveStatus, setSaveStatus] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+  
+  // Local state to track form changes before submitting
+  const [settingsData, setSettingsData] = useState<SettingsData>({
+    displaySettings: {
+      darkMode: false,
+      fontSize: 'medium',
+      colorScheme: 'default',
+    },
+    notificationSettings: {
+      email: true,
+      push: true,
+      studyRequests: true,
+      messages: true,
+      reminders: true,
+    },
+    privacySettings: {
+      profileVisibility: 'public',
+      showLocation: 'approximate',
+      studyAvailabilityPublicity: 'connections_only',
+    },
+  });
+
+  // Update local state when profile data loads
+  useEffect(() => {
+    if (profile) {
+      setSettingsData({
+        displaySettings: profile.displaySettings,
+        notificationSettings: profile.notificationSettings,
+        privacySettings: profile.privacySettings,
+      });
+    }
+  }, [profile]);
+
+  const handleSwitchChange = (section: SectionKey, key: string, value: boolean) => {
+    setSettingsData((prevData) => {
+      const sectionData = { ...prevData[section] };
+      (sectionData as any)[key] = value;
+      return {
+        ...prevData,
+        [section]: sectionData,
+      };
+    });
+  };
+
+  const handleSelectChange = (section: SectionKey, key: string, value: string) => {
+    setSettingsData((prevData) => {
+      const sectionData = { ...prevData[section] };
+      (sectionData as any)[key] = value;
+      return {
+        ...prevData,
+        [section]: sectionData,
+      };
+    });
+  };
+
+  const handleSubmit = async () => {
+    setIsSaving(true);
+    setSaveStatus(TEXTS.savingStatus);
+    
+    try {
+      const success = await updateProfile(settingsData);
+      
+      if (success) {
+        setSaveStatus(TEXTS.savedStatus);
+        setTimeout(() => setSaveStatus(''), 3000);
+      } else {
+        setSaveStatus(TEXTS.errorStatus);
+      }
+    } catch (error) {
+      console.error('Error updating settings:', error);
+      setSaveStatus(TEXTS.errorStatus);
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   const renderSection = () => {
-    // I am using h2 right here because the h1 is already used in the html calling this component
+    if (isLoading) {
+      return (
+        <Spinner />
+      );
+    }
+
     switch (selectedSection) {
       case 'Display':
         return (
@@ -72,59 +192,62 @@ export default function Settings() {
                     {TEXTS.darkModeDescription}
                   </p>
                 </div>
-                <DarkModeToggle aria-label="Dark Mode" />
-              </div>
-            </div>
-          </div>
-        );
-      case 'Account':
-        return (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between pb-4 border-b dark:border-gray-700">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                {TEXTS.accountSection}
-              </h2>
-            </div>
-            <div className="space-y-4">
-              <div>
-                <Label
-                  htmlFor="name"
-                  className="text-sm font-medium dark:text-gray-200"
-                >
-                  {TEXTS.nameLabel}
-                </Label>
-                <Input
-                  id="name"
-                  placeholder="Your name"
-                  className="w-full dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+                <Switch
+                  aria-label="Dark Mode"
+                  checked={settingsData.displaySettings.darkMode}
+                  onCheckedChange={(value: boolean) => handleSwitchChange('displaySettings', 'darkMode', value)}
                 />
               </div>
-              <div>
-                <Label
-                  htmlFor="email"
-                  className="text-sm font-medium dark:text-gray-200"
-                >
-                  {TEXTS.emailLabel}
+              
+              {/* Font Size Setting */}
+              <div className="space-y-2">
+                <Label className="text-base dark:text-gray-200">
+                  {TEXTS.fontSizeLabel}
                 </Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="Your email"
-                  className="w-full dark:bg-gray-800 dark:border-gray-700 dark:text-white"
-                />
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
+                  {TEXTS.fontSizeDescription}
+                </p>
+                <Select 
+                  value={settingsData.displaySettings.fontSize}
+                  onValueChange={(value) => 
+                    handleSelectChange('displaySettings', 'fontSize', value)
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select font size" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="small">Small</SelectItem>
+                    <SelectItem value="medium">Medium</SelectItem>
+                    <SelectItem value="large">Large</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-              <div>
-                <Label
-                  htmlFor="username"
-                  className="text-sm font-medium dark:text-gray-200"
-                >
-                  {TEXTS.usernameLabel}
+              
+              {/* Color Scheme Setting */}
+              <div className="space-y-2">
+                <Label className="text-base dark:text-gray-200">
+                  {TEXTS.colorSchemeLabel}
                 </Label>
-                <Input
-                  id="username"
-                  placeholder="Your username"
-                  className="w-full dark:bg-gray-800 dark:border-gray-700 dark:text-white"
-                />
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
+                  {TEXTS.colorSchemeDescription}
+                </p>
+                <Select 
+                  value={settingsData.displaySettings.colorScheme}
+                  onValueChange={(value) => 
+                    handleSelectChange('displaySettings', 'colorScheme', value)
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select color scheme" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="default">Default</SelectItem>
+                    <SelectItem value="blue">Blue</SelectItem>
+                    <SelectItem value="green">Green</SelectItem>
+                    <SelectItem value="purple">Purple</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
           </div>
@@ -148,8 +271,82 @@ export default function Settings() {
                   </p>
                 </div>
                 <Switch
-                  checked={notifications}
-                  onCheckedChange={setNotifications}
+                  checked={settingsData.notificationSettings.email}
+                  onCheckedChange={(value) => 
+                    handleSwitchChange('notificationSettings', 'email', value)
+                  }
+                />
+              </div>
+              
+              {/* Push Notifications */}
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label className="text-base dark:text-gray-200">
+                    {TEXTS.pushNotificationsLabel}
+                  </Label>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    {TEXTS.pushNotificationsDescription}
+                  </p>
+                </div>
+                <Switch
+                  checked={settingsData.notificationSettings.push}
+                  onCheckedChange={(value) => 
+                    handleSwitchChange('notificationSettings', 'push', value)
+                  }
+                />
+              </div>
+              
+              {/* Study Requests */}
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label className="text-base dark:text-gray-200">
+                    {TEXTS.studyRequestsLabel}
+                  </Label>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    {TEXTS.studyRequestsDescription}
+                  </p>
+                </div>
+                <Switch
+                  checked={settingsData.notificationSettings.studyRequests}
+                  onCheckedChange={(value) => 
+                    handleSwitchChange('notificationSettings', 'studyRequests', value)
+                  }
+                />
+              </div>
+              
+              {/* Messages */}
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label className="text-base dark:text-gray-200">
+                    {TEXTS.messagesLabel}
+                  </Label>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    {TEXTS.messagesDescription}
+                  </p>
+                </div>
+                <Switch
+                  checked={settingsData.notificationSettings.messages}
+                  onCheckedChange={(value) => 
+                    handleSwitchChange('notificationSettings', 'messages', value)
+                  }
+                />
+              </div>
+              
+              {/* Reminders */}
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label className="text-base dark:text-gray-200">
+                    {TEXTS.remindersLabel}
+                  </Label>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    {TEXTS.remindersDescription}
+                  </p>
+                </div>
+                <Switch
+                  checked={settingsData.notificationSettings.reminders}
+                  onCheckedChange={(value) => 
+                    handleSwitchChange('notificationSettings', 'reminders', value)
+                  }
                 />
               </div>
             </div>
@@ -164,27 +361,77 @@ export default function Settings() {
               </h2>
             </div>
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label className="text-base dark:text-gray-200">
-                    {TEXTS.publicProfileLabel}
-                  </Label>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    {TEXTS.publicProfileDescription}
-                  </p>
-                </div>
-                <Switch />
+              <div className="space-y-2">
+                <Label className="text-base dark:text-gray-200">
+                  {TEXTS.publicProfileLabel}
+                </Label>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
+                  {TEXTS.publicProfileDescription}
+                </p>
+                <Select 
+                  value={settingsData.privacySettings.profileVisibility}
+                  onValueChange={(value) => 
+                    handleSelectChange('privacySettings', 'profileVisibility', value)
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select visibility" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="public">Public</SelectItem>
+                    <SelectItem value="students_only">Students Only</SelectItem>
+                    <SelectItem value="connections_only">Connections Only</SelectItem>
+                    <SelectItem value="private">Private</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label className="text-base dark:text-gray-200">
-                    {TEXTS.searchEngineLabel}
-                  </Label>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    {TEXTS.searchEngineDescription}
-                  </p>
-                </div>
-                <Switch />
+              
+              <div className="space-y-2">
+                <Label className="text-base dark:text-gray-200">
+                  {TEXTS.showLocationLabel}
+                </Label>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
+                  {TEXTS.showLocationDescription}
+                </p>
+                <Select 
+                  value={settingsData.privacySettings.showLocation}
+                  onValueChange={(value) => 
+                    handleSelectChange('privacySettings', 'showLocation', value)
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select location sharing" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="exact">Exact Location</SelectItem>
+                    <SelectItem value="approximate">Approximate Location</SelectItem>
+                    <SelectItem value="none">Don't Show</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="space-y-2">
+                <Label className="text-base dark:text-gray-200">
+                  {TEXTS.studyAvailabilityLabel}
+                </Label>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
+                  {TEXTS.studyAvailabilityDescription}
+                </p>
+                <Select 
+                  value={settingsData.privacySettings.studyAvailabilityPublicity}
+                  onValueChange={(value) => 
+                    handleSelectChange('privacySettings', 'studyAvailabilityPublicity', value)
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select availability sharing" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="public">Public</SelectItem>
+                    <SelectItem value="connections_only">Connections Only</SelectItem>
+                    <SelectItem value="private">Private</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
           </div>
@@ -221,8 +468,41 @@ export default function Settings() {
                   type="password"
                   placeholder="New password"
                   className="w-full dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+                  disabled
                 />
               </div>
+            </div>
+          </div>
+        );
+      case 'Account':
+        return (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between pb-4 border-b dark:border-gray-700">
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                {TEXTS.accountSection}
+              </h2>
+            </div>
+            <div className="space-y-4">
+              {profile && (
+                <>
+                  <div>
+                    <Label className="text-sm font-medium dark:text-gray-200">
+                      Email
+                    </Label>
+                    <div className="mt-1 text-gray-600 dark:text-gray-400">
+                      {profile.email} <span className="text-xs">(Cannot be changed)</span>
+                    </div>
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium dark:text-gray-200">
+                      Username
+                    </Label>
+                    <div className="mt-1 text-gray-600 dark:text-gray-400">
+                      {profile.username}
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         );
@@ -230,6 +510,14 @@ export default function Settings() {
         return null;
     }
   };
+
+  const sections = [
+    { name: TEXTS.displaySection, icon: faDisplay },
+    { name: TEXTS.accountSection, icon: faKey },
+    { name: TEXTS.notificationsSection, icon: faBell },
+    { name: TEXTS.privacySection, icon: faGlobe },
+    { name: TEXTS.securitySection, icon: faShieldAlt },
+  ];
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-zinc-900 p-4 sm:p-6 md:p-8">
@@ -246,13 +534,7 @@ export default function Settings() {
         <div className="flex flex-col md:flex-row md:space-x-6 space-y-6 md:space-y-0">
           {/* Mobile Dropdown */}
           <MobileSectionDropdown
-            sections={[
-              { name: TEXTS.displaySection, icon: faDisplay },
-              { name: TEXTS.accountSection, icon: faKey },
-              { name: TEXTS.notificationsSection, icon: faBell },
-              { name: TEXTS.privacySection, icon: faGlobe },
-              { name: TEXTS.securitySection, icon: faShieldAlt },
-            ]}
+            sections={sections}
             selectedSection={selectedSection}
             onSectionChange={setSelectedSection}
           />
@@ -261,13 +543,7 @@ export default function Settings() {
           <aside className="hidden md:block md:w-64 flex-shrink-0">
             <nav className="bg-white dark:bg-zinc-950 p-3 rounded-lg shadow-sm dark:shadow-gray-800">
               <ul className="space-y-1">
-                {[
-                  { name: TEXTS.displaySection, icon: faDisplay },
-                  { name: TEXTS.accountSection, icon: faKey },
-                  { name: TEXTS.notificationsSection, icon: faBell },
-                  { name: TEXTS.privacySection, icon: faGlobe },
-                  { name: TEXTS.securitySection, icon: faShieldAlt },
-                ].map((item) => (
+                {sections.map((item) => (
                   <li key={item.name}>
                     <button
                       onClick={() => setSelectedSection(item.name)}
@@ -298,8 +574,26 @@ export default function Settings() {
           <div className="flex-1">
             <div className="bg-white dark:bg-zinc-950 p-6 rounded-lg shadow-sm dark:shadow-gray-800 space-y-6">
               {renderSection()}
-              <div className="pt-4 border-t dark:border-gray-700">
-                <Button className="w-auto">{TEXTS.saveChangesButton}</Button>
+              <div className="pt-4 border-t dark:border-gray-700 flex items-center justify-between">
+                <Button 
+                  className="w-auto" 
+                  onClick={handleSubmit}
+                  disabled={isLoading || isSaving}
+                >
+                  {isSaving ? TEXTS.savingStatus : TEXTS.saveChangesButton}
+                </Button>
+                
+                {saveStatus === TEXTS.savedStatus && (
+                  <span className="text-green-600 dark:text-green-400 text-sm">
+                    {TEXTS.savedStatus}
+                  </span>
+                )}
+                
+                {saveStatus === TEXTS.errorStatus && (
+                  <span className="text-red-600 dark:text-red-400 text-sm">
+                    {TEXTS.errorStatus}
+                  </span>
+                )}
               </div>
             </div>
           </div>

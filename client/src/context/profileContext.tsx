@@ -62,199 +62,141 @@ export interface UserProfile {
 // Define context type with methods
 interface ProfileContextType {
   profile: UserProfile | null;
-  loading: boolean;
-  error: string | null;
-  setProfile: (profile: UserProfile) => void;
-  updateProfile: (data: Partial<UserProfile>) => Promise<boolean>;
-  fetchProfile: () => Promise<boolean>;
+  isLoading: boolean;
+  updateProfile: (updates: Partial<UserProfile>) => Promise<boolean>;
+  refreshProfile: () => Promise<void>;
   clearProfile: () => void;
 }
 
 // Create the context
 const ProfileContext = createContext<ProfileContextType | undefined>(undefined);
 
-// Default empty profile
-const defaultProfile: UserProfile = {
-  email: '',
-  username: '',
-  bio: '',
-  location: '',
-  institution: '',
-  fieldOfStudy: '',
-  yearLevel: '',
-  academicInterests: '',
-  preferredStudyStyle: 'mixed',
-  preferredStudyEnvironment: 'library',
-  preferredGroupSize: 'small_group',
-  subjectsLookingToStudy: [],
-  preferredStudyTime: 'Afternoons',
-  timeZone: 'UTC-8',
-  studyFrequency: 'weekly',
-  weeklyAvailability: {
-    monday: [],
-    tuesday: [],
-    wednesday: [],
-    thursday: [],
-    friday: [],
-    saturday: [],
-    sunday: []
-  },
-  displaySettings: {
-    darkMode: false,
-    fontSize: 'medium',
-    colorScheme: 'default',
-  },
-  notificationSettings: {
-    email: true,
-    push: true,
-    studyRequests: true,
-    messages: true,
-    reminders: true,
-  },
-  privacySettings: {
-    profileVisibility: 'public',
-    showLocation: 'approximate',
-    studyAvailabilityPublicity: 'connections_only',
-  },
-  securitySettings: {
-    lastPasswordChange: new Date().toISOString(),
-  },
-  accountSettings: {
-    language: 'en',
-    emailVerified: true,
-  },
-};
-
 // Provider component
 export function ProfileProvider({ children }: { children: ReactNode }) {
-  const [profile, setProfileState] = useState<UserProfile | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
-  const { token, isAuthenticated } = useAuth();
+  const { token } = useAuth();
+  const [profile, setProfile] = useState<UserProfile | null>(() => {
+    if (typeof window !== 'undefined') {
+      const savedProfile = localStorage.getItem('userProfile');
+      if (savedProfile) {
+        try {
+          return JSON.parse(savedProfile);
+        } catch (err) {
+          console.error('Error parsing saved profile:', err);
+          localStorage.removeItem('userProfile');
+        }
+      }
+    }
+    return null;
+  });
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Set profile and save to localStorage
-  const setProfile = (newProfile: UserProfile) => {
-    setProfileState(newProfile);
-    // Store in localStorage for persistence across page refreshes
-    localStorage.setItem('userProfile', JSON.stringify(newProfile));
+  // Fetch profile from API
+  const fetchProfile = async (): Promise<UserProfile | null> => {
+    if (!token) return null;
+
+    try {
+      const response = await sendGetRequest(`${API_URL}/api/users/profile`, token as any);
+      
+      if (!response.error) {
+        return response.data;
+      }
+      
+      console.error('Error fetching profile:', response.message);
+      return null;
+    } catch (error) {
+      console.error('Unexpected error fetching profile:', error);
+      return null;
+    }
+  };
+
+  // Update profile with new data
+  const updateProfile = async (updates: Partial<UserProfile>): Promise<boolean> => {
+    if (!token || !profile) return false;
+    
+    try {
+      setIsLoading(true);
+      
+      const response = await sendPutRequest(
+        `${API_URL}/api/users/profile`, 
+        updates,
+        token as any
+      );
+      
+      if (response.ok) {
+        const updatedData = await response.json();
+        
+        const updatedProfile = { ...profile, ...updatedData };
+        setProfile(updatedProfile);
+        localStorage.setItem('userProfile', JSON.stringify(updatedProfile));
+        return true;
+      }
+
+      console.error('Server returned an error:', response.status);
+      return false;
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Refresh profile data from server
+  const refreshProfile = async (): Promise<void> => {
+    setIsLoading(true);
+    try {
+      const profileData = await fetchProfile();
+      if (profileData) {
+        setProfile(profileData);
+        localStorage.setItem('userProfile', JSON.stringify(profileData));
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Clear profile data (used on logout)
   const clearProfile = () => {
-    setProfileState(null);
+    setProfile(null);
     localStorage.removeItem('userProfile');
   };
 
-  // Update profile - both locally and on the server
-  const updateProfile = async (data: Partial<UserProfile>): Promise<boolean> => {
-    if (!profile || !token) return false;
-    
-    try {
-      setLoading(true);
-      setError(null);
-      
-      // Make API call to update profile
-      const response = await sendPutRequest(
-        `${API_URL}/api/users/profile`, 
-        data,
-        token
-      );
-      
-      if (response.ok) {
-        // Update local state with new data
-        const updatedProfile = { ...profile, ...data };
-        setProfile(updatedProfile);
-        return true;
-      } else {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to update profile');
-      }
-    } catch (err) {
-      console.error('Error updating profile:', err);
-      setError(err instanceof Error ? err.message : 'Failed to update profile');
-      return false;
-    } finally {
-      setLoading(false);
+  // Effect to synchronize localStorage when profile changes
+  useEffect(() => {
+    if (profile) {
+      localStorage.setItem('userProfile', JSON.stringify(profile));
     }
-  };
+  }, [profile]);
 
-  // Fetch profile from API
-  const fetchProfile = async (): Promise<boolean> => {
-    if (!isAuthenticated || !token) {
-      return false;
-    }
-  
-    setLoading(true);
-    setError(null);
-  
-    const response = await sendGetRequest(`${API_URL}/api/users/profile`, token);
-  
-    if (response.error) {
-      console.error('Error fetching profile:', response.error);
-  
-      // Handle 404 separately (e.g., user hasn't created a profile yet)
-      if (response.status === 404) {
-        return false;
-      }
-  
-      setError(response.error || 'Failed to load profile data');
-  
-      // Try to load from localStorage as a fallback
-      const savedProfile = localStorage.getItem('userProfile');
-      if (savedProfile) {
-        try {
-          setProfile(JSON.parse(savedProfile));
-          return true;
-        } catch (parseErr) {
-          console.error('Error parsing saved profile:', parseErr);
+  // Effect to fetch profile when token changes (user logs in)
+  useEffect(() => {
+    const loadProfile = async () => {
+      setIsLoading(true);
+      
+      if (token) {
+        const profileData = await fetchProfile();
+        if (profileData) {
+          setProfile(profileData);
+          localStorage.setItem('userProfile', JSON.stringify(profileData));
         }
+      } else {
+        // Clear profile when no token (user logs out)
+        clearProfile();
       }
-  
-      return false;
-    }
-  
-    setProfile(response.data);
-    setLoading(false);
-    return true;
-  };
+      
+      setIsLoading(false);
+    };
 
-  // Load profile from localStorage on mount
-  useEffect(() => {
-    const savedProfile = localStorage.getItem('userProfile');
-    if (savedProfile) {
-      try {
-        setProfileState(JSON.parse(savedProfile));
-      } catch (err) {
-        console.error('Error parsing saved profile:', err);
-        localStorage.removeItem('userProfile');
-      }
-    }
-  }, []);
-
-  useEffect(() => {
-    const savedProfile = localStorage.getItem('userProfile');
-    if (savedProfile) {
-      try {
-        const parsedProfile = JSON.parse(savedProfile);
-        setProfileState(parsedProfile);
-      } catch (err) {
-        console.error('Error parsing saved profile:', err);
-        localStorage.removeItem('userProfile');
-      }
-    } else if (isAuthenticated && token) {
-      fetchProfile();
-    }
-  }, [isAuthenticated, token]);
+    loadProfile();
+  }, [token]);
 
   return (
     <ProfileContext.Provider
       value={{
         profile,
-        loading,
-        error,
-        setProfile,
+        isLoading,
         updateProfile,
-        fetchProfile,
+        refreshProfile,
         clearProfile
       }}
     >

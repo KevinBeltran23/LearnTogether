@@ -17,6 +17,10 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { MobileSectionDropdown } from '@/components/mobileSectionDropdown';
 import { ProtectedComponent } from '@/context/authContext'; 
+import { useAuth } from '@/context/authContext';
+import { sendPutRequest } from '@/requests/sendPutRequest';
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const TEXTS = {
   title: 'Edit Profile',
@@ -53,10 +57,44 @@ const TEXTS = {
 };
 
 export default function EditProfile() {
-  const [selectedSection, setSelectedSection] = useState(
-    TEXTS.personalInfoSection,
-  );
+  const [selectedSection, setSelectedSection] = useState(TEXTS.personalInfoSection);
   const [publicProfile, setPublicProfile] = useState(true);
+  const { token } = useAuth();
+
+  const [profileData, setProfileData] = useState({
+    username: '',
+    bio: '',
+    location: '',
+    institution: '',
+    fieldOfStudy: '',
+    yearLevel: '',
+    academicInterests: '',
+    preferredStudyStyle: '',
+    preferredStudyEnvironment: '',
+    preferredGroupSize: '',
+    subjectsLookingToStudy: '',
+    preferredStudyTime: '',
+    timeZone: '',
+    studyFrequency: '',
+  });
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = e.target;
+    setProfileData((prevData) => ({ ...prevData, [id]: value }));
+  };
+
+  const handleSubmit = async () => {
+    try {
+      const response = await sendPutRequest(
+        `${API_URL}/api/users/profile`,
+        profileData,
+        token as any
+      );
+      console.log('Profile updated successfully:', await response.json());
+    } catch (error) {
+      console.error('Error updating profile:', error);
+    }
+  };
 
   const sections = [
     { name: TEXTS.personalInfoSection, icon: faUser },
@@ -99,6 +137,8 @@ export default function EditProfile() {
                 </Label>
                 <Input
                   id="username"
+                  value={profileData.username}
+                  onChange={handleInputChange}
                   placeholder="Your username"
                   className="w-full dark:bg-gray-800 dark:border-gray-700 dark:text-white"
                 />
@@ -112,6 +152,8 @@ export default function EditProfile() {
                 </Label>
                 <Input
                   id="bio"
+                  value={profileData.bio}
+                  onChange={handleInputChange}
                   placeholder="Tell others about yourself"
                   className="w-full dark:bg-gray-800 dark:border-gray-700 dark:text-white"
                 />
@@ -125,6 +167,8 @@ export default function EditProfile() {
                 </Label>
                 <Input
                   id="location"
+                  value={profileData.location}
+                  onChange={handleInputChange}
                   placeholder="City, Country"
                   className="w-full dark:bg-gray-800 dark:border-gray-700 dark:text-white"
                 />
@@ -435,7 +479,9 @@ export default function EditProfile() {
             <div className="bg-white dark:bg-zinc-950 p-6 rounded-lg shadow-sm dark:shadow-gray-800 space-y-6">
               {renderSection()}
               <div className="pt-4 border-t dark:border-gray-700">
-                <Button className="w-auto">{TEXTS.saveChangesButton}</Button>
+                <Button className="w-auto" onClick={handleSubmit}>
+                  {TEXTS.saveChangesButton}
+                </Button>
               </div>
             </div>
           </div>

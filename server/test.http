@@ -84,16 +84,30 @@ Authorization: Bearer {{authToken}}
 GET {{baseUrl}}/api/users/profile
 Authorization: Bearer {{authToken}}
 
-### 5. Update User Profile
+### 5. Update User Profile (Partial Update)
 PUT {{baseUrl}}/api/users/profile
 Content-Type: application/json
 Authorization: Bearer {{authToken}}
 
 {
+  "email": "test@example.com",
   "bio": "Updated bio information - now studying AI and Machine Learning",
   "location": "Seattle",
-  "preferredStudyEnvironment": "CAFE",
-  "subjectsLookingToStudy": ["Mathematics", "Computer Science", "Artificial Intelligence"]
+  "preferredStudyEnvironment": "cafe"
+}
+
+### 5b. Update User Display Settings (Partial Update)
+PUT {{baseUrl}}/api/users/profile
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "email": "test@example.com",
+  "displaySettings": {
+    "darkMode": false,
+    "fontSize": "large"
+  },
+  "preferredStudyTime": "Mornings and Evenings" 
 }
 
 ### 6. Find Study Partners
@@ -109,7 +123,3 @@ Content-Type: application/json
   "email": "partner@example.com",
   "password": "password456"
 }
-
-# Then login to get token
-# POST {{baseUrl}}/auth/login with the credentials above
-# Then create profile with the token

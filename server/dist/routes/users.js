@@ -65,6 +65,49 @@ const registerUsersRoutes = (app) => {
             res.status(500).json({ error: 'Internal server error' });
         }
     });
+    // modify the authenticated users profile
+    app.put('/api/users/profile', async (req, res) => {
+        try {
+            const authenticatedEmail = res.locals.token.email;
+            if (!authenticatedEmail) {
+                res.status(401).json({ error: 'Unauthorized' });
+                return;
+            }
+            const userData = req.body;
+            // The email in the request body must match the email in the authenticated token
+            // But we only need to check this if email is provided in the update
+            if (userData.email && userData.email !== authenticatedEmail) {
+                res.status(403).json({ error: 'Email in request body must match authenticated user' });
+                return;
+            }
+            // Ensure the email from the token is always used
+            // This prevents email updates even if valid email is provided
+            const updatesWithEmail = {
+                ...userData,
+                email: authenticatedEmail
+            };
+            // Modify the user with the data from the request body
+            const user = await userService.updateUserByEmail(authenticatedEmail, updatesWithEmail);
+            if (!user) {
+                res.status(404).json({ error: 'User not found' });
+                return;
+            }
+            const userProfile = user.toObject();
+            res.status(200).json(userProfile);
+        }
+        catch (error) {
+            console.error('Error updating user profile:', error);
+            // Check if it's a validation error
+            if (error instanceof Error && 'name' in error && error.name === 'ValidationError') {
+                res.status(400).json({
+                    error: 'Validation Error',
+                    details: error.message
+                });
+                return;
+            }
+            res.status(500).json({ error: 'Internal server error' });
+        }
+    });
     // Get current user profile
     app.get('/api/users/profile', async (req, res) => {
         try {

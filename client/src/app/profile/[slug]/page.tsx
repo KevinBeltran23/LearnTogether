@@ -59,7 +59,7 @@ export default function ProfileView() {
 
       const response = await sendGetRequest(
         `${API_URL}/api/users/profile/${slug}`, 
-        token
+        token as any
       );
 
       if (response.error) {

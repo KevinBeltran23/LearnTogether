@@ -51,9 +51,9 @@ export const getUserByUsername = async (username: string): Promise<IUser | null>
 };
 
 /**
- * Update user
+ * Update user by ID
  */
-export const updateUser = async (userId: string, updates: Partial<IUser>): Promise<IUser | null> => {
+export const updateUserById = async (userId: string, updates: Partial<IUser>): Promise<IUser | null> => {
   try {
     return await User.findByIdAndUpdate(
       userId,
@@ -62,6 +62,22 @@ export const updateUser = async (userId: string, updates: Partial<IUser>): Promi
     );
   } catch (error) {
     console.error(`Error updating user with ID ${userId}:`, error);
+    throw error;
+  }
+};
+
+/**
+ * Update user by email
+ */
+export const updateUserByEmail = async (email: string, updates: Partial<IUser>): Promise<IUser | null> => {
+  try {
+    return await User.findOneAndUpdate(
+      { email },
+      { $set: updates },
+      { new: true, runValidators: true }
+    );
+  } catch (error) {
+    console.error(`Error updating user with email ${email}:`, error);
     throw error;
   }
 };
