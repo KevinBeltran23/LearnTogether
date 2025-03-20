@@ -48,15 +48,12 @@ export const registerUsersRoutes = (app: express.Application) => {
       
       const userData = req.body;
       
-      // The email in the request body must match the email in the authenticated token
-      // But we only need to check this if email is provided in the update
       if (userData.email && userData.email !== authenticatedEmail) {
         res.status(403).json({ error: 'Email in request body must match authenticated user' });
         return;
       }
       
-      // Ensure the email from the token is always used
-      // This prevents email updates even if valid email is provided
+      // prevent email updates
       const updatesWithEmail = {
         ...userData,
         email: authenticatedEmail

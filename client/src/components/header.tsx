@@ -227,6 +227,7 @@ export function Header() {
         isOpen={isCreatePostOpen}
         onClose={() => setIsCreatePostOpen(false)}
         title="Create a Study Post"
+        maxWidth="max-w-6xl"
       >
         <CreatePostForm
           onSubmit={(data) => {

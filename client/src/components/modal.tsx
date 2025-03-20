@@ -10,13 +10,20 @@ interface ModalProps {
   onClose: () => void;
   title: string;
   children: ReactNode;
+  maxWidth?: string;
 }
 
-export function Modal({ isOpen, onClose, title, children }: ModalProps) {
+export function Modal({ 
+  isOpen, 
+  onClose, 
+  title, 
+  children,
+  maxWidth = "max-w-md" 
+}: ModalProps) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto">
       {/* Backdrop */}
       <div
         className="fixed inset-0 bg-black/50 dark:bg-black/70"
@@ -24,8 +31,8 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
       />
 
       {/* Modal Content */}
-      <div className="relative bg-white dark:bg-zinc-950 rounded-lg w-full max-w-md p-6 shadow-lg">
-        <div className="flex justify-between items-center mb-4">
+      <div className={`relative bg-white dark:bg-zinc-950 rounded-lg w-full ${maxWidth} p-6 shadow-lg max-h-[90vh] overflow-y-auto`}>
+        <div className="flex justify-between items-center mb-4 sticky top-0 bg-white dark:bg-zinc-950 z-10 pb-2">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
             {title}
           </h2>
