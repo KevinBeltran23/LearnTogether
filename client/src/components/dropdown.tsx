@@ -12,7 +12,6 @@ interface DropdownProps {
 
 const Dropdown: React.FC<DropdownProps> = ({
   label,
-  selectedValue,
   options,
   onSelect,
 }) => {

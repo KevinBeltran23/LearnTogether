@@ -11,6 +11,11 @@ const postsSchema = new mongoose_1.default.Schema({
         required: true,
         trim: true
     },
+    username: {
+        type: String,
+        required: true,
+        trim: true
+    },
     title: {
         type: String,
         required: true,

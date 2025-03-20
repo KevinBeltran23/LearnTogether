@@ -119,6 +119,7 @@ export default function FeedPage() {
                         key={post._id as string} 
                         id={post._id as string}
                         title={post.title}
+                        username={post.username}
                         description={post.description || ''}
                         learningType={post.preferredStudyStyle}
                         location={post.preferredStudyEnvironment}

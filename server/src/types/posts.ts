@@ -2,6 +2,7 @@ import { Document } from "mongoose";
 import { PreferredStudyStyle, PreferredStudyEnvironment, PreferredGroupSize, StudyFrequency, WeeklyAvailability } from "./users";
 export interface IPost extends Document {
   email: string;
+  username: string;
   title: string;
   description?: string;
   preferredStudyStyle: PreferredStudyStyle;

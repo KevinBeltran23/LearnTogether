@@ -29,6 +29,7 @@ import {
 // Mapped to match your backend API
 interface PostData {
   email: string;
+  username: string;
   title: string;
   description: string;
   preferredStudyStyle: string;
@@ -120,6 +121,7 @@ export function CreatePostForm({ onSubmit, onCancel, onSuccess }: CreatePostForm
       // Build the post data in the format expected by your API
       const postData: PostData = {
         email: profile.email,
+        username: profile.username,
         title: formData.title,
         description: formData.description,
         preferredStudyStyle: formData.preferredStudyStyle,

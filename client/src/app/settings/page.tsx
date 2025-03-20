@@ -16,6 +16,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { MobileSectionDropdown } from '@/components/mobileSectionDropdown';
 import { useProfile } from '@/context/profileContext';
+import { useTheme } from 'next-themes';
 
 // Import the exact types from the server
 import { 
@@ -85,6 +86,7 @@ type SectionKey = keyof SettingsData;
 
 export default function Settings() {
   const { profile, isLoading, updateProfile } = useProfile();
+  const { setTheme } = useTheme();
   const [selectedSection, setSelectedSection] = useState('Display');
   const [saveStatus, setSaveStatus] = useState('');
   const [isSaving, setIsSaving] = useState(false);
@@ -121,10 +123,15 @@ export default function Settings() {
     }
   }, [profile]);
 
+  useEffect(() => {
+    setTheme(settingsData.displaySettings.darkMode ? 'dark' : 'light');
+  }, [settingsData.displaySettings.darkMode, setTheme]);
+
   const handleSwitchChange = (section: SectionKey, key: string, value: boolean) => {
     setSettingsData((prevData) => {
       const sectionData = { ...prevData[section] };
       (sectionData as any)[key] = value;
+      
       return {
         ...prevData,
         [section]: sectionData,

@@ -31,7 +31,7 @@ function ProvidersAfterMount({ children }: { children: React.ReactNode }) {
     return <>{children}</>;
   }
 
-  return <ThemeProvider attribute="class">{children}</ThemeProvider>;
+  return <ThemeProvider attribute="class" enableSystem={false}>{children}</ThemeProvider>;
 }
 
 export default function RootLayout({

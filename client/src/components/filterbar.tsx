@@ -46,7 +46,7 @@ const STUDY_STYLE_OPTIONS = [
   { value: 'silent', label: 'Silent Study' },
   { value: 'work together', label: 'Work Together' },
   { value: 'tutoring', label: 'Tutoring' },
-  { value: 'any', label: 'Any Style' },
+  { value: 'no preference', label: 'No Preference' },
 ];
 
 const ENVIRONMENT_OPTIONS = [
@@ -76,6 +76,7 @@ const GROUP_SIZE_OPTIONS = [
   { value: 'small_group', label: 'Small Group (3-5)' },
   { value: 'medium_group', label: 'Medium Group (6-10)' },
   { value: 'large_group', label: 'Large Group (10+)' },
+  { value: 'no preference', label: 'No Preference' },
 ];
 
 export default function Filterbar({ filters, setFilters }: FilterbarProps) {

@@ -13,10 +13,12 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { formatDistanceToNow } from 'date-fns';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { useRouter } from 'next/navigation';
 
 interface PostCardProps {
   id: string;
   title: string;
+  username: string;
   description: string;
   learningType: string; 
   location: string; 
@@ -34,6 +36,7 @@ interface PostCardProps {
 export default function PostCard({
   id,
   title,
+  username,
   description,
   learningType,
   location,
@@ -43,10 +46,11 @@ export default function PostCard({
   groupSize,
   frequency,
   createdAt,
-  createdBy,
   creatorImage,
   specificLocation,
 }: PostCardProps) {
+  const router = useRouter();
+
   // Format the study style for display
   const formatStudyStyle = (style: string) => {
     return style.replace(/_/g, ' ').split(' ')
@@ -78,18 +82,17 @@ export default function PostCard({
       <CardHeader className="pb-0 pt-4">
         <div className="flex items-start justify-between mb-1">
           <div className="flex items-center gap-3">
-            {createdBy && (
-              <Avatar className="h-8 w-8 border border-gray-200 dark:border-gray-700">
-                {creatorImage ? (
-                  <img src={creatorImage} alt={createdBy} />
-                ) : (
-                  <AvatarFallback className="bg-primary/10 text-primary">
-                    {getInitials(createdBy)}
-                  </AvatarFallback>
-                )}
-              </Avatar>
-            )}
-            <h3 className="text-xl font-semibold line-clamp-1">{title}</h3>
+            <Avatar className="h-8 w-8 border border-gray-200 dark:border-gray-700">
+              {creatorImage ? (
+                <img src={creatorImage} alt={username} />
+              ) : (
+                <AvatarFallback>{getInitials(username)}</AvatarFallback>
+              )}
+            </Avatar>
+            <div>
+              <h3 className="text-xl font-semibold line-clamp-1">{title}</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">{username}</p>
+            </div>
           </div>
           <Badge variant="outline" className="text-xs font-normal">
             {formatDistanceToNow(new Date(createdAt), { addSuffix: true })}
@@ -158,7 +161,7 @@ export default function PostCard({
       </CardContent>
 
       <CardFooter className="flex justify-end gap-2 pt-2 pb-4 border-t border-gray-100 dark:border-gray-800 mt-4">
-        <Button size="sm" variant="outline">View Profile</Button>
+        <Button size="sm" variant="outline" onClick={() => router.push(`/${username}`)}>View Profile</Button>
         <Button size="sm" className="shadow-sm">Connect</Button>
       </CardFooter>
     </Card>

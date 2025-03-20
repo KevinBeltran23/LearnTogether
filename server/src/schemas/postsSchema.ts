@@ -11,6 +11,11 @@ const postsSchema: Schema<IPost> = new mongoose.Schema(
             required: true,
             trim: true
         },
+        username: { 
+            type: String,
+            required: true,
+            trim: true
+        },
         title: {
             type: String,
             required: true,
