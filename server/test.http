@@ -123,3 +123,80 @@ Content-Type: application/json
   "email": "partner@example.com",
   "password": "password456"
 }
+
+### 8. Create a Post
+POST {{baseUrl}}/api/posts
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "email": "test@example.com",
+  "title": "Study Session: Advanced Algorithms",
+  "content": "Looking for partners to study advanced algorithms this weekend. Anyone interested?",
+  "tags": ["Computer Science", "Algorithms", "Study Group"],
+  "location": "University Library, Room 302",
+  "scheduledTime": "2023-11-10T14:00:00.000Z",
+  "duration": 120
+}
+
+### 9. Create Another Post
+POST {{baseUrl}}/api/posts
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "email": "test@example.com",
+  "title": "Math Study Group",
+  "content": "Forming a group to study Calculus III. Meeting twice weekly.",
+  "tags": ["Mathematics", "Calculus", "Study Group"],
+  "location": "Online via Zoom",
+  "scheduledTime": "2023-11-12T18:00:00.000Z",
+  "duration": 90
+}
+
+### 10. Get All Posts
+GET {{baseUrl}}/api/posts
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+### 11. Get Posts by User Email
+GET {{baseUrl}}/api/posts/user/test@example.com
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+### 13. Update a Post
+# Replace {postId} with an actual post ID from a previous response
+PUT {{baseUrl}}/api/posts/67dbb2289e6b372098f7f272
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "email": "test@example.com",
+  "title": "UPDATED: Study Session: Advanced Algorithms",
+  "content": "Looking for 3-4 partners to study advanced algorithms this weekend. We'll focus on graph algorithms and dynamic programming.",
+  "tags": ["Computer Science", "Algorithms", "Study Group", "Graph Theory"],
+  "location": "University Library, Room 302",
+  "scheduledTime": "2023-11-10T15:00:00.000Z",
+  "duration": 150
+}
+
+### 14. Try to Update a Post with Wrong Email (Should Fail)
+# Replace {postId} with an actual post ID from a previous response
+PUT {{baseUrl}}/api/posts/{postId}
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "email": "wrong@example.com",
+  "title": "This update should fail",
+  "content": "This update should fail because the email doesn't match the authenticated user"
+}
+
+### 15. Delete a Post
+# Replace {postId} with an actual post ID from a previous response
+DELETE {{baseUrl}}/api/posts/{postId}
+Authorization: Bearer {{authToken}}
+
+### 16. Try to Access a Deleted Post (Should Return 404)
+# Use the same postId from the delete operation
+GET {{baseUrl}}/api/posts/{postId}

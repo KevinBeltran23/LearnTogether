@@ -4,6 +4,7 @@ import cors from 'cors';
 import { registerAuthRoutes } from "./routes/auth";
 import { verifyAuthToken } from "./services/authServices";
 import { registerUsersRoutes } from "./routes/users";
+import { registerPostsRoutes } from "./routes/posts";
 import { connectMongo, connectMongoose } from "./config/db";
 
 dotenv.config(); // Read the .env file in the current working directory, and load values into process.env.
@@ -27,6 +28,7 @@ async function setUpServer() {
         registerAuthRoutes(app);
         app.use("/api/*", verifyAuthToken);
         registerUsersRoutes(app);
+        registerPostsRoutes(app);
         
         app.get("*", (req: Request, res: Response) => {
             console.log("none of the routes above me were matched");

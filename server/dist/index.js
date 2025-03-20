@@ -9,6 +9,7 @@ const cors_1 = __importDefault(require("cors"));
 const auth_1 = require("./routes/auth");
 const authServices_1 = require("./services/authServices");
 const users_1 = require("./routes/users");
+const posts_1 = require("./routes/posts");
 const db_1 = require("./config/db");
 dotenv_1.default.config(); // Read the .env file in the current working directory, and load values into process.env.
 const PORT = process.env.PORT || 8000;
@@ -27,6 +28,7 @@ async function setUpServer() {
         (0, auth_1.registerAuthRoutes)(app);
         app.use("/api/*", authServices_1.verifyAuthToken);
         (0, users_1.registerUsersRoutes)(app);
+        (0, posts_1.registerPostsRoutes)(app);
         app.get("*", (req, res) => {
             console.log("none of the routes above me were matched");
         });

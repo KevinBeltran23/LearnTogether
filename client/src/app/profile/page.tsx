@@ -154,12 +154,9 @@ export default function EditProfile() {
   const [selectedSection, setSelectedSection] = useState(TEXTS.personalInfoSection);
   const [isSaving, setIsSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState('');
-  const [publicProfile, setPublicProfile] = useState(true);
-  const [showLocation, setShowLocation] = useState(false);
-  const [studyAvailability, setStudyAvailability] = useState(false);
   
-  // Local state to track form changes before submitting
-  const [profileData, setProfileData] = useState<ProfileFormData>({
+  // Local state for editable form data
+  const [formData, setFormData] = useState<ProfileFormData>({
     username: '',
     bio: '',
     location: '',
@@ -176,10 +173,10 @@ export default function EditProfile() {
     studyFrequency: StudyFrequency.WEEKLY,
   });
   
-  // Update local state when profile data loads
+  // Update form when profile loads or changes
   useEffect(() => {
     if (profile) {
-      setProfileData({
+      setFormData({
         username: profile.username || '',
         bio: profile.bio || '',
         location: profile.location || '',
@@ -199,14 +196,14 @@ export default function EditProfile() {
   }, [profile]);
 
   const handleInputChange = (field: keyof ProfileFormData, value: string) => {
-    setProfileData(prev => ({
+    setFormData(prev => ({
       ...prev,
       [field]: value
     }));
   };
 
   const handleSelectChange = (field: keyof ProfileFormData, value: any) => {
-    setProfileData(prev => ({
+    setFormData(prev => ({
       ...prev,
       [field]: value
     }));
@@ -215,7 +212,7 @@ export default function EditProfile() {
   const handleSubjectsChange = (value: string) => {
     // Convert comma-separated string to array
     const subjectsArray = value.split(',').map(subject => subject.trim()).filter(subject => subject !== '');
-    setProfileData(prev => ({
+    setFormData(prev => ({
       ...prev,
       subjectsLookingToStudy: subjectsArray
     }));
@@ -226,7 +223,7 @@ export default function EditProfile() {
     setSaveStatus(TEXTS.savingStatus);
     
     try {
-      const success = await updateProfile(profileData);
+      const success = await updateProfile(formData);
       
       if (success) {
         setSaveStatus(TEXTS.savedStatus);
@@ -275,7 +272,7 @@ export default function EditProfile() {
                   id="username"
                   placeholder="Your username"
                   className="w-full dark:bg-gray-800 dark:border-gray-700 dark:text-white"
-                  value={profileData.username}
+                  value={formData.username}
                   onChange={(e) => handleInputChange('username', e.target.value)}
                 />
               </div>
@@ -290,7 +287,7 @@ export default function EditProfile() {
                   id="bio"
                   placeholder="Tell others about yourself"
                   className="w-full dark:bg-gray-800 dark:border-gray-700 dark:text-white"
-                  value={profileData.bio}
+                  value={formData.bio}
                   onChange={(e) => handleInputChange('bio', e.target.value)}
                 />
               </div>
@@ -305,7 +302,7 @@ export default function EditProfile() {
                   id="location"
                   placeholder="City, Country"
                   className="w-full dark:bg-gray-800 dark:border-gray-700 dark:text-white"
-                  value={profileData.location}
+                  value={formData.location}
                   onChange={(e) => handleInputChange('location', e.target.value)}
                 />
               </div>
@@ -333,7 +330,7 @@ export default function EditProfile() {
                   id="school"
                   placeholder="Your institution"
                   className="w-full dark:bg-gray-800 dark:border-gray-700 dark:text-white"
-                  value={profileData.institution}
+                  value={formData.institution}
                   onChange={(e) => handleInputChange('institution', e.target.value)}
                 />
               </div>
@@ -348,7 +345,7 @@ export default function EditProfile() {
                   id="major"
                   placeholder="Your field of study"
                   className="w-full dark:bg-gray-800 dark:border-gray-700 dark:text-white"
-                  value={profileData.fieldOfStudy}
+                  value={formData.fieldOfStudy}
                   onChange={(e) => handleInputChange('fieldOfStudy', e.target.value)}
                 />
               </div>
@@ -363,7 +360,7 @@ export default function EditProfile() {
                   id="year"
                   placeholder="e.g., Freshman, Senior, Graduate"
                   className="w-full dark:bg-gray-800 dark:border-gray-700 dark:text-white"
-                  value={profileData.yearLevel}
+                  value={formData.yearLevel}
                   onChange={(e) => handleInputChange('yearLevel', e.target.value)}
                 />
               </div>
@@ -378,7 +375,7 @@ export default function EditProfile() {
                   id="interests"
                   placeholder="e.g., Machine Learning, Literature, Biology"
                   className="w-full dark:bg-gray-800 dark:border-gray-700 dark:text-white"
-                  value={profileData.academicInterests}
+                  value={formData.academicInterests}
                   onChange={(e) => handleInputChange('academicInterests', e.target.value)}
                 />
               </div>
@@ -403,7 +400,7 @@ export default function EditProfile() {
                   {TEXTS.studyStyleLabel}
                 </Label>
                 <Select 
-                  value={profileData.preferredStudyStyle}
+                  value={formData.preferredStudyStyle}
                   onValueChange={(value) => 
                     handleSelectChange('preferredStudyStyle', value)
                   }
@@ -428,7 +425,7 @@ export default function EditProfile() {
                   {TEXTS.environmentLabel}
                 </Label>
                 <Select 
-                  value={profileData.preferredStudyEnvironment}
+                  value={formData.preferredStudyEnvironment}
                   onValueChange={(value) => 
                     handleSelectChange('preferredStudyEnvironment', value)
                   }
@@ -453,7 +450,7 @@ export default function EditProfile() {
                   {TEXTS.groupSizeLabel}
                 </Label>
                 <Select 
-                  value={profileData.preferredGroupSize}
+                  value={formData.preferredGroupSize}
                   onValueChange={(value) => 
                     handleSelectChange('preferredGroupSize', value)
                   }
@@ -481,7 +478,7 @@ export default function EditProfile() {
                   id="subjects"
                   placeholder="List subjects you want to study with others (comma separated)"
                   className="w-full dark:bg-gray-800 dark:border-gray-700 dark:text-white"
-                  value={profileData.subjectsLookingToStudy.join(', ')}
+                  value={formData.subjectsLookingToStudy.join(', ')}
                   onChange={(e) => handleSubjectsChange(e.target.value)}
                 />
               </div>
@@ -509,7 +506,7 @@ export default function EditProfile() {
                   id="preferred-times"
                   placeholder="e.g., Weekday evenings, Weekend afternoons"
                   className="w-full dark:bg-gray-800 dark:border-gray-700 dark:text-white"
-                  value={profileData.preferredStudyTime}
+                  value={formData.preferredStudyTime}
                   onChange={(e) => handleInputChange('preferredStudyTime', e.target.value)}
                 />
               </div>
@@ -521,7 +518,7 @@ export default function EditProfile() {
                   {TEXTS.timeZoneLabel}
                 </Label>
                 <Select 
-                  value={profileData.timeZone}
+                  value={formData.timeZone}
                   onValueChange={(value) => 
                     handleSelectChange('timeZone', value)
                   }
@@ -546,7 +543,7 @@ export default function EditProfile() {
                   {TEXTS.frequencyLabel}
                 </Label>
                 <Select 
-                  value={profileData.studyFrequency}
+                  value={formData.studyFrequency}
                   onValueChange={(value) => 
                     handleSelectChange('studyFrequency', value)
                   }
