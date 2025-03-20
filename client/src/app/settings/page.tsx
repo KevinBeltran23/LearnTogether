@@ -24,7 +24,6 @@ const TEXTS = {
   title: 'Settings',
   subtitle: 'Manage your account settings and preferences',
   displaySection: 'Display',
-  accountSection: 'Account',
   notificationsSection: 'Notifications',
   privacySection: 'Privacy',
   securitySection: 'Security',
@@ -474,38 +473,6 @@ export default function Settings() {
             </div>
           </div>
         );
-      case 'Account':
-        return (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between pb-4 border-b dark:border-gray-700">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                {TEXTS.accountSection}
-              </h2>
-            </div>
-            <div className="space-y-4">
-              {profile && (
-                <>
-                  <div>
-                    <Label className="text-sm font-medium dark:text-gray-200">
-                      Email
-                    </Label>
-                    <div className="mt-1 text-gray-600 dark:text-gray-400">
-                      {profile.email} <span className="text-xs">(Cannot be changed)</span>
-                    </div>
-                  </div>
-                  <div>
-                    <Label className="text-sm font-medium dark:text-gray-200">
-                      Username
-                    </Label>
-                    <div className="mt-1 text-gray-600 dark:text-gray-400">
-                      {profile.username}
-                    </div>
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
-        );
       default:
         return null;
     }
@@ -513,7 +480,6 @@ export default function Settings() {
 
   const sections = [
     { name: TEXTS.displaySection, icon: faDisplay },
-    { name: TEXTS.accountSection, icon: faKey },
     { name: TEXTS.notificationsSection, icon: faBell },
     { name: TEXTS.privacySection, icon: faGlobe },
     { name: TEXTS.securitySection, icon: faShieldAlt },

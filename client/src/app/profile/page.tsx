@@ -2,25 +2,86 @@
 
 // I think this is fine for now
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
+import Spinner from '@/components/ui/spinner';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faUser,
   faBook,
-  faLock,
   faClock,
   faGraduationCap,
 } from '@fortawesome/free-solid-svg-icons';
 import { MobileSectionDropdown } from '@/components/mobileSectionDropdown';
-import { ProtectedComponent } from '@/context/authContext'; 
-import { useAuth } from '@/context/authContext';
-import { sendPutRequest } from '@/requests/sendPutRequest';
+import { ProtectedComponent } from '@/context/authContext';
+import { useProfile } from '@/context/profileContext';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+// Enums matching the server types
+enum PreferredStudyStyle {
+  VISUAL = "visual",
+  AUDITORY = "auditory",
+  READING_WRITING = "reading_writing",
+  KINESTHETIC = "kinesthetic",
+  MIXED = "mixed"
+}
+
+enum PreferredStudyEnvironment {
+  QUIET = "quiet",
+  MODERATE_NOISE = "moderate_noise",
+  BUSY = "busy",
+  OUTDOORS = "outdoors",
+  CAFE = "cafe",
+  LIBRARY = "library",
+  VIRTUAL = "virtual"
+}
+
+enum PreferredGroupSize {
+  SOLO = "solo",
+  PAIR = "pair",
+  SMALL_GROUP = "small_group",
+  MEDIUM_GROUP = "medium_group",
+  LARGE_GROUP = "large_group"
+}
+
+enum TimeZone {
+  UTC_MINUS_12 = "UTC-12",
+  UTC_MINUS_11 = "UTC-11",
+  UTC_MINUS_10 = "UTC-10",
+  UTC_MINUS_9 = "UTC-9",
+  UTC_MINUS_8 = "UTC-8",
+  UTC_MINUS_7 = "UTC-7",
+  UTC_MINUS_6 = "UTC-6",
+  UTC_MINUS_5 = "UTC-5",
+  UTC_MINUS_4 = "UTC-4",
+  UTC_MINUS_3 = "UTC-3",
+  UTC_MINUS_2 = "UTC-2",
+  UTC_MINUS_1 = "UTC-1",
+  UTC = "UTC",
+  UTC_PLUS_1 = "UTC+1",
+  UTC_PLUS_2 = "UTC+2",
+  UTC_PLUS_3 = "UTC+3",
+  UTC_PLUS_4 = "UTC+4",
+  UTC_PLUS_5 = "UTC+5",
+  UTC_PLUS_6 = "UTC+6",
+  UTC_PLUS_7 = "UTC+7",
+  UTC_PLUS_8 = "UTC+8",
+  UTC_PLUS_9 = "UTC+9",
+  UTC_PLUS_10 = "UTC+10",
+  UTC_PLUS_11 = "UTC+11",
+  UTC_PLUS_12 = "UTC+12"
+}
+
+enum StudyFrequency {
+  DAILY = "daily",
+  FEW_TIMES_WEEK = "few_times_week",
+  WEEKLY = "weekly",
+  BIWEEKLY = "biweekly",
+  MONTHLY = "monthly",
+  AS_NEEDED = "as_needed"
+}
 
 const TEXTS = {
   title: 'Edit Profile',
@@ -29,7 +90,6 @@ const TEXTS = {
   academicInfoSection: 'Academic Info',
   studyPreferencesSection: 'Study Preferences',
   availabilitySection: 'Availability',
-  privacySection: 'Privacy',
   nameLabel: 'Name',
   usernameLabel: 'Username',
   bioLabel: 'Bio',
@@ -52,16 +112,54 @@ const TEXTS = {
   studyAvailabilityLabel: 'Study Availability',
   studyAvailabilityDescription: 'Show your availability calendar to others',
   saveChangesButton: 'Save Changes',
+  savingStatus: 'Saving...',
+  savedStatus: 'Changes saved!',
+  errorStatus: 'Error saving changes',
   weeklyAvailabilityLabel: 'Weekly Availability',
   weeklyAvailabilityDescription: 'Select your typical available times',
 };
 
-export default function EditProfile() {
-  const [selectedSection, setSelectedSection] = useState(TEXTS.personalInfoSection);
-  const [publicProfile, setPublicProfile] = useState(true);
-  const { token } = useAuth();
+// Helper functions for formatting enum displays
+const formatEnumForDisplay = (value: string): string => {
+  return value
+    .split('_')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+};
 
-  const [profileData, setProfileData] = useState({
+const formatTimeZone = (value: string): string => {
+  return value.replace('_', ' ');
+};
+
+// Define type for profile form data
+interface ProfileFormData {
+  username: string;
+  bio: string;
+  location: string;
+  institution: string;
+  fieldOfStudy: string;
+  yearLevel: string;
+  academicInterests: string;
+  preferredStudyStyle: PreferredStudyStyle;
+  preferredStudyEnvironment: PreferredStudyEnvironment;
+  preferredGroupSize: PreferredGroupSize;
+  subjectsLookingToStudy: string[];
+  preferredStudyTime: string;
+  timeZone: TimeZone;
+  studyFrequency: StudyFrequency;
+}
+
+export default function EditProfile() {
+  const { profile, isLoading, updateProfile } = useProfile();
+  const [selectedSection, setSelectedSection] = useState(TEXTS.personalInfoSection);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveStatus, setSaveStatus] = useState('');
+  const [publicProfile, setPublicProfile] = useState(true);
+  const [showLocation, setShowLocation] = useState(false);
+  const [studyAvailability, setStudyAvailability] = useState(false);
+  
+  // Local state to track form changes before submitting
+  const [profileData, setProfileData] = useState<ProfileFormData>({
     username: '',
     bio: '',
     location: '',
@@ -69,30 +167,78 @@ export default function EditProfile() {
     fieldOfStudy: '',
     yearLevel: '',
     academicInterests: '',
-    preferredStudyStyle: '',
-    preferredStudyEnvironment: '',
-    preferredGroupSize: '',
-    subjectsLookingToStudy: '',
+    preferredStudyStyle: PreferredStudyStyle.MIXED,
+    preferredStudyEnvironment: PreferredStudyEnvironment.QUIET,
+    preferredGroupSize: PreferredGroupSize.SMALL_GROUP,
+    subjectsLookingToStudy: [],
     preferredStudyTime: '',
-    timeZone: '',
-    studyFrequency: '',
+    timeZone: TimeZone.UTC,
+    studyFrequency: StudyFrequency.WEEKLY,
   });
+  
+  // Update local state when profile data loads
+  useEffect(() => {
+    if (profile) {
+      setProfileData({
+        username: profile.username || '',
+        bio: profile.bio || '',
+        location: profile.location || '',
+        institution: profile.institution || '',
+        fieldOfStudy: profile.fieldOfStudy || '',
+        yearLevel: profile.yearLevel || '',
+        academicInterests: profile.academicInterests || '',
+        preferredStudyStyle: (profile.preferredStudyStyle as PreferredStudyStyle) || PreferredStudyStyle.MIXED,
+        preferredStudyEnvironment: (profile.preferredStudyEnvironment as PreferredStudyEnvironment) || PreferredStudyEnvironment.QUIET,
+        preferredGroupSize: (profile.preferredGroupSize as PreferredGroupSize) || PreferredGroupSize.SMALL_GROUP,
+        subjectsLookingToStudy: profile.subjectsLookingToStudy || [],
+        preferredStudyTime: profile.preferredStudyTime || '',
+        timeZone: (profile.timeZone as TimeZone) || TimeZone.UTC,
+        studyFrequency: (profile.studyFrequency as StudyFrequency) || StudyFrequency.WEEKLY,
+      });
+    }
+  }, [profile]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { id, value } = e.target;
-    setProfileData((prevData) => ({ ...prevData, [id]: value }));
+  const handleInputChange = (field: keyof ProfileFormData, value: string) => {
+    setProfileData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const handleSelectChange = (field: keyof ProfileFormData, value: any) => {
+    setProfileData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const handleSubjectsChange = (value: string) => {
+    // Convert comma-separated string to array
+    const subjectsArray = value.split(',').map(subject => subject.trim()).filter(subject => subject !== '');
+    setProfileData(prev => ({
+      ...prev,
+      subjectsLookingToStudy: subjectsArray
+    }));
   };
 
   const handleSubmit = async () => {
+    setIsSaving(true);
+    setSaveStatus(TEXTS.savingStatus);
+    
     try {
-      const response = await sendPutRequest(
-        `${API_URL}/api/users/profile`,
-        profileData,
-        token as any
-      );
-      console.log('Profile updated successfully:', await response.json());
+      const success = await updateProfile(profileData);
+      
+      if (success) {
+        setSaveStatus(TEXTS.savedStatus);
+        setTimeout(() => setSaveStatus(''), 3000);
+      } else {
+        setSaveStatus(TEXTS.errorStatus);
+      }
     } catch (error) {
       console.error('Error updating profile:', error);
+      setSaveStatus(TEXTS.errorStatus);
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -101,10 +247,13 @@ export default function EditProfile() {
     { name: TEXTS.academicInfoSection, icon: faGraduationCap },
     { name: TEXTS.studyPreferencesSection, icon: faBook },
     { name: TEXTS.availabilitySection, icon: faClock },
-    { name: TEXTS.privacySection, icon: faLock },
   ];
 
   const renderSection = () => {
+    if (isLoading) {
+      return <Spinner />;
+    }
+
     switch (selectedSection) {
       case TEXTS.personalInfoSection:
         return (
@@ -117,19 +266,6 @@ export default function EditProfile() {
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label
-                  htmlFor="name"
-                  className="text-sm font-medium dark:text-gray-200"
-                >
-                  {TEXTS.nameLabel}
-                </Label>
-                <Input
-                  id="name"
-                  placeholder="Your name"
-                  className="w-full dark:bg-gray-800 dark:border-gray-700 dark:text-white"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label
                   htmlFor="username"
                   className="text-sm font-medium dark:text-gray-200"
                 >
@@ -137,10 +273,10 @@ export default function EditProfile() {
                 </Label>
                 <Input
                   id="username"
-                  value={profileData.username}
-                  onChange={handleInputChange}
                   placeholder="Your username"
                   className="w-full dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+                  value={profileData.username}
+                  onChange={(e) => handleInputChange('username', e.target.value)}
                 />
               </div>
               <div className="space-y-2">
@@ -152,10 +288,10 @@ export default function EditProfile() {
                 </Label>
                 <Input
                   id="bio"
-                  value={profileData.bio}
-                  onChange={handleInputChange}
                   placeholder="Tell others about yourself"
                   className="w-full dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+                  value={profileData.bio}
+                  onChange={(e) => handleInputChange('bio', e.target.value)}
                 />
               </div>
               <div className="space-y-2">
@@ -167,10 +303,10 @@ export default function EditProfile() {
                 </Label>
                 <Input
                   id="location"
-                  value={profileData.location}
-                  onChange={handleInputChange}
                   placeholder="City, Country"
                   className="w-full dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+                  value={profileData.location}
+                  onChange={(e) => handleInputChange('location', e.target.value)}
                 />
               </div>
             </div>
@@ -197,6 +333,8 @@ export default function EditProfile() {
                   id="school"
                   placeholder="Your institution"
                   className="w-full dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+                  value={profileData.institution}
+                  onChange={(e) => handleInputChange('institution', e.target.value)}
                 />
               </div>
               <div className="space-y-2">
@@ -210,6 +348,8 @@ export default function EditProfile() {
                   id="major"
                   placeholder="Your field of study"
                   className="w-full dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+                  value={profileData.fieldOfStudy}
+                  onChange={(e) => handleInputChange('fieldOfStudy', e.target.value)}
                 />
               </div>
               <div className="space-y-2">
@@ -223,6 +363,8 @@ export default function EditProfile() {
                   id="year"
                   placeholder="e.g., Freshman, Senior, Graduate"
                   className="w-full dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+                  value={profileData.yearLevel}
+                  onChange={(e) => handleInputChange('yearLevel', e.target.value)}
                 />
               </div>
               <div className="space-y-2">
@@ -236,6 +378,8 @@ export default function EditProfile() {
                   id="interests"
                   placeholder="e.g., Machine Learning, Literature, Biology"
                   className="w-full dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+                  value={profileData.academicInterests}
+                  onChange={(e) => handleInputChange('academicInterests', e.target.value)}
                 />
               </div>
             </div>
@@ -258,11 +402,23 @@ export default function EditProfile() {
                 >
                   {TEXTS.studyStyleLabel}
                 </Label>
-                <Input
-                  id="study-style"
-                  placeholder="e.g., Group discussions, Silent study, Project collaboration"
-                  className="w-full dark:bg-gray-800 dark:border-gray-700 dark:text-white"
-                />
+                <Select 
+                  value={profileData.preferredStudyStyle}
+                  onValueChange={(value) => 
+                    handleSelectChange('preferredStudyStyle', value)
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select study style" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.values(PreferredStudyStyle).map((style) => (
+                      <SelectItem key={style} value={style}>
+                        {formatEnumForDisplay(style)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="space-y-2">
                 <Label
@@ -271,11 +427,23 @@ export default function EditProfile() {
                 >
                   {TEXTS.environmentLabel}
                 </Label>
-                <Input
-                  id="environment"
-                  placeholder="e.g., Library, Coffee shop, Online"
-                  className="w-full dark:bg-gray-800 dark:border-gray-700 dark:text-white"
-                />
+                <Select 
+                  value={profileData.preferredStudyEnvironment}
+                  onValueChange={(value) => 
+                    handleSelectChange('preferredStudyEnvironment', value)
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select study environment" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.values(PreferredStudyEnvironment).map((env) => (
+                      <SelectItem key={env} value={env}>
+                        {formatEnumForDisplay(env)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="space-y-2">
                 <Label
@@ -284,11 +452,23 @@ export default function EditProfile() {
                 >
                   {TEXTS.groupSizeLabel}
                 </Label>
-                <Input
-                  id="group-size"
-                  placeholder="e.g., 2-3 people, 4-6 people"
-                  className="w-full dark:bg-gray-800 dark:border-gray-700 dark:text-white"
-                />
+                <Select 
+                  value={profileData.preferredGroupSize}
+                  onValueChange={(value) => 
+                    handleSelectChange('preferredGroupSize', value)
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select group size" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.values(PreferredGroupSize).map((size) => (
+                      <SelectItem key={size} value={size}>
+                        {formatEnumForDisplay(size)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="space-y-2">
                 <Label
@@ -299,8 +479,10 @@ export default function EditProfile() {
                 </Label>
                 <Input
                   id="subjects"
-                  placeholder="List subjects you want to study with others"
+                  placeholder="List subjects you want to study with others (comma separated)"
                   className="w-full dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+                  value={profileData.subjectsLookingToStudy.join(', ')}
+                  onChange={(e) => handleSubjectsChange(e.target.value)}
                 />
               </div>
             </div>
@@ -327,6 +509,8 @@ export default function EditProfile() {
                   id="preferred-times"
                   placeholder="e.g., Weekday evenings, Weekend afternoons"
                   className="w-full dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+                  value={profileData.preferredStudyTime}
+                  onChange={(e) => handleInputChange('preferredStudyTime', e.target.value)}
                 />
               </div>
               <div className="space-y-2">
@@ -336,11 +520,23 @@ export default function EditProfile() {
                 >
                   {TEXTS.timeZoneLabel}
                 </Label>
-                <Input
-                  id="time-zone"
-                  placeholder="Your time zone"
-                  className="w-full dark:bg-gray-800 dark:border-gray-700 dark:text-white"
-                />
+                <Select 
+                  value={profileData.timeZone}
+                  onValueChange={(value) => 
+                    handleSelectChange('timeZone', value)
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select time zone" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.values(TimeZone).map((tz) => (
+                      <SelectItem key={tz} value={tz}>
+                        {formatTimeZone(tz)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="space-y-2">
                 <Label
@@ -349,11 +545,23 @@ export default function EditProfile() {
                 >
                   {TEXTS.frequencyLabel}
                 </Label>
-                <Input
-                  id="frequency"
-                  placeholder="e.g., Weekly, Bi-weekly, As needed"
-                  className="w-full dark:bg-gray-800 dark:border-gray-700 dark:text-white"
-                />
+                <Select 
+                  value={profileData.studyFrequency}
+                  onValueChange={(value) => 
+                    handleSelectChange('studyFrequency', value)
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select frequency" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.values(StudyFrequency).map((freq) => (
+                      <SelectItem key={freq} value={freq}>
+                        {formatEnumForDisplay(freq)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="space-y-0.5">
                 <Label className="text-base dark:text-gray-200">
@@ -363,55 +571,6 @@ export default function EditProfile() {
                   {TEXTS.weeklyAvailabilityDescription}
                 </p>
                 {/* It would be nice to add a nicer calendar/schedule picker component here */}
-              </div>
-            </div>
-          </div>
-        );
-
-      case TEXTS.privacySection:
-        return (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between pb-4 border-b dark:border-gray-700">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                {TEXTS.privacySection}
-              </h2>
-            </div>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label className="text-base dark:text-gray-200">
-                    {TEXTS.publicProfileLabel}
-                  </Label>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    {TEXTS.publicProfileDescription}
-                  </p>
-                </div>
-                <Switch
-                  checked={publicProfile}
-                  onCheckedChange={setPublicProfile}
-                />
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label className="text-base dark:text-gray-200">
-                    {TEXTS.showLocationLabel}
-                  </Label>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    {TEXTS.showLocationDescription}
-                  </p>
-                </div>
-                <Switch />
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label className="text-base dark:text-gray-200">
-                    {TEXTS.studyAvailabilityLabel}
-                  </Label>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    {TEXTS.studyAvailabilityDescription}
-                  </p>
-                </div>
-                <Switch />
               </div>
             </div>
           </div>
@@ -478,10 +637,26 @@ export default function EditProfile() {
           <div className="flex-1">
             <div className="bg-white dark:bg-zinc-950 p-6 rounded-lg shadow-sm dark:shadow-gray-800 space-y-6">
               {renderSection()}
-              <div className="pt-4 border-t dark:border-gray-700">
-                <Button className="w-auto" onClick={handleSubmit}>
-                  {TEXTS.saveChangesButton}
+              <div className="pt-4 border-t dark:border-gray-700 flex items-center justify-between">
+                <Button 
+                  className="w-auto"
+                  onClick={handleSubmit}
+                  disabled={isLoading || isSaving}
+                >
+                  {isSaving ? TEXTS.savingStatus : TEXTS.saveChangesButton}
                 </Button>
+                
+                {saveStatus === TEXTS.savedStatus && (
+                  <span className="text-green-600 dark:text-green-400 text-sm">
+                    {TEXTS.savedStatus}
+                  </span>
+                )}
+                
+                {saveStatus === TEXTS.errorStatus && (
+                  <span className="text-red-600 dark:text-red-400 text-sm">
+                    {TEXTS.errorStatus}
+                  </span>
+                )}
               </div>
             </div>
           </div>

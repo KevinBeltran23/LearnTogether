@@ -1,5 +1,5 @@
 @baseUrl = http://localhost:8000
-@authToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJpYXQiOjE3NDIzNTc3MzksImV4cCI6MTc0MjQ0NDEzOX0.EE8LD25ahnnp6pfvZCUz6VzNpekGM7FS9W-izw8mBBA
+@authToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJpYXQiOjE3NDI0NDUxMzMsImV4cCI6MTc0MjUzMTUzM30.X0E8oUWRH_kMfCiRUvd7-zroTi82KR4fdkB7s1NQrOs
 
 ### Health Check
 GET {{baseUrl}}/hello
