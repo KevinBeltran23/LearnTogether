@@ -3,10 +3,8 @@
 // this is fine for now
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { ProtectedComponent } from '@/context/authContext';
@@ -24,7 +22,7 @@ import {
   StudyFrequency,
   PrivacyLevel,
   ShowLocation,
-  StudyAvailabilityPublicity
+  StudyAvailabilityPublicity,
 } from '../../../../../server/src/types/users';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -63,12 +61,11 @@ const TEXTS = {
 };
 
 export default function CreateProfile() {
-  const router = useRouter();
   const { token } = useAuth();  
   const { updateProfile } = useProfile();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
-  const [email, setEmail] = useState(localStorage.getItem('userEmail') || '');
+  const [email] = useState(localStorage.getItem('userEmail') || '');
   
   const [formData, setFormData] = useState({
     username: '',
@@ -114,7 +111,13 @@ export default function CreateProfile() {
         return;
       }
       
-      // Transform form data to match API schema
+      // Parse subjects into array
+      const subjectsArray = formData.subjectsLookingToStudy
+        .split(',')
+        .map(s => s.trim())
+        .filter(s => s.length > 0);
+      
+      // Create the profile data object
       const profileData = {
         email: email, 
         username: formData.username,
@@ -127,12 +130,12 @@ export default function CreateProfile() {
         preferredStudyStyle: formData.preferredStudyStyle,
         preferredStudyEnvironment: formData.preferredStudyEnvironment,
         preferredGroupSize: formData.preferredGroupSize,
-        subjectsLookingToStudy: formData.subjectsLookingToStudy.split(',').map(s => s.trim()).filter(s => s.length > 0),
+        subjectsLookingToStudy: subjectsArray,
         preferredStudyTime: formData.preferredStudyTime,
         timeZone: formData.timeZone,
         studyFrequency: formData.studyFrequency,
         
-        // Create weekly availability with sample data
+        // Create nested objects
         weeklyAvailability: {
           monday: ["09:00-12:00", "14:00-17:00"],
           tuesday: ["09:00-12:00"],
@@ -143,14 +146,12 @@ export default function CreateProfile() {
           sunday: []
         },
         
-        // Set display settings
         displaySettings: {
           darkMode: false,
           fontSize: "medium",
           colorScheme: "default"
         },
         
-        // Set notification settings
         notificationSettings: {
           email: true,
           push: true,
@@ -159,19 +160,16 @@ export default function CreateProfile() {
           reminders: true
         },
         
-        // Set privacy based on form toggles
         privacySettings: {
           profileVisibility: formData.profileVisibility,
           showLocation: formData.showLocation,
           studyAvailabilityPublicity: formData.studyAvailabilityPublicity
         },
         
-        // Security settings
         securitySettings: {
           lastPasswordChange: new Date().toISOString()
         },
         
-        // Account settings
         accountSettings: {
           language: "en",
           emailVerified: true
@@ -179,7 +177,6 @@ export default function CreateProfile() {
       };
 
       console.log('Sending profile data:', profileData);
-      console.log('Using token:', token ? `${token.substring(0, 15)}...` : 'No token');
       
       // Send the request to create user profile
       const response = await sendPostRequest(
@@ -190,11 +187,14 @@ export default function CreateProfile() {
       
       if (response.ok) {
         const responseData = await response.json();
-        // Store profile in context and localStorage
-        updateProfile(responseData);
-        console.log('Profile created successfully:', responseData);
-        router.push('/feed');
-      } else {
+        if (responseData) {
+          localStorage.setItem('userProfile', JSON.stringify(responseData));
+          await updateProfile(responseData);
+          console.log('Profile created and context updated successfully');
+        }
+        
+        window.location.replace('/feed'); // trigger full reload for user population and profile context update
+        } else {
         // Handle error response
         let errorMessage = 'Failed to create profile';
         try {
