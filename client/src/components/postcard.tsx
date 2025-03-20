@@ -27,6 +27,7 @@ interface PostCardProps {
   frequency: string; 
   createdAt: string;
   createdBy?: string; 
+  creatorImage?: string; 
   specificLocation?: string; 
 }
 

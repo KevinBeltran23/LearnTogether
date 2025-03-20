@@ -21,8 +21,10 @@ export default function FeedPage() {
 
   const [filters, setFilters] = useState({
     sortBy: 'Most Recent',
-    type: '',
-    topic: '',
+    studyStyle: '',
+    environment: '',
+    subject: '',
+    groupSize: '',
   });
 
   // Fetch posts from the API
@@ -61,12 +63,20 @@ export default function FeedPage() {
       );
 
     // Map your filters to the actual post schema
-    const typeMatch = !filters.type || post.preferredStudyStyle.toLowerCase() === filters.type.toLowerCase();
-    const topicMatch = !filters.topic || post.subjectsLookingToStudy?.some(
-      subject => subject.toLowerCase() === filters.topic.toLowerCase()
+    const studyStyleMatch = !filters.studyStyle || 
+      post.preferredStudyStyle.toLowerCase() === filters.studyStyle.toLowerCase();
+    
+    const environmentMatch = !filters.environment || 
+      post.preferredStudyEnvironment.toLowerCase() === filters.environment.toLowerCase();
+    
+    const subjectMatch = !filters.subject || post.subjectsLookingToStudy?.some(
+      subject => subject.toLowerCase() === filters.subject.toLowerCase()
     );
+    
+    const groupSizeMatch = !filters.groupSize || 
+      post.preferredGroupSize.toLowerCase() === filters.groupSize.toLowerCase();
 
-    return searchMatch && typeMatch && topicMatch;
+    return searchMatch && studyStyleMatch && environmentMatch && subjectMatch && groupSizeMatch;
   });
 
   // Sort posts based on the selected sort option
@@ -74,7 +84,9 @@ export default function FeedPage() {
     if (filters.sortBy === 'Most Recent') {
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     }
-    // Add other sorting options as needed
+    if (filters.sortBy === 'Oldest') {
+      return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+    }
     return 0;
   });
   
@@ -110,7 +122,8 @@ export default function FeedPage() {
                         description={post.description || ''}
                         learningType={post.preferredStudyStyle}
                         location={post.preferredStudyEnvironment}
-                        school={post.institution || undefined}
+                        specificLocation={post.location}
+                        school={post.institution}
                         availability={post.preferredStudyTime}
                         subjects={post.subjectsLookingToStudy || []}
                         groupSize={post.preferredGroupSize}
@@ -121,7 +134,7 @@ export default function FeedPage() {
                   </div>
                 ) : (
                   <div className="text-center py-8 text-gray-500">
-                    No posts found. Create a new post to get started!
+                    No posts found matching your criteria. Try adjusting your filters.
                   </div>
                 )}
               </>
